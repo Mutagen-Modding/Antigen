@@ -16,10 +16,10 @@ class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
         Severity.Suggestion)
         .WithoutFormatting("Npc has ambush script but is not called 'Ambush' in the EditorId");
 
-    public static readonly TopicDefinition<Aggression?> AmbushAggressive = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<Aggression> AmbushAggressive = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush npc aggressive",
-            Severity.Error
-        ).WithFormatting<Aggression?> ("Ambush npc is {0} not Unaggressive");
+            Severity.Error)
+        .WithFormatting<Aggression>("Ambush npc is {0} not Unaggressive");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive];
 
@@ -45,7 +45,7 @@ class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
 
         if (!hasScript && !editorIdContainsAmbush) return;
 
-        var aggression = npc?.AIData.Aggression;
+        var aggression = npc.AIData.Aggression;
         if (aggression != Aggression.Unaggressive)
         {
             param.AddTopic(AmbushAggressive.Format(aggression));
