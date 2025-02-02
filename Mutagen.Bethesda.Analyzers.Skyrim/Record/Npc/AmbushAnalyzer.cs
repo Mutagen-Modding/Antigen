@@ -9,17 +9,17 @@ class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition AmbushMissingScript = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush requires script",
             Severity.Suggestion)
-        .WithoutFormatting("Npc is called ambush npc but does not have an AmbushScript");
+        .WithoutFormatting("Npc is called ambush npc but does not have an ambush script");
 
     public static readonly TopicDefinition AmbushNotInEditorId = MutagenTopicBuilder.DevelopmentTopic(
         "Ambush not in EditorId,",
         Severity.Suggestion)
         .WithoutFormatting("Npc has ambush script but is not called 'Ambush' in the EditorId");
 
-    public static readonly TopicDefinition AmbushAggressive = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<Aggression?> AmbushAggressive = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush npc aggressive",
             Severity.Warning
-        ).WithoutFormatting("Ambush npcs need to be unaggressive");
+        ).WithFormatting< Aggression?> ("Ambush npc is {0} not Unaggressive");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive];
 
@@ -29,8 +29,6 @@ class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 
         bool EditorIdContainsAmbush
             = npc.EditorID?.Contains("Ambush", StringComparison.OrdinalIgnoreCase) == true;
-
-        if (!EditorIdContainsAmbush) return; //temp
 
         bool hasScript
             = npc?.VirtualMachineAdapter?.Scripts
@@ -47,10 +45,10 @@ class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 
         if (!hasScript && !EditorIdContainsAmbush) return;
 
-
-        if (npc?.AIData.Aggression != Aggression.Unaggressive)
+        Aggression? aggression = npc?.AIData.Aggression;
+        if (aggression != Aggression.Unaggressive)
         {
-            param.AddTopic(AmbushAggressive.Format());
+            param.AddTopic(AmbushAggressive.Format(aggression));
         }
     }
 
