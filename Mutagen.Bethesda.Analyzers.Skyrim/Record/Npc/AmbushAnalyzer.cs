@@ -9,14 +9,19 @@ class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition AmbushMissingScript = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush requires script",
             Severity.Suggestion)
-        .WithoutFormatting("Npc is an ambush npc but does not have masterAmbushScript");
+        .WithoutFormatting("Npc is called ambush npc but does not have an AmbushScript");
+
+    public static readonly TopicDefinition AmbushNotInEditorId = MutagenTopicBuilder.DevelopmentTopic(
+        "Ambush not in EditorId,",
+        Severity.Suggestion)
+        .WithoutFormatting("Npc has ambush script but is not called 'Ambush' in the EditorId");
 
     public static readonly TopicDefinition AmbushAggressive = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush npc aggressive",
             Severity.Warning
         ).WithoutFormatting("Ambush npcs need to be unaggressive");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushAggressive];
+    public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive];
 
     void IContextualRecordAnalyzer<INpcGetter>.AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
@@ -25,17 +30,25 @@ class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         bool EditorIdContainsAmbush
             = npc.EditorID?.Contains("Ambush", StringComparison.OrdinalIgnoreCase) == true;
 
-        bool hasScript
-            = npc.HasScript("masterambushscript");
-        bool unaggressive
-            = npc.AIData.Aggression == Aggression.Unaggressive;
+        if (!EditorIdContainsAmbush) return; //temp
 
-        if(EditorIdContainsAmbush && !hasScript)
+        bool hasScript
+            = npc?.VirtualMachineAdapter?.Scripts
+                .Any(s => s.Name.Contains("Ambush", StringComparison.OrdinalIgnoreCase)) == true;
+
+        if (EditorIdContainsAmbush && !hasScript)
         {
             param.AddTopic(AmbushMissingScript.Format());
         }
+        if (!EditorIdContainsAmbush && hasScript)
+        {
+            param.AddTopic(AmbushNotInEditorId.Format());
+        }
 
-        if(!unaggressive && (EditorIdContainsAmbush || hasScript))
+        if (!hasScript && !EditorIdContainsAmbush) return;
+
+
+        if (npc?.AIData.Aggression != Aggression.Unaggressive)
         {
             param.AddTopic(AmbushAggressive.Format());
         }
