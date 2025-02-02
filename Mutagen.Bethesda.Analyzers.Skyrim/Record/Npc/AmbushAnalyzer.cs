@@ -4,7 +4,7 @@ using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
-class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
+class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
 {
     public static readonly TopicDefinition AmbushMissingScript = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush requires script",
@@ -18,41 +18,41 @@ class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 
     public static readonly TopicDefinition<Aggression?> AmbushAggressive = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush npc aggressive",
-            Severity.Warning
-        ).WithFormatting< Aggression?> ("Ambush npc is {0} not Unaggressive");
+            Severity.Error
+        ).WithFormatting<Aggression?> ("Ambush npc is {0} not Unaggressive");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive];
 
-    void IContextualRecordAnalyzer<INpcGetter>.AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
+    void IIsolatedRecordAnalyzer<INpcGetter>.AnalyzeRecord(IsolatedRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
 
-        bool EditorIdContainsAmbush
+        bool editorIdContainsAmbush
             = npc.EditorID?.Contains("Ambush", StringComparison.OrdinalIgnoreCase) == true;
 
         bool hasScript
-            = npc?.VirtualMachineAdapter?.Scripts
+            = npc.VirtualMachineAdapter?.Scripts
                 .Any(s => s.Name.Contains("Ambush", StringComparison.OrdinalIgnoreCase)) == true;
 
-        if (EditorIdContainsAmbush && !hasScript)
+        if (editorIdContainsAmbush && !hasScript)
         {
             param.AddTopic(AmbushMissingScript.Format());
         }
-        if (!EditorIdContainsAmbush && hasScript)
+        if (!editorIdContainsAmbush && hasScript)
         {
             param.AddTopic(AmbushNotInEditorId.Format());
         }
 
-        if (!hasScript && !EditorIdContainsAmbush) return;
+        if (!hasScript && !editorIdContainsAmbush) return;
 
-        Aggression? aggression = npc?.AIData.Aggression;
+        var aggression = npc?.AIData.Aggression;
         if (aggression != Aggression.Unaggressive)
         {
             param.AddTopic(AmbushAggressive.Format(aggression));
         }
     }
 
-    IEnumerable<Func<INpcGetter, object?>> IContextualRecordAnalyzer<INpcGetter>.FieldsOfInterest()
+    IEnumerable<Func<INpcGetter, object?>> IIsolatedRecordAnalyzer<INpcGetter>.FieldsOfInterest()
     {
         yield return x => x.EditorID;
         yield return x => x.AIData;
