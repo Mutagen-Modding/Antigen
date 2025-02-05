@@ -8,6 +8,7 @@ using Mutagen.Bethesda.Analyzers.Cli.Args;
 using Mutagen.Bethesda.Analyzers.Cli.Overrides;
 using Mutagen.Bethesda.Analyzers.Config;
 using Mutagen.Bethesda.Analyzers.Config.Run;
+using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
@@ -71,6 +72,19 @@ public class AnalyzerCommandModule(RunAnalyzersCommand command) : Module
             builder.RegisterInstance(new InjectedEnabledPluginListingsProvider(loadOrder)).As<IEnabledPluginListingsProvider>();
             builder.RegisterType<NullPluginListingsPathProvider>().As<IPluginListingsPathProvider>();
             builder.RegisterType<NullCreationClubListingsPathProvider>().As<ICreationClubListingsPathProvider>();
+        }
+
+        if (command.BlacklistedMods is not null)
+        {
+            var blacklistedMods = command.BlacklistedMods?.Split(',')
+                .Select(x => x.Trim())
+                .Select(x => ModKey.FromFileName(x)) ?? [];
+
+            builder.RegisterInstance(new InjectedBlacklistedModsProvider(blacklistedMods)).As<IBlacklistedModsProvider>();
+        }
+        else
+        {
+            builder.RegisterInstance(new InjectedBlacklistedModsProvider([])).As<IBlacklistedModsProvider>();
         }
     }
 }

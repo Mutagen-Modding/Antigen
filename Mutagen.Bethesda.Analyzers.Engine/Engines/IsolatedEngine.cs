@@ -1,4 +1,6 @@
-﻿using Mutagen.Bethesda.Analyzers.Drivers;
+﻿using Mutagen.Bethesda.Analyzers.Config.Run;
+using Mutagen.Bethesda.Analyzers.Drivers;
+using Mutagen.Bethesda.Analyzers.SDK;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Records.DI;
@@ -13,6 +15,7 @@ public interface IIsolatedEngine : IEngine
 
 public class IsolatedEngine : IIsolatedEngine
 {
+    private readonly IBlacklistedModsProvider _blacklistedModsProvider;
     private readonly IWorkDropoff _workDropoff;
     public IModImporter ModImporter { get; }
     public IDriverProvider<IIsolatedDriver> IsolatedDrivers { get; }
@@ -22,10 +25,12 @@ public class IsolatedEngine : IIsolatedEngine
     public IsolatedEngine(
         IModImporter modImporter,
         IDriverProvider<IIsolatedDriver> isolatedDrivers,
+        IBlacklistedModsProvider blacklistedModsProvider,
         IWorkDropoff workDropoff)
     {
         ModImporter = modImporter;
         IsolatedDrivers = isolatedDrivers;
+        _blacklistedModsProvider = blacklistedModsProvider;
         _workDropoff = workDropoff;
     }
 
@@ -35,6 +40,8 @@ public class IsolatedEngine : IIsolatedEngine
         CancellationToken cancel)
     {
         if (cancel.IsCancellationRequested) return;
+        if (_blacklistedModsProvider.IsBlacklisted(modPath.ModKey)) return;
+
         var mod = ModImporter.Import(modPath);
 
         var driverParams = new IsolatedDriverParams(

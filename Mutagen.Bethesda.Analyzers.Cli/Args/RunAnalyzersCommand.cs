@@ -28,6 +28,9 @@ public class RunAnalyzersCommand : IMinimumSeverityConfiguration
     [Option("LoadOrder", HelpText = "Optional list of mod file names to set a custom load order, separated by commas")]
     public string? LoadOrder { get; set; } = null;
 
+    [Option("BlacklistedMods", HelpText = "Optional list of mod file names excluded from analyzing, separated by commas")]
+    public string? BlacklistedMods { get; set; } = null;
+
     [Option('t', "NumThreads", HelpText = "Number of threads to use")]
     public int? NumThreads { get; set; }
 

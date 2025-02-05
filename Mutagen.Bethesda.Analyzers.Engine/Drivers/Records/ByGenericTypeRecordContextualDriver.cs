@@ -1,4 +1,6 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+﻿using Mutagen.Bethesda.Analyzers.Config.Run;
+using Mutagen.Bethesda.Analyzers.SDK;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog.WorkEngine;
 
@@ -9,6 +11,7 @@ public class ByGenericTypeRecordContextualDriver<TMajor> : IContextualDriver
 {
     private readonly IWorkDropoff _dropoff;
     private readonly IContextualRecordAnalyzer<TMajor>[] _contextualRecordAnalyzers;
+    private readonly IBlacklistedModsProvider _blacklistedModsProvider;
 
     public bool Applicable => _contextualRecordAnalyzers.Length > 0;
 
@@ -16,9 +19,11 @@ public class ByGenericTypeRecordContextualDriver<TMajor> : IContextualDriver
 
     public ByGenericTypeRecordContextualDriver(
         IAnalyzerProvider<IContextualRecordAnalyzer<TMajor>> contextualRecordAnalyzerProvider,
+        IBlacklistedModsProvider blacklistedModsProvider,
         IWorkDropoff dropoff)
     {
         _contextualRecordAnalyzers = contextualRecordAnalyzerProvider.GetAnalyzers().ToArray();
+        _blacklistedModsProvider = blacklistedModsProvider;
         _dropoff = dropoff;
     }
 
@@ -30,6 +35,7 @@ public class ByGenericTypeRecordContextualDriver<TMajor> : IContextualDriver
         {
             if (driverParams.CancellationToken.IsCancellationRequested) return;
             if (listing.Mod is null) continue;
+            if (_blacklistedModsProvider.IsBlacklisted(listing.ModKey)) continue;
 
             await Task.WhenAll(listing.Mod.EnumerateMajorRecords<TMajor>().SelectMany(rec =>
             {
