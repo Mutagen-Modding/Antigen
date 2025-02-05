@@ -1,5 +1,6 @@
 ﻿using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
+
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
 public static class PlacedNpcExtensions

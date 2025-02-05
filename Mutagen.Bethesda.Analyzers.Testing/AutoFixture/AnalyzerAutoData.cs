@@ -5,6 +5,7 @@ using Mutagen.Bethesda.Analyzers.Testing.AutoFixture;
 using Mutagen.Bethesda.Testing.AutoData;
 using Noggog.Testing.AutoFixture;
 using Xunit;
+
 namespace Mutagen.Bethesda.Analyzers.Tests;
 
 public class AnalyzerAutoData : AutoDataAttribute

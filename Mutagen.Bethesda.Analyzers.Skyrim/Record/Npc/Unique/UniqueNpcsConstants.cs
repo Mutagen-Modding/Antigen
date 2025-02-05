@@ -1,4 +1,5 @@
 ﻿using Mutagen.Bethesda.Skyrim;
+
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
 public static class UniqueNpcsConstants
