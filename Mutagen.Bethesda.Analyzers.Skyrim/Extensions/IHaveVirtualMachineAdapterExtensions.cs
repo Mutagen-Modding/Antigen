@@ -5,7 +5,7 @@ public static class IHaveVirtualMachineAdapterExtensions
 {
     public static IScriptEntryGetter? GetScript(this IHaveVirtualMachineAdapterGetter npc, string name)
     {
-        return npc.VirtualMachineAdapter?.Scripts.FirstOrDefault(script => script.Name == name);
+        return npc.VirtualMachineAdapter?.Scripts.FirstOrDefault(script => string.Equals(script.Name, name, StringComparison.OrdinalIgnoreCase));
     }
 
     public static bool HasScript(this IHaveVirtualMachineAdapterGetter npc, string name)
