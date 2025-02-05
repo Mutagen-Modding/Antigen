@@ -5,7 +5,6 @@ using Mutagen.Bethesda.Analyzers.Config;
 using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.FormKeys.SkyrimSE;
 using Noggog.Testing.IO;
-using NSubstitute;
 using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Tests.Config;

@@ -1,5 +1,4 @@
 ﻿using Mutagen.Bethesda.Analyzers.Config.Run;
-using Mutagen.Bethesda.Analyzers.SDK;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog.WorkEngine;

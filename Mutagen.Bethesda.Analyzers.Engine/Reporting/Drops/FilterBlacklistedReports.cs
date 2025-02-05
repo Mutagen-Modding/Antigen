@@ -1,5 +1,4 @@
 ﻿using Mutagen.Bethesda.Analyzers.Config.Run;
-using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;

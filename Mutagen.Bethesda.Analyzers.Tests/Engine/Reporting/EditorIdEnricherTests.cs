@@ -1,4 +1,3 @@
-using AutoFixture.Xunit2;
 using FluentAssertions;
 using Mutagen.Bethesda.Analyzers.Reporting.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;

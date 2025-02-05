@@ -1,6 +1,5 @@
 using System.Buffers;
 using Mutagen.Bethesda.Analyzers.Config.Run;
-using Mutagen.Bethesda.Analyzers.SDK;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;

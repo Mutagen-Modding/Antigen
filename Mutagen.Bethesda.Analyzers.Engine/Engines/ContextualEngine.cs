@@ -1,6 +1,5 @@
 ﻿using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.Drivers;
-using Mutagen.Bethesda.Analyzers.SDK;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Environments.DI;
 using Noggog.WorkEngine;

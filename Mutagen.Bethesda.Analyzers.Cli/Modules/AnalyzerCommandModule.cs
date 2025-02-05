@@ -8,7 +8,6 @@ using Mutagen.Bethesda.Analyzers.Cli.Args;
 using Mutagen.Bethesda.Analyzers.Cli.Overrides;
 using Mutagen.Bethesda.Analyzers.Config;
 using Mutagen.Bethesda.Analyzers.Config.Run;
-using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
