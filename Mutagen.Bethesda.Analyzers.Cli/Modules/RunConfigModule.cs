@@ -35,5 +35,7 @@ public class RunConfigModule(IRunConfigLookup runConfig) : Module
             builder.RegisterType<CsvReportHandler>().AsImplementedInterfaces().SingleInstance();
             builder.RegisterInstance(new CsvInputs(runConfig.OutputFilePath)).AsSelf().AsImplementedInterfaces();
         }
+
+        builder.RegisterInstance(new InjectedBlacklistedModsProvider(runConfig.BlacklistMods ?? [])).As<IBlacklistedModsProvider>();
     }
 }
