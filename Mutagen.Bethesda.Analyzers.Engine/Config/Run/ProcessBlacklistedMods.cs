@@ -17,7 +17,7 @@ public class ProcessBlacklistedMods(ILogger<ProcessBlacklistedMods> logger) : IC
         try
         {
             var modKeys = mods.Select(fileName => ModKey.FromFileName(fileName.Trim())).ToList();
-            config.OverrideLoadOrderSetToMods(modKeys);
+            config.OverrideBlacklistMods(modKeys);
         }
         catch (ArgumentException e)
         {
