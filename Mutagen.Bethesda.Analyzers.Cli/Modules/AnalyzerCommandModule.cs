@@ -81,9 +81,5 @@ public class AnalyzerCommandModule(RunAnalyzersCommand command) : Module
 
             builder.RegisterInstance(new InjectedBlacklistedModsProvider(blacklistedMods)).As<IBlacklistedModsProvider>();
         }
-        else
-        {
-            builder.RegisterInstance(new InjectedBlacklistedModsProvider([])).As<IBlacklistedModsProvider>();
-        }
     }
 }
