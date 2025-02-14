@@ -8,7 +8,7 @@ public class ProcessBlacklistedMods(ILogger<ProcessBlacklistedMods> logger) : IC
     public bool Process(IRunConfig config, IReadOnlyList<string> instructionParts, string value)
     {
         // environment.blacklisted_mods = <mod1>,<mod2>,...
-        if (instructionParts.Count != 3) return false;
+        if (instructionParts.Count != 2) return false;
 
         if (instructionParts[0] is not "environment") return false;
         if (instructionParts[1] is not "blacklisted_mods") return false;
