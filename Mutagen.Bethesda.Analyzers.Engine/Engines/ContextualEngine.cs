@@ -1,4 +1,5 @@
-﻿using Mutagen.Bethesda.Analyzers.Drivers;
+﻿using Mutagen.Bethesda.Analyzers.Config.Run;
+using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Environments.DI;
 using Noggog.WorkEngine;
@@ -12,6 +13,7 @@ public interface IContextualEngine : IEngine
 
 public class ContextualEngine : IContextualEngine
 {
+    private readonly IBlacklistedModsProvider _blacklistedModsProvider;
     private readonly IWorkDropoff _workDropoff;
     public IReportDropbox ReportDropbox { get; }
     public IGameEnvironmentProvider EnvGetter { get; }
@@ -26,8 +28,10 @@ public class ContextualEngine : IContextualEngine
         IDriverProvider<IContextualDriver> contextualDrivers,
         IDriverProvider<IIsolatedDriver> isolatedDrivers,
         IReportDropbox reportDropbox,
+        IBlacklistedModsProvider blacklistedModsProvider,
         IWorkDropoff workDropoff)
     {
+        _blacklistedModsProvider = blacklistedModsProvider;
         _workDropoff = workDropoff;
         ReportDropbox = reportDropbox;
         EnvGetter = envGetter;
@@ -47,8 +51,10 @@ public class ContextualEngine : IContextualEngine
         {
             foreach (var listing in env.LoadOrder.ListedOrder)
             {
-                if (listing.Mod is null) continue;
                 if (cancel.IsCancellationRequested) return;
+
+                if (listing.Mod is null) continue;
+                if (_blacklistedModsProvider.IsBlacklisted(listing.ModKey)) continue;
 
                 var modPath = Path.Combine(env.DataFolderPath.Path, listing.ModKey.FileName);
 

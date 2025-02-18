@@ -1,4 +1,5 @@
 using System.Buffers;
+using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
@@ -18,6 +19,7 @@ public class RecordFrameDriver : IIsolatedDriver, IContextualDriver
     private readonly GameConstants _constants;
     private readonly IGameReleaseContext _gameReleaseContext;
     private readonly IDataDirectoryProvider _dataDataDirectoryProvider;
+    private readonly IBlacklistedModsProvider _blacklistedModsProvider;
 
     private class Drivers
     {
@@ -39,10 +41,12 @@ public class RecordFrameDriver : IIsolatedDriver, IContextualDriver
         IDataDirectoryProvider dataDataDirectoryProvider,
         IIsolatedRecordFrameAnalyzerDriver[] isolatedDrivers,
         IContextualRecordFrameAnalyzerDriver[] contextualDrivers,
+        IBlacklistedModsProvider blacklistedModsProvider,
         IWorkDropoff dropoff)
     {
         _gameReleaseContext = gameReleaseContext;
         _dataDataDirectoryProvider = dataDataDirectoryProvider;
+        _blacklistedModsProvider = blacklistedModsProvider;
         _dropoff = dropoff;
         _constants = GameConstants.Get(_gameReleaseContext.Release);
         foreach (var drivers in isolatedDrivers
@@ -68,6 +72,8 @@ public class RecordFrameDriver : IIsolatedDriver, IContextualDriver
             .Select(async mod =>
             {
                 if (driverParams.CancellationToken.IsCancellationRequested) return;
+                if (_blacklistedModsProvider.IsBlacklisted(mod.ModKey)) return;
+
                 var modPath = Path.Combine(_dataDataDirectoryProvider.Path, mod.ModKey.FileName);
 
                 var parsingMeta = ParsingMeta.Factory(new BinaryReadParameters(), _gameReleaseContext.Release, modPath);

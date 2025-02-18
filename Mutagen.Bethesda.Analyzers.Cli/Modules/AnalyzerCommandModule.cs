@@ -72,5 +72,14 @@ public class AnalyzerCommandModule(RunAnalyzersCommand command) : Module
             builder.RegisterType<NullPluginListingsPathProvider>().As<IPluginListingsPathProvider>();
             builder.RegisterType<NullCreationClubListingsPathProvider>().As<ICreationClubListingsPathProvider>();
         }
+
+        if (command.BlacklistedMods is not null)
+        {
+            var blacklistedMods = command.BlacklistedMods?.Split(',')
+                .Select(x => x.Trim())
+                .Select(x => ModKey.FromFileName(x)) ?? [];
+
+            builder.RegisterInstance(new InjectedBlacklistedModsProvider(blacklistedMods)).As<IBlacklistedModsProvider>();
+        }
     }
 }

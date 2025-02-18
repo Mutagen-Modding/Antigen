@@ -3,7 +3,6 @@ using Autofac;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Mutagen.Bethesda.Analyzers.Cli.Modules;
-using Mutagen.Bethesda.Analyzers.Config;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;

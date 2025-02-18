@@ -1,6 +1,7 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
+
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior.Settlement;
 
 public class NoBossLocRefTypeAnalyzer : IContextualRecordAnalyzer<ICellGetter>
