@@ -13,7 +13,7 @@ class CircularLocationAnalyzer : IContextualRecordAnalyzer<ILocationGetter>
             175,
             "Circular Location",
             Severity.CTD)
-        .WithoutFormatting("Location is its own parent location.");
+        .WithoutFormatting("Location is its own parent location");
 
     IEnumerable<TopicDefinition> IAnalyzer.Topics { get; } = [CircularLocation];
 
