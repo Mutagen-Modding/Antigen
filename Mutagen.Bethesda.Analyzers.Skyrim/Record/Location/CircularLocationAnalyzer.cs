@@ -1,43 +1,50 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Location;
 
 class CircularLocationAnalyzer : IContextualRecordAnalyzer<ILocationGetter>
 {
-    public static readonly TopicDefinition CircularLocation = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition CircularLocation = MutagenTopicBuilder.FromDiscussion(
+            175,
             "Circular Location",
             Severity.CTD)
-        .WithoutFormatting("Location is its own parent location - this leads to CTDs and infinite loading screens");
+        .WithoutFormatting("Location is its own parent location.");
 
     IEnumerable<TopicDefinition> IAnalyzer.Topics { get; } = [CircularLocation];
 
-    private static bool FindCicularLocation(ILocationGetter sourceLocation, ILocationGetter? currentLocation, ILinkCache linkCache)
+    private static IEnumerable<ILocationGetter> GetParentLocations(ILocationGetter currentLocation, ILinkCache linkCache)
     {
-        if (currentLocation == null) return false;
-
-        if (currentLocation.FormKey == sourceLocation.FormKey) return true;
-
-        if (currentLocation.ParentLocation.IsNull) return false;
-
-        if (!linkCache.TryResolve<ILocationGetter>(currentLocation.ParentLocation.FormKey, out var parentLocation)) return false;
-
-        return FindCicularLocation(sourceLocation, parentLocation, linkCache);
+        while (currentLocation is { ParentLocation.IsNull: false })
+        {
+            if (linkCache.TryResolve<ILocationGetter>(currentLocation.ParentLocation.FormKey, out var parentLocation))
+            {
+                yield return parentLocation;
+                currentLocation = parentLocation;
+            }
+            else
+            {
+                yield break;
+            }
+        }
     }
 
     void IContextualRecordAnalyzer<ILocationGetter>.AnalyzeRecord(ContextualRecordAnalyzerParams<ILocationGetter> param)
     {
-        var location = param.Record;
+        var link = param.Record.ToLink();
+        HashSet<IFormLinkGetter> sequence = [link];
+        bool circular = GetParentLocations(param.Record, param.LinkCache)
+            .Any(parentLocation => !sequence.Add(parentLocation.ToLink()));
 
-        if (location.ParentLocation.IsNull) return;
-
-        if (!param.LinkCache.TryResolve<ILocationGetter>(location.ParentLocation.FormKey, out var parentLocation)) return;
-
-        if (FindCicularLocation(location, parentLocation, param.LinkCache))
+        if (circular)
         {
-            param.AddTopic(CircularLocation.Format());
+            var parentsList = sequence.Except([link]).ToList();
+            parentsList.Add(link);
+            param.AddTopic(CircularLocation.Format(), ("Parent Locations", parentsList));
         }
     }
      
