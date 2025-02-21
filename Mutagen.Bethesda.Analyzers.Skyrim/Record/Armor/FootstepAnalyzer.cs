@@ -72,7 +72,14 @@ public class FootstepAnalyzer : IContextualRecordAnalyzer<IArmorGetter>
                 correctFootstepSound = FormKeys.SkyrimSE.Skyrim.FootstepSet.FSTArmorHeavyFootstepSet;
                 break;
             case ArmorType.Clothing:
-                correctFootstepSound = FormKeys.SkyrimSE.Skyrim.FootstepSet.DefaultFootstepSet;
+                if (armor.EditorID is not null && armor.EditorID.Contains("Naked"))
+                {
+                    correctFootstepSound = FormKeys.SkyrimSE.Skyrim.FootstepSet.FSTBarefootFootstepSet;
+                }
+                else
+                {
+                    correctFootstepSound = FormKeys.SkyrimSE.Skyrim.FootstepSet.DefaultFootstepSet;
+                }
                 break;
             default:
                 param.AddTopic(
