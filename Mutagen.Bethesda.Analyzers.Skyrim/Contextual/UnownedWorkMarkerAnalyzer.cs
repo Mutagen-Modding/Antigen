@@ -32,7 +32,7 @@ public class UnownedWorkMarkerAnalyzer : IContextualAnalyzer
             {
                 if (WorkMarkers.Contains(placedObject.Base.FormKey))
                 {
-                    var context = param.LinkCache.ResolveSimpleContext(placedObject);
+                    var context = param.LinkCache.ResolveSimpleContext<IPlacedObjectGetter>(placedObject.FormKey);
                     param.AddTopic(
                         context.ModKey,
                         placedObject,
