@@ -54,7 +54,7 @@ public class FootstepAnalyzer : IContextualRecordAnalyzer<IArmorGetter>
             .ToDictionary(x => x.Key, x => x.Select(x => x.ArmorAddon).ToList());
 
         foreach (var (race, addons) in armorAddonRaces) {
-            if (addons.Count == 0) continue;
+            if (addons.Count <= 1) continue;
 
             param.AddTopic(
                 ArmorDuplicateFootstep.Format(race),
