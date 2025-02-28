@@ -11,7 +11,7 @@ public class FootstepAnalyzer : IContextualRecordAnalyzer<IArmorGetter>
     public static readonly TopicDefinition<ArmorType> UnknownArmorType = MutagenTopicBuilder.DevelopmentTopic(
             "Unknown Armor Type",
             Severity.Suggestion)
-        .WithFormatting<ArmorType>("Armor type is set to unkown value {0}");
+        .WithFormatting<ArmorType>("Armor type is set to unknown value {0}");
 
     public static readonly TopicDefinition<ArmorType, IFormLinkGetter<IFootstepSetGetter>> ArmorMatchingFootstepArmorType = MutagenTopicBuilder.DevelopmentTopic(
             "Footsteps on armor don't match their equipped armor type",
