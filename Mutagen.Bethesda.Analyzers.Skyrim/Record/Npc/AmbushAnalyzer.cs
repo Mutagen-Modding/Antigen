@@ -4,7 +4,7 @@ using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
-class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
+public class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
 {
     public static readonly TopicDefinition AmbushMissingScript = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush requires script",
@@ -19,7 +19,7 @@ class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition<Aggression> AmbushAggressive = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush npc aggressive",
             Severity.Error)
-        .WithFormatting<Aggression>("Ambush npc is {0} not Unaggressive");
+        .WithFormatting<Aggression>("NPC with ambush script is {0} not Unaggressive");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive];
 
@@ -43,7 +43,7 @@ class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
             param.AddTopic(AmbushNotInEditorId.Format());
         }
 
-        if (!hasScript && !editorIdContainsAmbush) return;
+        if (!hasScript) return;
 
         var aggression = npc.AIData.Aggression;
         if (aggression != Aggression.Unaggressive)
