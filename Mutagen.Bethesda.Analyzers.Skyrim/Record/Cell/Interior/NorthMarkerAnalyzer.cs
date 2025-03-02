@@ -11,10 +11,10 @@ public class NorthMarkerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
             Severity.Suggestion)
         .WithoutFormatting("Missing north marker");
 
-    public static readonly TopicDefinition<IEnumerable<IPlacedObjectGetter>> MoreThanOneNorthMarker = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<int> MoreThanOneNorthMarker = MutagenTopicBuilder.DevelopmentTopic(
             "More Than One North Marker",
             Severity.Suggestion)
-        .WithFormatting<IEnumerable<IPlacedObjectGetter>>("Cell has multiple north markers {0} when only one is permitted");
+        .WithFormatting<int>("Cell has {0} north markers when only one is permitted");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoNorthMarker, MoreThanOneNorthMarker];
 
@@ -42,7 +42,8 @@ public class NorthMarkerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
             param.AddTopic(
                 context.ModKey,
                 cell,
-                MoreThanOneNorthMarker.Format(northMarkers));
+                MoreThanOneNorthMarker.Format(northMarkers.Length),
+                ("NorthMarkers", northMarkers));
         }
     }
 
