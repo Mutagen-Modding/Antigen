@@ -22,7 +22,8 @@ public class NoBossLocRefTypeAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 
         foreach (var placedNpc in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedNpcGetter>())
         {
-            // Skip NPCs that are initially disabled
+            // Skip NPCs that are deleted or initially disabled
+            if (placedNpc.IsDeleted) continue;
             if (placedNpc.MajorFlags.HasFlag(PlacedNpc.MajorFlag.InitiallyDisabled)) continue;
 
             // Skip NPCs that are already marked as bosses

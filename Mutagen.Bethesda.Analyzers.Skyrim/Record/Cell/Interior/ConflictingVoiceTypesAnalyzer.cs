@@ -22,6 +22,7 @@ public class ConflictingVoiceTypesAnalyzer : IContextualRecordAnalyzer<ICellGett
         var npcVoiceTypes = new Dictionary<IFormLinkGetter<INpcGetter>, IFormLinkGetter<IVoiceTypeGetter>>();
         foreach (var placedNpc in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedNpcGetter>())
         {
+            if (placedNpc.IsDeleted) continue;
             if (!param.LinkCache.TryResolve<INpcGetter>(placedNpc.Base.FormKey, out var npc)) continue;
             if (!npc.IsUnique()) continue;
             if (npc.Voice.IsNull) continue;

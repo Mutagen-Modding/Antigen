@@ -40,6 +40,7 @@ public class DoorAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 
         foreach (var placedObject in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedObjectGetter>())
         {
+            if (placedObject.IsDeleted) continue;
             if (!placedObject.LeadsToExterior(param.LinkCache, out var exteriorDoor)) continue;
 
             if (placedObject.Lock is null)

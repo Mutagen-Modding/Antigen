@@ -24,6 +24,8 @@ public class UnownedBedAnalyzer : IContextualAnalyzer
 
             foreach (var placedObject in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedObjectGetter>())
             {
+                if (placedObject.IsDeleted) continue;
+
                 // Owned beds are not a problem
                 if (!placedObject.Owner.IsNull) continue;
 

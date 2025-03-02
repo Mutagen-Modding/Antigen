@@ -27,6 +27,8 @@ public class NoBedLocRefTypeAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 
         foreach (var placedObject in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedObjectGetter>())
         {
+            if (placedObject.IsDeleted) continue;
+
             var isBed = placedObject.IsBed(param.LinkCache);
             var hasLocRefType = placedObject.HasLocationRefType(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.HouseBedRefType);
 

@@ -22,6 +22,8 @@ public class NpcNotInCellFactionAnalyzer : IContextualAnalyzer
 
             foreach (var placedNpc in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedNpcGetter>())
             {
+                if (placedNpc.IsDeleted) continue;
+
                 var npc = placedNpc.Base.TryResolve(param.LinkCache);
                 if (npc is null || !npc.IsUnique()) continue;
 

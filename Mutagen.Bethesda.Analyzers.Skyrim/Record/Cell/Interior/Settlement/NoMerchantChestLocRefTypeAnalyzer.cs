@@ -32,6 +32,7 @@ public class NoMerchantChestLocRefTypeAnalyzer : IContextualRecordAnalyzer<ICell
 
         foreach (var placedObject in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedObjectGetter>())
         {
+            if (placedObject.IsDeleted) continue;
             // todo: replace with reference cache
             var isMerchantChest = merchantChests.Contains(placedObject.FormKey);
             var hasLocRefType = placedObject.HasLocationRefType(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.MerchantContainerRefType);
