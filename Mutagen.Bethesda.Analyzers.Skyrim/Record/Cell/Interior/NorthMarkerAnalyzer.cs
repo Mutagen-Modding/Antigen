@@ -25,6 +25,7 @@ public class NorthMarkerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 
         var northMarkers = cell.GetAllPlaced(param.LinkCache)
             .OfType<IPlacedObjectGetter>()
+            .Where(placed => placed.IsDeleted == false)
             .Where(placed => placed.Base.FormKey == FormKeys.SkyrimSE.Skyrim.Static.NorthMarker.FormKey)
             .ToArray();
 
