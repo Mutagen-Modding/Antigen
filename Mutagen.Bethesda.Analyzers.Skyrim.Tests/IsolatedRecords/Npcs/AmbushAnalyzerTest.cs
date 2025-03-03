@@ -1,17 +1,17 @@
 
-using Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
+using Mutagen.Bethesda.Analyzers.Skyrim.Record.Npcs;
 using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Testing.AutoData;
 using Xunit;
 
-namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests.IsolatedRecords.Npc;
+namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests.IsolatedRecords.Npcs;
 
 public class AmbushAnalyzerTest
 {
     [Theory, MutagenModAutoData]
     public void TestAmbushUnaggressive(
-        IsolatedRecordTestFixture<AmbushAnalyzer, INpc, INpcGetter> fixture)
+        IsolatedRecordTestFixture<AmbushAnalyzer, Npc, INpcGetter> fixture)
     {
         fixture.Run(
             prepForError: rec =>
@@ -45,7 +45,7 @@ public class AmbushAnalyzerTest
 
     [Theory, MutagenModAutoData]
     public void TestAmbushMissingScript(
-    IsolatedRecordTestFixture<AmbushAnalyzer, INpc, INpcGetter> fixture)
+    IsolatedRecordTestFixture<AmbushAnalyzer, Npc, INpcGetter> fixture)
     {
         fixture.Run(
             prepForError: rec =>
@@ -74,12 +74,12 @@ public class AmbushAnalyzerTest
 
     [Theory, MutagenModAutoData]
     public void TestAmbushNotInEditorId(
-    IsolatedRecordTestFixture<AmbushAnalyzer, INpc, INpcGetter> fixture)
+    IsolatedRecordTestFixture<AmbushAnalyzer, Npc, INpcGetter> fixture)
     {
         fixture.Run(
             prepForError: rec =>
             {
-                rec.EditorID = "TestActorAmbush";
+                rec.EditorID = "TestActor";
                 rec.VirtualMachineAdapter = new VirtualMachineAdapter();
                 rec.VirtualMachineAdapter.Scripts.Add(new ScriptEntry()
                 {

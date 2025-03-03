@@ -2,7 +2,7 @@ using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
 
-namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
+namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npcs;
 
 public class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
 {
@@ -16,7 +16,8 @@ public class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
         Severity.Suggestion)
         .WithoutFormatting("Npc has ambush script but is not called 'Ambush' in the EditorId");
 
-    public static readonly TopicDefinition<Aggression> AmbushAggressive = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<Aggression> AmbushAggressive = MutagenTopicBuilder.FromDiscussion(
+            176,
             "Ambush npc aggressive",
             Severity.Error)
         .WithFormatting<Aggression>("NPC with ambush script is {0} not Unaggressive");
