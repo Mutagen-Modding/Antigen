@@ -386,3 +386,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 .idea/
 *.sln.iml
+
+# User specific launch settings when starting from the IDE
+/Mutagen.Bethesda.Analyzers.Cli/Properties/launchSettings.json
