@@ -1,5 +1,5 @@
 
-using Mutagen.Bethesda.Analyzers.Skyrim.Record.Npcs;
+using Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Testing.AutoData;
