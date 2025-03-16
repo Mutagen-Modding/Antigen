@@ -46,13 +46,13 @@ public class AliasIDAnalyzer : IIsolatedRecordAnalyzer<IQuestGetter>
         }
 
         Dictionary<uint, IQuestAliasGetter> aliases = [];
-        foreach (IQuestAliasGetter alias in quest.Aliases)
+        foreach (var alias in quest.Aliases)
         {
             _ = aliases.TryAdd(alias.ID, alias);
         }
 
         HashSet<uint> ids = [];
-        foreach(IQuestAliasGetter alias in quest.Aliases)
+        foreach(var alias in quest.Aliases)
         {
             if (alias.Location != null)
             {
@@ -110,8 +110,8 @@ public class AliasIDAnalyzer : IIsolatedRecordAnalyzer<IQuestGetter>
 
     private static string GetReferencedAliasName(uint idToCheck, Dictionary<uint, IQuestAliasGetter> aliases)
     {
-        IQuestAliasGetter? referencedAlias;
-        if (aliases.TryGetValue(idToCheck, out referencedAlias) && (referencedAlias.Name != null))
+        if (aliases.TryGetValue(idToCheck, out var referencedAlias)
+            && referencedAlias.Name != null)
         {
             return referencedAlias.Name;
         }
