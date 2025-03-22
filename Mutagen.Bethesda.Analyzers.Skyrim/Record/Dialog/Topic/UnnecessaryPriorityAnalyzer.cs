@@ -18,6 +18,7 @@ public class UnnecessaryPriorityAnalyzer : IContextualRecordAnalyzer<IDialogTopi
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogTopicGetter> param)
     {
         var dialogTopic = param.Record;
+        if (dialogTopic.IsDeleted) return;
 
         // Only check custom topics
         if (dialogTopic.Subtype != DialogTopic.SubtypeEnum.Custom) return;
