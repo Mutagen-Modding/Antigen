@@ -7,15 +7,15 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Object;
 
 public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 {
-    public static readonly TopicDefinition<string, float> ScaleTooSmall = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, IPlaceableObjectGetter, float> ScaleTooSmall = MutagenTopicBuilder.DevelopmentTopic(
             "Scale Too Small",
             Severity.Warning)
-        .WithFormatting<string, float>("A {0} placement with scale {1} is too small");
+        .WithFormatting<string, IPlaceableObjectGetter, float>("A {0} placement of {1} with scale {2} is too small");
 
-    public static readonly TopicDefinition<string, float> ScaleTooLarge = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, IPlaceableObjectGetter, float> ScaleTooLarge = MutagenTopicBuilder.DevelopmentTopic(
             "Scale Too Large",
             Severity.Warning)
-        .WithFormatting<string, float>("A {0} placement with scale {1} is too large");
+        .WithFormatting<string, IPlaceableObjectGetter, float>("A {0} placement of {1} with scale {2} is too large");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [ScaleTooSmall, ScaleTooLarge];
 
@@ -111,7 +111,7 @@ public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
         }
 
         param.AddTopic(
-            (scale < 1 ? ScaleTooSmall : ScaleTooLarge).Format(baseObject.Registration.Name, scale));
+            (scale < 1 ? ScaleTooSmall : ScaleTooLarge).Format(baseObject.Registration.Name, baseObject, scale));
     }
 
     public IEnumerable<Func<IPlacedObjectGetter, object?>> FieldsOfInterest()
