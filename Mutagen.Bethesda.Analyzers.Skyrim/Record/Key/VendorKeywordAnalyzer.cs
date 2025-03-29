@@ -16,6 +16,7 @@ public class VendorKeywordAnalyzer : IIsolatedRecordAnalyzer<IKeyGetter>
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IKeyGetter> param)
     {
         var key = param.Record;
+        if (key.IsDeleted) return;
 
         if (key.Keywords is null || !key.Keywords.Contains(FormKeys.SkyrimSE.Skyrim.Keyword.VendorItemKey))
         {
