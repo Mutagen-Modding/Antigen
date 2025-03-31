@@ -11,6 +11,16 @@ public class GhostKeywordAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Suggestion)
         .WithoutFormatting("Npc has ghost script but no ghost keyword");
 
+    public static readonly TopicDefinition GhostScriptMissingDoesntBleedFlag = MutagenTopicBuilder.DevelopmentTopic(
+            "Ghost With Script Missing DoesNotBleed Flag",
+            Severity.Suggestion)
+        .WithoutFormatting("Npc has ghost script but DoesNotBleed flag");
+
+    public static readonly TopicDefinition GhostScriptMissingBleedoutOverrideFlag = MutagenTopicBuilder.DevelopmentTopic(
+            "Ghost With Script Missing BleedoutOverride Flag",
+            Severity.Suggestion)
+        .WithoutFormatting("Npc has ghost script but no BleedoutOverride flag");
+
     public static readonly TopicDefinition GhostFlagMissingKeyword = MutagenTopicBuilder.DevelopmentTopic(
             "Ghost With Flag Missing Keyword",
             Severity.Suggestion)
@@ -26,10 +36,25 @@ public class GhostKeywordAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         var hasFlag = npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.IsGhost);
         var hasScript = npc.HasScript("defaultGhostScript");
 
-        if (hasScript && !hasKeyword)
+        if (hasScript)
         {
-            param.AddTopic(
-                GhostScriptMissingKeyword.Format());
+            if (!hasKeyword)
+            {
+                param.AddTopic(
+                    GhostScriptMissingKeyword.Format());
+            }
+
+            if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.DoesNotBleed) == false)
+            {
+                param.AddTopic(
+                    GhostScriptMissingDoesntBleedFlag.Format());
+            }
+
+            if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.BleedoutOverride) == false)
+            {
+                param.AddTopic(
+                    GhostScriptMissingBleedoutOverrideFlag.Format());
+            }
         }
 
         if (hasFlag && !hasKeyword)
