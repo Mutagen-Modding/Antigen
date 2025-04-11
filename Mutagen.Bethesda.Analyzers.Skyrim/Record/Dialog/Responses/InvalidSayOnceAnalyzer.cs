@@ -9,7 +9,7 @@ public class InvalidSayOnceAnalyzer : IContextualRecordAnalyzer<IDialogResponses
     public static readonly TopicDefinition<IQuestGetter> InvalidSayOnce = MutagenTopicBuilder.DevelopmentTopic(
             "Invalid SayOnce",
             Severity.Error)
-        .WithFormatting<IQuestGetter>("Dialog is say once although it's quest {0} is not Start Game Enabled");
+        .WithFormatting<IQuestGetter>("Dialog is say once although its quest {0} is not Start Game Enabled");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [InvalidSayOnce];
 
