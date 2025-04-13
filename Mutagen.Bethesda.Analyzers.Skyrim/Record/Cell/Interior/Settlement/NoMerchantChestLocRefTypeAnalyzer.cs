@@ -12,7 +12,7 @@ public class NoMerchantChestLocRefTypeAnalyzer : IContextualRecordAnalyzer<ICell
         .WithFormatting<IPlacedObjectGetter>("{0} is a merchant chest and should have MerchantContainerRefType location reference type");
 
     public static readonly TopicDefinition<IPlacedObjectGetter> InvalidMerchantChestLocRefType = MutagenTopicBuilder.DevelopmentTopic(
-            "Invalid Bed Location Reference Type",
+            "Invalid Merchant Chest Location Reference Type",
             Severity.Error)
         .WithFormatting<IPlacedObjectGetter>("{0} is not a merchant chest and should not have MerchantContainerRefType location reference type");
 
