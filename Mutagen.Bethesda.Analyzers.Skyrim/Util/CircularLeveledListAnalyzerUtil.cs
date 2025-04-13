@@ -10,7 +10,7 @@ public static class CircularLeveledListAnalyzerUtil
     public static void FindCircularList<T>(
         ContextualRecordAnalyzerParams<T> param,
         Func<T, IEnumerable<FormKey>> nestedEntriesSelector,
-        TopicDefinition<List<T>> topic)
+        TopicDefinition topic)
         where T : class, IMajorRecordGetter
     {
         var stack = new Stack<T>();
@@ -21,7 +21,7 @@ public static class CircularLeveledListAnalyzerUtil
         {
             if (stack.Any(x => x.FormKey == t.FormKey))
             {
-                param.AddTopic(topic.Format(stack.ToList()));
+                param.AddTopic(topic.Format(), ("Path", stack.ToList()));
                 return;
             }
 
