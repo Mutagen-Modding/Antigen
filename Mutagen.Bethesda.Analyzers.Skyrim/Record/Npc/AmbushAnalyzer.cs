@@ -1,10 +1,11 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
-public class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
+public class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
     public static readonly TopicDefinition AmbushMissingScript = MutagenTopicBuilder.DevelopmentTopic(
             "Ambush requires script",
@@ -12,8 +13,8 @@ public class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
         .WithoutFormatting("Npc is called ambush npc but does not have an ambush script");
 
     public static readonly TopicDefinition AmbushNotInEditorId = MutagenTopicBuilder.DevelopmentTopic(
-        "Ambush not in EditorId,",
-        Severity.Suggestion)
+            "Ambush not in EditorId,",
+            Severity.Suggestion)
         .WithoutFormatting("Npc has ambush script but is not called 'Ambush' in the EditorId");
 
     public static readonly TopicDefinition<Aggression> AmbushAggressive = MutagenTopicBuilder.FromDiscussion(
@@ -22,9 +23,14 @@ public class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
             Severity.Error)
         .WithFormatting<Aggression>("NPC with ambush script is {0} not Unaggressive");
 
+    public static readonly TopicDefinition AmbushPackages = MutagenTopicBuilder.DevelopmentTopic(
+            "Ambush npc without ambush packages",
+            Severity.Warning)
+        .WithoutFormatting("NPC with ambush script is not using ambush packages");
+
     public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive];
 
-    void IIsolatedRecordAnalyzer<INpcGetter>.AnalyzeRecord(IsolatedRecordAnalyzerParams<INpcGetter> param)
+    public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
 
@@ -51,9 +57,23 @@ public class AmbushAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
         {
             param.AddTopic(AmbushAggressive.Format(aggression));
         }
+
+        var hasAmbushPackages = npc.Packages
+            .Select(p => p.TryResolve(param.LinkCache))
+            .WhereNotNull()
+            .Any(p => p.EditorID is not null && p.EditorID.Contains("ambush", StringComparison.OrdinalIgnoreCase));
+
+        var hasTemplatePackages = npc.Configuration.TemplateFlags.HasFlag(NpcConfiguration.TemplateFlag.AIPackages);
+
+        // Assume when using template packages that the template doesn't use ambush packages
+        // Maybe revisit to analyze the template(s) as well in the future
+        if (!hasAmbushPackages || hasTemplatePackages)
+        {
+            param.AddTopic(AmbushPackages.Format());
+        }
     }
 
-    IEnumerable<Func<INpcGetter, object?>> IIsolatedRecordAnalyzer<INpcGetter>.FieldsOfInterest()
+    public IEnumerable<Func<INpcGetter, object?>> FieldsOfInterest()
     {
         yield return x => x.EditorID;
         yield return x => x.AIData;
