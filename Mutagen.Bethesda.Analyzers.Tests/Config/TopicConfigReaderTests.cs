@@ -1,9 +1,9 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.Config;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Shouldly;
 using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Tests.Config;
@@ -29,7 +29,7 @@ public class TopicConfigReaderTests
         TopicConfigReader sut)
     {
         sut.Reader.ReadInto(line.AsSpan(), config);
-        config.LookupSeverity(_topicDefinition).Should().Be(Severity.Warning);
+        config.LookupSeverity(_topicDefinition).ShouldBe(Severity.Warning);
     }
 
     [Theory]
@@ -48,6 +48,6 @@ public class TopicConfigReaderTests
         TopicConfigReader sut)
     {
         sut.Reader.ReadInto(line.AsSpan(), config);
-        config.LookupSeverity(_topicDefinition).Should().Be(Severity.None);
+        config.LookupSeverity(_topicDefinition).ShouldBe(Severity.None);
     }
 }

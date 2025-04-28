@@ -1,3 +1,4 @@
+using Mutagen.Bethesda.Assets.DI;
 using Mutagen.Bethesda.Environments;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins.Cache;
@@ -16,6 +17,7 @@ public record TestGameEnvironment : IGameEnvironment, IDataDirectoryProvider
     public required FilePath? CreationClubListingsFilePath { get; init; }
     public required ILoadOrderGetter<IModListingGetter<IModGetter>> LoadOrder { get; init; }
     public required ILinkCache LinkCache { get; init; }
+    public required IAssetProvider AssetProvider { get; init;  }
 
     public void Dispose()
     {

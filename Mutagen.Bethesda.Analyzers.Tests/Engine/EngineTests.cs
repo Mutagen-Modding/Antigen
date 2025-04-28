@@ -1,6 +1,5 @@
 ﻿using System.IO.Abstractions;
 using Autofac;
-using FluentAssertions;
 using Mutagen.Bethesda.Analyzers.Engines;
 using Mutagen.Bethesda.Analyzers.Testing;
 using Mutagen.Bethesda.Plugins.Order;
@@ -8,6 +7,7 @@ using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Testing.AutoData;
 using Noggog;
+using Noggog.Testing.Extensions;
 using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Tests.Engine;
@@ -40,7 +40,7 @@ public class EngineTests
         await sut.RunOn(modPath, dropoff, CancellationToken.None);
 
         dropoff.Reports.Select(x => x.TopicDefinition.Id)
-            .Should().Equal(TestIsolatedRecordAnalyzer.HasHeight.Id);
+            .ShouldEqual(TestIsolatedRecordAnalyzer.HasHeight.Id);
     }
 
     [Theory, MutagenModAutoData]
@@ -60,10 +60,10 @@ public class EngineTests
             DataFolderPath = existingDataDir,
             CreationClubListingsFilePath = null,
             LoadOrderFilePath = "",
-            LoadOrder = new LoadOrder<IModListingGetter<IModGetter>>(new IModListingGetter<IModGetter>[]
-            {
+            LoadOrder = new LoadOrder<IModListingGetter<IModGetter>>([
                 new ModListing<IModGetter>(mod)
-            })
+            ]),
+            AssetProvider = null!,
         };
         builder.RegisterInstance(new TestGameEnvironmentProvider(env)).AsImplementedInterfaces();
         builder.RegisterInstance(env).AsImplementedInterfaces();
@@ -83,7 +83,7 @@ public class EngineTests
         await sut.Run(CancellationToken.None);
 
         dropoff.Reports.Select(x => x.TopicDefinition.Id)
-            .Should().Equal(TestIsolatedRecordAnalyzer.HasHeight.Id);
+            .ShouldEqual(TestIsolatedRecordAnalyzer.HasHeight.Id);
     }
 
     [Theory, MutagenModAutoData]
@@ -103,10 +103,10 @@ public class EngineTests
             DataFolderPath = existingDataDir,
             CreationClubListingsFilePath = null,
             LoadOrderFilePath = "",
-            LoadOrder = new LoadOrder<IModListingGetter<IModGetter>>(new IModListingGetter<IModGetter>[]
-            {
+            LoadOrder = new LoadOrder<IModListingGetter<IModGetter>>([
                 new ModListing<IModGetter>(mod)
-            })
+            ]),
+            AssetProvider = null!,
         };
         builder.RegisterInstance(new TestGameEnvironmentProvider(env)).AsImplementedInterfaces();
         builder.RegisterInstance(env).AsImplementedInterfaces();
@@ -126,6 +126,6 @@ public class EngineTests
         await sut.Run(CancellationToken.None);
 
         dropoff.Reports.Select(x => x.TopicDefinition.Id)
-            .Should().Equal(TestContextualRecordAnalyzer.HasHeight.Id);
+            .ShouldEqual(TestContextualRecordAnalyzer.HasHeight.Id);
     }
 }

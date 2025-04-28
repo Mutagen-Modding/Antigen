@@ -1,4 +1,3 @@
-using FluentAssertions;
 using Mutagen.Bethesda.Analyzers.Reporting.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
@@ -7,6 +6,8 @@ using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Testing.AutoData;
 using Noggog;
+using Noggog.Testing.Extensions;
+using Shouldly;
 using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Tests.Engine.Reporting;
@@ -48,7 +49,7 @@ public class EditorIdEnricherTests
         };
         payload.Sut.Dropoff(param, topic);
         payload.TestReportDropbox.Dropoffs.Select(x => x.Topics.MetaData)
-            .Should().Equal(topic.MetaData);
+            .ShouldEqual(topic.MetaData);
     }
 
     [Theory, MutagenModAutoData]
@@ -74,7 +75,7 @@ public class EditorIdEnricherTests
             LinkCache = mod.ToImmutableLinkCache()
         }, topic);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .Should().Equal(new MajorRecordIdentifier()
+            .ShouldEqual(new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
                 EditorID = npc.EditorID
@@ -110,12 +111,12 @@ public class EditorIdEnricherTests
             LinkCache = mod.ToImmutableLinkCache()
         }, topic);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .Should().HaveCount(1);
+            .ShouldHaveCount(1);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .First().Should().BeOfType<object[]>();
+            .First().ShouldBeOfType<object[]>();
         var arr = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as object[];
-        arr.Should().Equal(
+        arr!.ShouldEqual(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -154,12 +155,12 @@ public class EditorIdEnricherTests
             LinkCache = mod.ToImmutableLinkCache()
         }, topic);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .Should().HaveCount(1);
+            .ShouldHaveCount(1);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .First().Should().BeOfType<object[]>();
+            .First().ShouldBeOfType<object[]>();
         var arr = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as object[];
-        arr.Should().Equal(
+        arr!.ShouldEqual(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -201,12 +202,12 @@ public class EditorIdEnricherTests
             LinkCache = mod.ToImmutableLinkCache()
         }, topic);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .Should().HaveCount(1);
+            .ShouldHaveCount(1);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .First().Should().BeOfType<Dictionary<object, object>>();
+            .First().ShouldBeOfType<Dictionary<object, object>>();
         var dict = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as Dictionary<object, object>;
-        dict!.Keys.Should().Equal(
+        dict!.Keys.ShouldEqual(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -217,7 +218,7 @@ public class EditorIdEnricherTests
                 FormKey = npc2.FormKey,
                 EditorID = npc2.EditorID
             });
-        dict!.Values.Should().Equal("Hello", "World");
+        dict!.Values.ShouldEqual("Hello", "World");
     }
 
     [Theory, MutagenModAutoData]
@@ -249,13 +250,13 @@ public class EditorIdEnricherTests
             LinkCache = mod.ToImmutableLinkCache()
         }, topic);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .Should().HaveCount(1);
+            .ShouldHaveCount(1);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .First().Should().BeOfType<Dictionary<object, object>>();
+            .First().ShouldBeOfType<Dictionary<object, object>>();
         var dict = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as Dictionary<object, object>;
-        dict!.Keys.Should().Equal("Hello", "World");
-        dict!.Values.Should().Equal(
+        dict!.Keys.ShouldEqual("Hello", "World");
+        dict!.Values.ShouldEqual(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -297,12 +298,12 @@ public class EditorIdEnricherTests
             LinkCache = mod.ToImmutableLinkCache()
         }, topic);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .Should().HaveCount(1);
+            .ShouldHaveCount(1);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .First().Should().BeOfType<Dictionary<object, object>>();
+            .First().ShouldBeOfType<Dictionary<object, object>>();
         var dict = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as Dictionary<object, object>;
-        dict!.Keys.Should().Equal(
+        dict!.Keys.ShouldEqual(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -313,7 +314,7 @@ public class EditorIdEnricherTests
                 FormKey = npc2.FormKey,
                 EditorID = npc2.EditorID
             });
-        dict!.Values.Should().Equal(
+        dict!.Values.ShouldEqual(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,

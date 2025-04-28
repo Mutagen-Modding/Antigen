@@ -1,10 +1,11 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.Config;
 using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.FormKeys.SkyrimSE;
+using Noggog.Testing.Extensions;
 using Noggog.Testing.IO;
+using Shouldly;
 using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Tests.Config;
@@ -28,8 +29,8 @@ public class RunConfigReaderTests
     {
         var line = $"environment.data_directory = {PathingUtil.DrivePrefix}some/path";
         sut.Reader.ReadInto(line.AsSpan(), config);
-        config.DataDirectoryPath.Should().NotBeNull();
-        config.DataDirectoryPath!.Value.Path.Should().Be(Path.Combine(PathingUtil.DrivePrefix, "some", "path"));
+        config.DataDirectoryPath.ShouldNotBeNull();
+        config.DataDirectoryPath!.Value.Path.ShouldBe(Path.Combine(PathingUtil.DrivePrefix, "some", "path"));
     }
 
     [Theory, AnalyzerAutoData]
@@ -39,8 +40,8 @@ public class RunConfigReaderTests
     {
         var line = @$"environment.data_directory = {PathingUtil.DrivePrefix}some\path";
         sut.Reader.ReadInto(line.AsSpan(), config);
-        config.DataDirectoryPath.Should().NotBeNull();
-        config.DataDirectoryPath!.Value.Path.Should().Be(Path.Combine(PathingUtil.DrivePrefix, "some", "path"));
+        config.DataDirectoryPath.ShouldNotBeNull();
+        config.DataDirectoryPath!.Value.Path.ShouldBe(Path.Combine(PathingUtil.DrivePrefix, "some", "path"));
     }
 
     [Theory]
@@ -51,7 +52,7 @@ public class RunConfigReaderTests
         RunConfigReader sut)
     {
         sut.Reader.ReadInto(line.AsSpan(), config);
-        config.LoadOrderSetToMods.Should().BeEquivalentTo([FormKeys.SkyrimSE.Skyrim.ModKey, Update.ModKey]);
+        config.LoadOrderSetToMods!.ShouldEqual([FormKeys.SkyrimSE.Skyrim.ModKey, Update.ModKey]);
     }
 
     [Theory, AnalyzerAutoData]
@@ -61,8 +62,8 @@ public class RunConfigReaderTests
     {
         var line = $"output_file = {PathingUtil.DrivePrefix}some/path";
         sut.Reader.ReadInto(line.AsSpan(), config);
-        config.OutputFilePath.Should().NotBeNull();
-        config.OutputFilePath!.Value.Path.Should().Be(Path.Combine(PathingUtil.DrivePrefix, "some", "path"));
+        config.OutputFilePath.ShouldNotBeNull();
+        config.OutputFilePath!.Value.Path.ShouldBe(Path.Combine(PathingUtil.DrivePrefix, "some", "path"));
     }
 
     [Theory, AnalyzerAutoData]
@@ -72,7 +73,7 @@ public class RunConfigReaderTests
     {
         var line = $@"output_file = {PathingUtil.DrivePrefix}some\path";
         sut.Reader.ReadInto(line.AsSpan(), config);
-        config.OutputFilePath.Should().NotBeNull();
-        config.OutputFilePath!.Value.Path.Should().Be(Path.Combine(PathingUtil.DrivePrefix, "some", "path"));
+        config.OutputFilePath.ShouldNotBeNull();
+        config.OutputFilePath!.Value.Path.ShouldBe(Path.Combine(PathingUtil.DrivePrefix, "some", "path"));
     }
 }

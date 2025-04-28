@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics.CodeAnalysis;
-using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.Config;
+using Noggog.Testing.Extensions;
+using Shouldly;
 using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Tests.Config;
@@ -38,17 +39,17 @@ public class ConfigReaderTests
         sut.Processor.Func = (_, parts, value) =>
         {
             ran = true;
-            parts.Should().HaveCount(3);
-            parts[0].Should().Be("other");
-            parts[1].Should().Be("A123");
-            parts[2].Should().Be("severity");
-            value.Should().Be("Warning");
+            parts.ShouldHaveCount(3);
+            parts[0].ShouldBe("other");
+            parts[1].ShouldBe("A123");
+            parts[2].ShouldBe("severity");
+            value.ShouldBe("Warning");
             return true;
         };
 
         sut.Reader.ReadInto(line.AsSpan(), new TestConfig());
 
-        ran.Should().BeTrue();
+        ran.ShouldBeTrue();
     }
 
     [Theory]
@@ -62,17 +63,17 @@ public class ConfigReaderTests
         sut.Processor.Func = (_, parts, value) =>
         {
             ran = true;
-            parts.Should().HaveCount(3);
-            parts[0].Should().Be("diagnostic");
-            parts[1].Should().Be("A123");
-            parts[2].Should().Be("severity");
-            value.Should().Be("Warning And Gibberish");
+            parts.ShouldHaveCount(3);
+            parts[0].ShouldBe("diagnostic");
+            parts[1].ShouldBe("A123");
+            parts[2].ShouldBe("severity");
+            value.ShouldBe("Warning And Gibberish");
             return true;
         };
 
         sut.Reader.ReadInto(line.AsSpan(), new TestConfig());
 
-        ran.Should().BeTrue();
+        ran.ShouldBeTrue();
     }
 
     [Theory]
@@ -86,16 +87,16 @@ public class ConfigReaderTests
         sut.Processor.Func = (_, parts, value) =>
         {
             ran = true;
-            parts.Should().HaveCount(3);
-            parts[0].Should().Be("diagnostic");
-            parts[1].Should().Be("A123");
-            value.Should().Be("");
+            parts.ShouldHaveCount(3);
+            parts[0].ShouldBe("diagnostic");
+            parts[1].ShouldBe("A123");
+            value.ShouldBe("");
             return true;
         };
 
         sut.Reader.ReadInto(line.AsSpan(), new TestConfig());
 
-        ran.Should().BeFalse();
+        ran.ShouldBeFalse();
     }
 
     [Theory]
@@ -109,17 +110,17 @@ public class ConfigReaderTests
         sut.Processor.Func = (_, parts, value) =>
         {
             ran = true;
-            parts.Should().HaveCount(3);
-            parts[0].Should().Be("diagnostic");
-            parts[1].Should().Be("A123");
-            parts[2].Should().Be("severity");
-            value.Should().Be("Other");
+            parts.ShouldHaveCount(3);
+            parts[0].ShouldBe("diagnostic");
+            parts[1].ShouldBe("A123");
+            parts[2].ShouldBe("severity");
+            value.ShouldBe("Other");
             return true;
         };
 
         sut.Reader.ReadInto(line.AsSpan(), new TestConfig());
 
-        ran.Should().BeTrue();
+        ran.ShouldBeTrue();
     }
 
     [Theory]
@@ -134,12 +135,12 @@ public class ConfigReaderTests
         sut.Processor.Func = (_, parts, _) =>
         {
             ran = true;
-            parts.Should().HaveCount(0);
+            parts.ShouldHaveCount(0);
             return true;
         };
 
         sut.Reader.ReadInto(line.AsSpan(), new TestConfig());
 
-        ran.Should().BeFalse();
+        ran.ShouldBeFalse();
     }
 }

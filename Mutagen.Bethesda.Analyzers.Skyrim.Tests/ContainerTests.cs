@@ -1,9 +1,9 @@
 ﻿using Autofac;
-using FluentAssertions;
 using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.Drivers.Records;
 using Mutagen.Bethesda.Analyzers.Testing;
 using Mutagen.Bethesda.Environments.DI;
+using Shouldly;
 using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests;
@@ -21,11 +21,11 @@ public class ContainerTests
         var drivers = container.Resolve<IIsolatedDriver[]>();
         drivers
             .Any(x => x.GetType().IsGenericType && typeof(ByGenericTypeRecordIsolatedDriver<>).IsAssignableFrom(x.GetType().GetGenericTypeDefinition()))
-            .Should().BeTrue();
+            .ShouldBeTrue();
 
         var contextualDrivers = container.Resolve<IContextualDriver[]>();
         contextualDrivers
             .Any(x => x.GetType().IsGenericType && typeof(ByGenericTypeRecordContextualDriver<>).IsAssignableFrom(x.GetType().GetGenericTypeDefinition()))
-            .Should().BeTrue();
+            .ShouldBeTrue();
     }
 }

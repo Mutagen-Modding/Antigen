@@ -1,11 +1,11 @@
 using Autofac;
-using FluentAssertions;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
 using Mutagen.Bethesda.Analyzers.Engines;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Testing;
 using Mutagen.Bethesda.Environments;
+using Noggog.Testing.Extensions;
 using NSubstitute;
 using Xunit;
 
@@ -63,7 +63,7 @@ public class RunConfigApplicationTests
             testAnalyzer.Analyze(default);
             builder.RegisterInstance(testAnalyzer).AsSelf();
         });
-        dropoff.Reports.Should().HaveCount(0);
+        dropoff.Reports.ShouldHaveCount(0);
     }
 
     [Theory, AnalyzerAutoData]
@@ -73,7 +73,7 @@ public class RunConfigApplicationTests
         {
             builder.RegisterInstance(WarningAnalyzer).AsImplementedInterfaces();
         });
-        dropoff.Reports.Should().HaveCount(1);
+        dropoff.Reports.ShouldHaveCount(1);
     }
 
     [Theory, AnalyzerAutoData]
@@ -86,7 +86,7 @@ public class RunConfigApplicationTests
             minSev.MinimumSeverity.Returns(Severity.Warning);
             builder.RegisterInstance(minSev).As<IMinimumSeverityConfiguration>();
         });
-        dropoff.Reports.Should().HaveCount(0);
+        dropoff.Reports.ShouldHaveCount(0);
     }
 
     [Theory, AnalyzerAutoData]
@@ -102,6 +102,6 @@ public class RunConfigApplicationTests
             sevLookup.LookupSeverity(Warning).Returns(Severity.Suggestion);
             builder.RegisterInstance(sevLookup).As<ISeverityLookup>();
         });
-        dropoff.Reports.Should().HaveCount(0);
+        dropoff.Reports.ShouldHaveCount(0);
     }
 }

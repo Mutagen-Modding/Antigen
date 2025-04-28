@@ -1,9 +1,10 @@
 using AutoFixture;
-using FluentAssertions;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Records;
+using Noggog.Testing.Extensions;
+using Shouldly;
 
 namespace Mutagen.Bethesda.Analyzers.Testing.Frameworks;
 
@@ -38,7 +39,7 @@ public class IsolatedRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
 
         Sut.AnalyzeRecord(param);
         dropOff.Reports.Select(x => x.TopicDefinition.Id)
-            .Should().Equal(expectedTopics.Select(x => x.Id));
+            .ShouldEqual(expectedTopics.Select(x => x.Id));
 
         prepForFix(rec);
 
@@ -47,7 +48,7 @@ public class IsolatedRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
 
         dropOff = new();
         Sut.AnalyzeRecord(param);
-        dropOff.Reports.Should().BeEmpty();
+        dropOff.Reports.ShouldBeEmpty();
     }
 
     public void RunShouldBeNoError(
@@ -62,6 +63,6 @@ public class IsolatedRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
             parameters: default,
             reportDropbox: dropOff);
         Sut.AnalyzeRecord(param);
-        dropOff.Reports.Should().BeEmpty();
+        dropOff.Reports.ShouldBeEmpty();
     }
 }

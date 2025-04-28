@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using Mutagen.Bethesda.Analyzers.SDK.Topics;
+﻿using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Shouldly;
 using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Tests.Engine;
@@ -10,8 +10,8 @@ public class TopicIdTests
     public void ParseTypical()
     {
         var id = TopicId.Parse("A123");
-        id.Id.Should().Be(123);
-        id.Prefix.String.Should().Be("A");
+        id.Id.ShouldBe<ushort>(123);
+        id.Prefix.String.ShouldBe("A");
     }
 
     [Fact]

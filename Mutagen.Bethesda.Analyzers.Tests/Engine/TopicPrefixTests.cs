@@ -1,5 +1,5 @@
-﻿using FluentAssertions;
-using Mutagen.Bethesda.Analyzers.SDK.Topics;
+﻿using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Shouldly;
 using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Tests.Engine;
@@ -10,7 +10,7 @@ public class TopicPrefixTests
     public void CtorTypical()
     {
         var id = new TopicPrefix("A");
-        id.String.Should().Be("A");
+        id.String.ShouldBe("A");
     }
 
     [Fact]
