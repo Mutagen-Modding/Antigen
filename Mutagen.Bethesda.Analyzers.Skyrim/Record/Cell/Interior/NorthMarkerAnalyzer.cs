@@ -29,9 +29,9 @@ public class NorthMarkerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
             .Where(placed => placed.Base.FormKey == FormKeys.SkyrimSE.Skyrim.Static.NorthMarker.FormKey)
             .ToArray();
 
-        var context = param.LinkCache.ResolveSimpleContext(cell);
         if (northMarkers.Length == 0)
         {
+            var context = param.LinkCache.ResolveSimpleContext(cell);
             param.AddTopic(
                 context.ModKey,
                 cell,
@@ -40,6 +40,7 @@ public class NorthMarkerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 
         if (northMarkers.Length > 1)
         {
+            var context = param.LinkCache.ResolveSimpleContext(cell);
             param.AddTopic(
                 context.ModKey,
                 cell,
