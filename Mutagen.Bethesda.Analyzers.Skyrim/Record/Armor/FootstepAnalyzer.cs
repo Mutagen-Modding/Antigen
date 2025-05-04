@@ -11,12 +11,12 @@ public class FootstepAnalyzer : IContextualRecordAnalyzer<IArmorGetter>
     public static readonly TopicDefinition<ArmorType> UnknownArmorType = MutagenTopicBuilder.DevelopmentTopic(
             "Unknown Armor Type",
             Severity.Suggestion)
-        .WithFormatting<ArmorType>("Armor type is set to unkown value {0}");
+        .WithFormatting<ArmorType>("Armor type is set to unknown value {0}");
 
-    public static readonly TopicDefinition<ArmorType, IFormLinkGetter<IFootstepSetGetter>> ArmorMatchingFootstepArmorType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<ArmorType, IArmorAddonGetter, IFormLinkGetter<IFootstepSetGetter>> ArmorMatchingFootstepArmorType = MutagenTopicBuilder.DevelopmentTopic(
             "Footsteps on armor don't match their equipped armor type",
             Severity.Suggestion)
-        .WithFormatting<ArmorType, IFormLinkGetter<IFootstepSetGetter>>("Armor has armor type {0} but armor addon doesn't have footstep {1}");
+        .WithFormatting<ArmorType, IArmorAddonGetter, IFormLinkGetter<IFootstepSetGetter>>("Armor has armor type {0} but armor addon {1} doesn't have footstep {2}");
 
     public static readonly TopicDefinition ArmorMissingFootstep = MutagenTopicBuilder.DevelopmentTopic(
             "Armor has no footstep sound",
@@ -54,7 +54,7 @@ public class FootstepAnalyzer : IContextualRecordAnalyzer<IArmorGetter>
             .ToDictionary(x => x.Key, x => x.Select(x => x.ArmorAddon).ToList());
 
         foreach (var (race, addons) in armorAddonRaces) {
-            if (addons.Count == 0) continue;
+            if (addons.Count <= 1) continue;
 
             param.AddTopic(
                 ArmorDuplicateFootstep.Format(race),
@@ -72,7 +72,14 @@ public class FootstepAnalyzer : IContextualRecordAnalyzer<IArmorGetter>
                 correctFootstepSound = FormKeys.SkyrimSE.Skyrim.FootstepSet.FSTArmorHeavyFootstepSet;
                 break;
             case ArmorType.Clothing:
-                correctFootstepSound = FormKeys.SkyrimSE.Skyrim.FootstepSet.DefaultFootstepSet;
+                if (armor.EditorID is not null && armor.EditorID.Contains("Naked"))
+                {
+                    correctFootstepSound = FormKeys.SkyrimSE.Skyrim.FootstepSet.FSTBarefootFootstepSet;
+                }
+                else
+                {
+                    correctFootstepSound = FormKeys.SkyrimSE.Skyrim.FootstepSet.DefaultFootstepSet;
+                }
                 break;
             default:
                 param.AddTopic(
@@ -83,10 +90,11 @@ public class FootstepAnalyzer : IContextualRecordAnalyzer<IArmorGetter>
 
         foreach (var armorAddon in armorAddons)
         {
+            if (armorAddon.FootstepSound.IsNull) continue;
             if (armorAddon.FootstepSound.FormKey == correctFootstepSound.FormKey) continue;
 
             param.AddTopic(
-                ArmorMatchingFootstepArmorType.Format(armor.BodyTemplate.ArmorType, correctFootstepSound));
+                ArmorMatchingFootstepArmorType.Format(armor.BodyTemplate.ArmorType, armorAddon, correctFootstepSound));
         }
 
         // Check if there are any footstep sounds

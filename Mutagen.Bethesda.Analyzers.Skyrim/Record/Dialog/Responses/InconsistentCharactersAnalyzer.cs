@@ -1,5 +1,6 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -19,8 +20,6 @@ public class InconsistentCharactersAnalyzer : IIsolatedRecordAnalyzer<IDialogRes
 
     public IEnumerable<TopicDefinition> Topics { get; } = [PromptInconsistentCharacters, ResponseInconsistentCharacters];
 
-    private static readonly char[] InvalidCharacters = ['[', ']'];
-
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IDialogResponsesGetter> param)
     {
         var dialogResponses = param.Record;
@@ -28,7 +27,7 @@ public class InconsistentCharactersAnalyzer : IIsolatedRecordAnalyzer<IDialogRes
         // Check prompt
         if (dialogResponses.Prompt?.String is not null)
         {
-            CheckInconsistentCharacters(dialogResponses.Prompt.String, PromptInconsistentCharacters);
+            InvalidCharactersAnalyzerUtil.CheckInconsistentCharacters(param, dialogResponses.Prompt.String, PromptInconsistentCharacters);
         }
 
         // Check responses
@@ -36,20 +35,7 @@ public class InconsistentCharactersAnalyzer : IIsolatedRecordAnalyzer<IDialogRes
                      .Select(x => x.Text.String)
                      .WhereNotNull())
         {
-            CheckInconsistentCharacters(response, ResponseInconsistentCharacters);
-
-        }
-
-        return;
-
-        void CheckInconsistentCharacters(string text, TopicDefinition<string> topic)
-        {
-            var foundCharacters = InvalidCharacters.Where(text.Contains).ToArray();
-            if (foundCharacters.Length == 0) return;
-
-            param.AddTopic(
-                topic.Format(text),
-                ("Inconsistent Characters", foundCharacters));
+            InvalidCharactersAnalyzerUtil.CheckInconsistentCharacters(param, response, ResponseInconsistentCharacters);
         }
     }
 

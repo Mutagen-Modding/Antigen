@@ -30,9 +30,11 @@ public class UnownedWorkMarkerAnalyzer : IContextualAnalyzer
 
             foreach (var placedObject in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedObjectGetter>())
             {
+                if (placedObject.IsDeleted) continue;
+
                 if (WorkMarkers.Contains(placedObject.Base.FormKey))
                 {
-                    var context = param.LinkCache.ResolveSimpleContext(placedObject);
+                    var context = param.LinkCache.ResolveSimpleContext<IPlacedObjectGetter>(placedObject.FormKey);
                     param.AddTopic(
                         context.ModKey,
                         placedObject,

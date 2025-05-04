@@ -7,15 +7,15 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Object;
 
 public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 {
-    public static readonly TopicDefinition<string, float> ScaleTooSmall = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, IPlaceableObjectGetter, float> ScaleTooSmall = MutagenTopicBuilder.DevelopmentTopic(
             "Scale Too Small",
             Severity.Warning)
-        .WithFormatting<string, float>("A {0} placement with scale {1} is too small");
+        .WithFormatting<string, IPlaceableObjectGetter, float>("A {0} placement of {1} with scale {2} is too small");
 
-    public static readonly TopicDefinition<string, float> ScaleTooLarge = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, IPlaceableObjectGetter, float> ScaleTooLarge = MutagenTopicBuilder.DevelopmentTopic(
             "Scale Too Large",
             Severity.Warning)
-        .WithFormatting<string, float>("A {0} placement with scale {1} is too large");
+        .WithFormatting<string, IPlaceableObjectGetter, float>("A {0} placement of {1} with scale {2} is too large");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [ScaleTooSmall, ScaleTooLarge];
 
@@ -30,13 +30,16 @@ public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedObjectGetter> param)
     {
         var placedObject = param.Record;
+
+        if (placedObject.IsDeleted) return;
+
         var scaleNullable = placedObject.Scale;
         if (scaleNullable is null) return;
 
         var scale = scaleNullable.Value;
 
-        // Scale 1 is always allowed
-        if (Math.Abs(1 - scale) < float.Epsilon) return;
+        // Scale that is always allowed
+        if (scale is >= 0.5f and <= 1.5f) return;
 
         // Allowed objects
         if (AllowedScaledObjects.Contains(placedObject.Base.FormKey)) return;
@@ -60,20 +63,33 @@ public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
         // Specific type filter
         switch (baseObject)
         {
-            case IMiscItemGetter:
-                // Misc items should never be scaled
-                // They can be picked up and dropped which resets the scale to 1
-                // A value other than 1 would be lost and create inconsistencies
-                break;
             case IActivatorGetter:
+            case ITalkingActivatorGetter:
             case IContainerGetter:
             case IDoorGetter:
             case IFurnitureGetter:
             case IIngestibleGetter:
-                if (scale is >= 0.5f and <= 1.5f) return;
+                // Use default range
+
+                break;
+            case IAmmunitionGetter:
+            case IArmorGetter:
+            case IBookGetter:
+            case IIngredientGetter:
+            case IKeyGetter:
+            case IScrollGetter:
+            case ISoulGemGetter:
+            case IWeaponGetter:
+            case IMiscItemGetter:
+                // Scale allowed for items that can be picked up
+                if (scale is >= 0.8f and <= 1.2f) return;
 
                 break;
             case IFloraGetter:
+                if (scale is >= 0.1f and <= 3f) return;
+
+                break;
+            case ITreeGetter:
                 if (scale is >= 0.1f and <= 3f) return;
 
                 break;
@@ -83,10 +99,6 @@ public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
                 break;
             case IStaticGetter:
                 if (scale is >= 0.2f and <= 2.5f) return;
-
-                break;
-            case ITreeGetter:
-                if (scale is >= 0.1f and <= 3f) return;
 
                 break;
             // Ignored types - never report
@@ -99,7 +111,7 @@ public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
         }
 
         param.AddTopic(
-            (scale < 1 ? ScaleTooSmall : ScaleTooLarge).Format(baseObject.Registration.Name, scale));
+            (scale < 1 ? ScaleTooSmall : ScaleTooLarge).Format(baseObject.Registration.Name, baseObject, scale));
     }
 
     public IEnumerable<Func<IPlacedObjectGetter, object?>> FieldsOfInterest()

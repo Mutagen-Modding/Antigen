@@ -22,6 +22,8 @@ public class NpcNotInCellFactionAnalyzer : IContextualAnalyzer
 
             foreach (var placedNpc in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedNpcGetter>())
             {
+                if (placedNpc.IsDeleted) continue;
+
                 var npc = placedNpc.Base.TryResolve(param.LinkCache);
                 if (npc is null || !npc.IsUnique()) continue;
 
@@ -42,7 +44,7 @@ public class NpcNotInCellFactionAnalyzer : IContextualAnalyzer
                 // Skip prisoners
                 if (npc.HasFaction(param.LinkCache, editorId => editorId is not null && editorId.Contains("Prisoner"))) continue;
 
-                var context = param.LinkCache.ResolveSimpleContext(npc);
+                var context = param.LinkCache.ResolveSimpleContext<INpcGetter>(npc.FormKey);
                 param.AddTopic(
                     context.ModKey,
                     npc,
