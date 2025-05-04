@@ -18,7 +18,9 @@ public class NoTracksAnalyzer : IIsolatedRecordAnalyzer<IMusicTypeGetter>
     {
         var record = param.Record;
 
-        if ((record.Tracks is null) || (record.Tracks?.Count == 0))
+        var tracks = record.Tracks;
+
+        if (tracks is null || tracks.Count == 0)
         {
             param.AddTopic(NoTracks.Format());
         }
