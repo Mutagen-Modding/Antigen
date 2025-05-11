@@ -1,0 +1,33 @@
+﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Skyrim;
+
+namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Branch;
+
+public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IDialogBranchGetter>
+{
+    public static readonly TopicDefinition NoQuest = MutagenTopicBuilder.DevelopmentTopic(
+            "No Quest",
+            Severity.Error)
+        .WithoutFormatting("Branch has no quest, it will not be available in game");
+
+    public IEnumerable<TopicDefinition> Topics { get; } = [NoQuest];
+
+    public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IDialogBranchGetter> param)
+    {
+        var dialogTopic = param.Record;
+        if (dialogTopic.IsDeleted) return;
+
+
+        if (dialogTopic.Quest.IsNull)
+        {
+            param.AddTopic(
+                NoQuest.Format());
+        }
+    }
+
+    public IEnumerable<Func<IDialogBranchGetter, object?>> FieldsOfInterest()
+    {
+        yield return x => x.Quest;
+    }
+}
