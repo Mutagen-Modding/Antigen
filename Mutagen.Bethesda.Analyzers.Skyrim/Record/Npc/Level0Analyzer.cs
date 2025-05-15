@@ -34,24 +34,18 @@ public class Level0Analyzer : IIsolatedRecordAnalyzer<INpcGetter>
             case INpcLevelGetter npcLevel:
                 if (npcLevel.Level == 0)
                 {
-                    param.AddTopic(
-                        Level0.Format());
-                    return;
+                    param.AddTopic(Level0.Format());
                 }
                 break;
             case IPcLevelMultGetter pcLevelMult:
                 if (Math.Abs(pcLevelMult.LevelMult) < 0.001)
                 {
-                    param.AddTopic(
-                        LevelMultTooSmall.Format(pcLevelMult.LevelMult));
-                    return;
+                    param.AddTopic(LevelMultTooSmall.Format(pcLevelMult.LevelMult));
                 }
 
                 if (npc.Configuration.CalcMinLevel == 0)
                 {
-                    param.AddTopic(
-                        MinLevel0.Format());
-                    return;
+                    param.AddTopic(MinLevel0.Format());
                 }
                 break;
         }
