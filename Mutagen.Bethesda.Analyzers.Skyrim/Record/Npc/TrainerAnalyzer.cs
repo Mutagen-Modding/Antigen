@@ -7,20 +7,23 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition TrainerFactionMissingScript = MutagenTopicBuilder.DevelopmentTopic(
-            "Trainer requires script",
+    public static readonly TopicDefinition TrainerFactionMissingScript = MutagenTopicBuilder.FromDiscussion(
+            196,
+            "Trainer requires TrainerGoldScript",
             Severity.Warning)
-        .WithoutFormatting("Npc is a trainer but does not have a TrainerGoldScript");
+        .WithoutFormatting("Trainer npc does not have a TrainerGoldScript");
 
-    public static readonly TopicDefinition TrainerScriptMissingFaction = MutagenTopicBuilder.DevelopmentTopic(
-            "Trainer requires faction",
+    public static readonly TopicDefinition TrainerScriptMissingFaction = MutagenTopicBuilder.FromDiscussion(
+            197,
+            "Trainer requires trainer faction",
             Severity.Warning)
-        .WithoutFormatting("Npc has TrainerGoldScript but is not in a trainer faction");
+        .WithoutFormatting("Trainer npc is not in a trainer faction");
 
-    public static readonly TopicDefinition TrainerWithoutSpecialization = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition TrainerWithoutSpecialization = MutagenTopicBuilder.FromDiscussion(
+            198,
             "Trainer without specialization",
             Severity.Warning)
-        .WithoutFormatting("NPCs with a JobMerchant faction need specialized Job faction, otherwise their merchant dialogue might not work");
+        .WithoutFormatting("Trainer npc does not have a specialized trainer faction");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [TrainerFactionMissingScript, TrainerScriptMissingFaction, TrainerWithoutSpecialization];
 
