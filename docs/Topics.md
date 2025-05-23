@@ -28,9 +28,9 @@ Each topic discussion should generally have the following information:
 - Topic Number (implicit)
 - Severity label
 - Games the topic applies to (Skyrim, Fallout, etc)
-- Context
-  - The "Bethesda Path". `ARMA/[MOD2/MOD3]`
-  - The "Mutagen Path". `ArmorAddon.WorldModel.[M/F].File` is the path for the example topic, as these are the classes/fields involved in the topic.
+- Context: What records are involved
+    - The "Bethesda Path". `ARMA/[MOD2/MOD3]`
+    - The "Mutagen Path". `ArmorAddon.WorldModel.[M/F].File` is the path for the example topic, as these are the classes/fields involved in the topic.
 - Description outlining what the issue/suggestion is
 - Effects of what the topic are if left unattended
 - Any related images/video
