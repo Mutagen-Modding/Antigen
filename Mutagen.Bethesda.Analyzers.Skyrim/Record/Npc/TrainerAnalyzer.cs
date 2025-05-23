@@ -25,6 +25,18 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Warning)
         .WithoutFormatting("Trainer npc does not have a specialized trainer faction");
 
+    public static readonly TopicDefinition TrainerWithLevel1 = MutagenTopicBuilder.FromDiscussion(
+            199,
+            "Trainer npc has level 1",
+            Severity.Warning)
+        .WithoutFormatting("Trainer npc has level 1, they won't be able to train you");
+
+    public static readonly TopicDefinition TrainerWithLevel1Min = MutagenTopicBuilder.FromDiscussion(
+            199,
+            "Trainer npc has min level 1",
+            Severity.Warning)
+        .WithoutFormatting("Trainer npc has min level 1, they won't be able to train you");
+
     public IEnumerable<TopicDefinition> Topics { get; } = [TrainerFactionMissingScript, TrainerScriptMissingFaction, TrainerWithoutSpecialization];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
@@ -64,6 +76,31 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
                 param.AddTopic(
                     TrainerWithoutSpecialization.Format());
             }
+
+            if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.AutoCalcStats))
+            {
+                switch (npc.Configuration.Level)
+                {
+                    case INpcLevelGetter npcLevel:
+                    {
+                        if (npcLevel.Level <= 1)
+                        {
+                            param.AddTopic(
+                                TrainerWithLevel1.Format());
+                        }
+                        break;
+                    }
+                    case IPcLevelMultGetter:
+                    {
+                        if (npc.Configuration.CalcMinLevel <= 1)
+                        {
+                            param.AddTopic(
+                                TrainerWithLevel1Min.Format());
+                        }
+                        break;
+                    }
+                }
+            }
         }
     }
 
@@ -72,5 +109,8 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         yield return x => x.Template;
         yield return x => x.Factions;
         yield return x => x.VirtualMachineAdapter;
+        yield return x => x.Configuration.Level;
+        yield return x => x.Configuration.CalcMinLevel;
+        yield return x => x.Configuration.Flags;
     }
 }
