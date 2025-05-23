@@ -6,18 +6,21 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class Level0Analyzer : IIsolatedRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition Level0 = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition Level0 = MutagenTopicBuilder.FromDiscussion(
+            201,
             "Level 0",
             Severity.Warning)
         .WithoutFormatting("Npc has level 0");
 
 
-    public static readonly TopicDefinition MinLevel0 = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition MinLevel0 = MutagenTopicBuilder.FromDiscussion(
+            201,
             "Minimum Level 0",
             Severity.Warning)
         .WithoutFormatting("Npc has minimum level 0");
 
-    public static readonly TopicDefinition<float> LevelMultTooSmall = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<float> LevelMultTooSmall = MutagenTopicBuilder.FromDiscussion(
+            202,
             "Level Mult Too Small",
             Severity.Warning)
         .WithFormatting<float>("Npc has too small level mult {0}");
