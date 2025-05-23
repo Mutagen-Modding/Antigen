@@ -1,0 +1,21 @@
+:root {
+  --md-primary-fg-color:        #a83281;
+  --md-accent-fg-color:         #4ce6ae;
+}
+
+.md-sidebar__inner {
+  --md-typeset-a-color: #4ce6ae;
+}
+
+.md-content {
+  --md-typeset-a-color: #4ce6ae;
+}
+
+[data-md-color-scheme="slate"] {
+  --md-hue: 234; 
+}
+
+.md-grid {
+    width: 100%;
+    max-width: 1900px;
+}
