@@ -6,12 +6,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior.Settlement;
 
 public class NoBedLocRefTypeAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition<IPlacedObjectGetter> NoBedLocRefType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IPlacedObjectGetter> NoBedLocRefType = MutagenTopicBuilder.FromDiscussion(
+            293,
             "No Bed Location Reference Type",
             Severity.Suggestion)
         .WithFormatting<IPlacedObjectGetter>("{0} is a bed and should have HouseBedRefType location reference type");
 
-    public static readonly TopicDefinition<IPlacedObjectGetter> InvalidBedLocRefType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IPlacedObjectGetter> InvalidBedLocRefType = MutagenTopicBuilder.FromDiscussion(
+            354,
             "Invalid Bed Location Reference Type",
             Severity.Error)
         .WithFormatting<IPlacedObjectGetter>("{0} is not a bed and should not have HouseBedRefType location reference type");

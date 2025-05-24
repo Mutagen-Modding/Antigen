@@ -12,7 +12,8 @@ public class SharedDialogueAnalyzer : IContextualRecordAnalyzer<IDialogResponses
             Severity.Warning)
         .WithoutFormatting("Shared dialogue cannot not have a script attached");
 
-    public static readonly TopicDefinition UnusedSharedDialogue = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition UnusedSharedDialogue = MutagenTopicBuilder.FromDiscussion(
+            272,
             "Unused Shared Dialogue",
             Severity.Suggestion)
         .WithoutFormatting("Shared dialogue is not used in any topic");

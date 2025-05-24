@@ -9,9 +9,9 @@ public class CellUnderscoreAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
 {
     public static readonly TopicDefinition<string?> CellUnderscoreWrong = MutagenTopicBuilder.FromDiscussion(
             112,
-            "Cell Editor Id Has Underscore",
+            "Cell EditorID Has Underscore",
             Severity.Error)
-        .WithFormatting<string?>("Cell editor ids must not have underscores: {0}");
+        .WithFormatting<string?>("Cell EditorIDs must not have underscores: {0}");
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<ICellGetter> param)
     {

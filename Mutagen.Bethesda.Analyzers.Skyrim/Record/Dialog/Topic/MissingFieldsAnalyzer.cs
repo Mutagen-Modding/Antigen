@@ -6,12 +6,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Topic;
 
 public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IDialogTopicGetter>
 {
-    public static readonly TopicDefinition NoBranch = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoBranch = MutagenTopicBuilder.FromDiscussion(
+            276,
             "No Branch",
             Severity.Error)
         .WithoutFormatting("Topic has no branch, it will not be available in game");
 
-    public static readonly TopicDefinition NoQuest = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoQuest = MutagenTopicBuilder.FromDiscussion(
+            342,
             "No Quest",
             Severity.Error)
         .WithoutFormatting("Topic has no quest, it will not be available in game");

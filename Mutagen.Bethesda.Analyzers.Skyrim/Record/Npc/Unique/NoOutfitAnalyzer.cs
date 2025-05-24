@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
 public class NoOutfitAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition NoOutfit = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoOutfit = MutagenTopicBuilder.FromDiscussion(
+            282,
             "No Outfit",
             Severity.Warning)
         .WithoutFormatting("Npc doesn't wear any outfit");

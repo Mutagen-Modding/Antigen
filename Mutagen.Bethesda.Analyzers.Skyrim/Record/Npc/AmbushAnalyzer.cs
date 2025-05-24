@@ -7,13 +7,15 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition AmbushMissingScript = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition AmbushMissingScript = MutagenTopicBuilder.FromDiscussion(
+            239,
             "Ambush requires script",
-            Severity.Suggestion)
+            Severity.Warning)
         .WithoutFormatting("Npc is called ambush npc but does not have an ambush script");
 
-    public static readonly TopicDefinition AmbushNotInEditorId = MutagenTopicBuilder.DevelopmentTopic(
-            "Ambush not in EditorId,",
+    public static readonly TopicDefinition AmbushNotInEditorId = MutagenTopicBuilder.FromDiscussion(
+            313,
+            "Ambush not in EditorId",
             Severity.Suggestion)
         .WithoutFormatting("Npc has ambush script but is not called 'Ambush' in the EditorId");
 
@@ -23,10 +25,11 @@ public class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Error)
         .WithFormatting<Aggression>("NPC with ambush script is {0} not Unaggressive");
 
-    public static readonly TopicDefinition AmbushPackages = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition AmbushPackages = MutagenTopicBuilder.FromDiscussion(
+            314,
             "Ambush npc without ambush packages",
             Severity.Warning)
-        .WithoutFormatting("NPC with ambush script is not using ambush packages");
+        .WithoutFormatting("Npc with ambush script is not using ambush packages");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive];
 

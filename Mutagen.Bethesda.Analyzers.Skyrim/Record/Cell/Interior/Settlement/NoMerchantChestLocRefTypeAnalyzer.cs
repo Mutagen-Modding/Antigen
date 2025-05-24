@@ -6,12 +6,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior.Settlement;
 
 public class NoMerchantChestLocRefTypeAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition<IPlacedObjectGetter> NoMerchantChestLocRefType = MutagenTopicBuilder.DevelopmentTopic(
-            "No Bed Location Reference Type",
+    public static readonly TopicDefinition<IPlacedObjectGetter> NoMerchantChestLocRefType = MutagenTopicBuilder.FromDiscussion(
+            296,
+            "No Merchant Chest Location Reference Type",
             Severity.Suggestion)
         .WithFormatting<IPlacedObjectGetter>("{0} is a merchant chest and should have MerchantContainerRefType location reference type");
 
-    public static readonly TopicDefinition<IPlacedObjectGetter> InvalidMerchantChestLocRefType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IPlacedObjectGetter> InvalidMerchantChestLocRefType = MutagenTopicBuilder.FromDiscussion(
+            355,
             "Invalid Merchant Chest Location Reference Type",
             Severity.Error)
         .WithFormatting<IPlacedObjectGetter>("{0} is not a merchant chest and should not have MerchantContainerRefType location reference type");

@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class DuplicateShortNameAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition<string?> DuplicateShortName = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string?> DuplicateShortName = MutagenTopicBuilder.FromDiscussion(
+            245,
             "Duplicate short name",
             Severity.Suggestion)
         .WithFormatting<string?>("Npc short name {0} is the same as the full name");

@@ -9,7 +9,7 @@ public class InvalidCharactersAnalyzerBook : IIsolatedRecordAnalyzer<IBookGetter
 {
     public static readonly TopicDefinition InvalidCharactersBookText = MutagenTopicBuilder.DevelopmentTopic(
             "Book Text Contains Invalid Characters",
-            Severity.Warning)
+            Severity.Error)
         .WithoutFormatting("Book text contains invalid characters");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [InvalidCharactersBookText];

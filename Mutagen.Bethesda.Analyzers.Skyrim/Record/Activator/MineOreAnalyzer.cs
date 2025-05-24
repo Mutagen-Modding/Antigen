@@ -6,17 +6,20 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Activator;
 
 public class MineOreAnalyzer : IContextualRecordAnalyzer<IActivatorGetter>
 {
-    public static readonly TopicDefinition NoMineOreScript = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoMineOreScript = MutagenTopicBuilder.FromDiscussion(
+            214,
             "No MineOreScript",
-            Severity.Warning)
+            Severity.Error)
         .WithoutFormatting("Mine Ore does not have a MineOreScript attached");
 
-    public static readonly TopicDefinition NoOreProperty = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoOreProperty = MutagenTopicBuilder.FromDiscussion(
+            298,
             "No Ore Property",
-            Severity.Warning)
+            Severity.Error)
         .WithoutFormatting("Mine ore has no Ore property on MineOreScript");
 
-    public static readonly TopicDefinition<IMiscItemGetter> IncorrectVeinOre = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IMiscItemGetter> IncorrectVeinOre = MutagenTopicBuilder.FromDiscussion(
+            299,
             "Correct Vein/Ore",
             Severity.Warning)
         .WithFormatting<IMiscItemGetter>("Mine ore uses incorrect ore: {0}");

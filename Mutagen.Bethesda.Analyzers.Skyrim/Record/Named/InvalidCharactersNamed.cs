@@ -10,7 +10,7 @@ public class InvalidCharactersAnalyzerNamed : IIsolatedRecordAnalyzer<ISkyrimMaj
 {
     public static readonly TopicDefinition InvalidCharactersName = MutagenTopicBuilder.DevelopmentTopic(
             "Invalid Characters in Name",
-            Severity.Warning)
+            Severity.Error)
         .WithoutFormatting("The name contains invalid characters");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [InvalidCharactersName];

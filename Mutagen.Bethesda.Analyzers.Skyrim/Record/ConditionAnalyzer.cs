@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record;
 
 public class ConditionAnalyzer : IIsolatedRecordAnalyzer<ISkyrimMajorRecordGetter>
 {
-    private static readonly TopicDefinition<string?> InvalidConditionReference = MutagenTopicBuilder.DevelopmentTopic(
+    private static readonly TopicDefinition<string?> InvalidConditionReference = MutagenTopicBuilder.FromDiscussion(
+            213,
             "Condition Runs on Null Reference",
             Severity.Error)
         .WithFormatting<string?>("Condition {0} runs on reference, but reference is null");

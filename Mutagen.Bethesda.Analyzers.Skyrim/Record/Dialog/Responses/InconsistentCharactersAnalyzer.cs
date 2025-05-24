@@ -8,12 +8,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
 public class InconsistentCharactersAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
 {
-    public static readonly TopicDefinition<string> PromptInconsistentCharacters = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string> PromptInconsistentCharacters = MutagenTopicBuilder.FromDiscussion(
+            275,
             "Prompt Has Inconsistent Characters",
             Severity.Suggestion)
-        .WithFormatting<string>("Response {0} contains characters which are not usually used in dialog");
+        .WithFormatting<string>("Prompt {0} contains characters which are not usually used in dialog");
 
-    public static readonly TopicDefinition<string> ResponseInconsistentCharacters = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string> ResponseInconsistentCharacters = MutagenTopicBuilder.FromDiscussion(
+            337,
             "Response Has Inconsistent Characters",
             Severity.Suggestion)
         .WithFormatting<string>("Response {0} contains characters which are not usually used in dialog");

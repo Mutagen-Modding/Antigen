@@ -8,9 +8,10 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.LeveledSpell;
 
 public class CircularLeveledSpellListAnalyzer : IContextualRecordAnalyzer<ILeveledSpellGetter>
 {
-    public static readonly TopicDefinition CircularLeveledSpell = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition CircularLeveledSpell = MutagenTopicBuilder.FromDiscussion(
+            231,
             "Circular Leveled Spell",
-            Severity.Suggestion)
+            Severity.CTD)
         .WithoutFormatting("Leveled Spell contains itself in path {0}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [CircularLeveledSpell];

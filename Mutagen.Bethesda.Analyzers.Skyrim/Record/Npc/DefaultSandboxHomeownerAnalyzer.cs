@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class DefaultSandboxHomeownerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition DefaultSandboxHomeownerListLast = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition DefaultSandboxHomeownerListLast = MutagenTopicBuilder.FromDiscussion(
+            244,
             "Last package is DefaultSandboxHomeowner",
             Severity.Suggestion)
         .WithoutFormatting("Npc uses DefaultSandboxHomeowner as last package, consider using DefaultHomeOwnerPackageList in Default Package List instead");

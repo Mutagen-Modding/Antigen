@@ -7,7 +7,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Location;
 
 public class NoParentLocationAnalyzer : IContextualRecordAnalyzer<ILocationGetter>
 {
-    public static readonly TopicDefinition NoParentLocation = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoParentLocation = MutagenTopicBuilder.FromDiscussion(
+            233,
             "No Parent Location",
             Severity.Suggestion)
         .WithoutFormatting("Location has no parent location - this is likely a mistake - only top level locations should have no parent location");

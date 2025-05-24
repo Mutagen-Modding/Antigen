@@ -9,7 +9,7 @@ public class InvalidCharactersAnalyzerDialogResponses : IIsolatedRecordAnalyzer<
 {
     public static readonly TopicDefinition<string, string> InvalidCharactersDialogResponses = MutagenTopicBuilder.DevelopmentTopic(
             "Dialog Responses Contains Invalid Characters",
-            Severity.Warning)
+            Severity.Error)
         .WithFormatting<string, string>("Dialog response '{0}' contain invalid characters: {1}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [InvalidCharactersDialogResponses];

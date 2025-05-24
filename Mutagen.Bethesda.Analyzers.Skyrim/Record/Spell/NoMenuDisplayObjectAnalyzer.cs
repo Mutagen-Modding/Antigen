@@ -6,10 +6,11 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Spell;
 
 public class NoMenuDisplayObjectAnalyzer : IContextualRecordAnalyzer<ISpellGetter>
 {
-    public static readonly TopicDefinition NoMenuDisplayObject = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoMenuDisplayObject = MutagenTopicBuilder.FromDiscussion(
+            258,
             "No Menu Display Object",
             Severity.Suggestion)
-        .WithoutFormatting("Spell has no menu display object and none of its effects have it - it will be invisible in the magic menu");
+        .WithoutFormatting("Spell has no menu display object and none of its effects have it");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoMenuDisplayObject];
 

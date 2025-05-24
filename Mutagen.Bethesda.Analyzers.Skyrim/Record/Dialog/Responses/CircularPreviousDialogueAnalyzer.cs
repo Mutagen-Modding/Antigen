@@ -7,7 +7,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
 public class CircularPreviousDialogueAnalyzer : IContextualRecordAnalyzer<IDialogResponsesGetter>
 {
-    public static readonly TopicDefinition<IDialogResponsesGetter, IDialogResponsesGetter> CircularPreviousDialogue = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IDialogResponsesGetter, IDialogResponsesGetter> CircularPreviousDialogue = MutagenTopicBuilder.FromDiscussion(
+            266,
             "Circular Previous Dialog",
             Severity.Warning)
         .WithFormatting<IDialogResponsesGetter, IDialogResponsesGetter>("Dialogue has a circular reference in the previous dialog between {0} and {1}");

@@ -6,22 +6,26 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class GhostKeywordAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition GhostScriptMissingKeyword = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition GhostScriptMissingKeyword = MutagenTopicBuilder.FromDiscussion(
+            246,
             "Ghost With Script Missing Keyword",
             Severity.Suggestion)
         .WithoutFormatting("Npc has ghost script but no ghost keyword");
 
-    public static readonly TopicDefinition GhostScriptMissingDoesntBleedFlag = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition GhostScriptMissingDoesntBleedFlag = MutagenTopicBuilder.FromDiscussion(
+            319,
             "Ghost With Script Missing DoesNotBleed Flag",
-            Severity.Suggestion)
-        .WithoutFormatting("Npc has ghost script but DoesNotBleed flag");
+            Severity.Warning)
+        .WithoutFormatting("Npc has ghost script but no DoesNotBleed flag");
 
-    public static readonly TopicDefinition GhostScriptMissingBleedoutOverrideFlag = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition GhostScriptMissingBleedoutOverrideFlag = MutagenTopicBuilder.FromDiscussion(
+            320,
             "Ghost With Script Missing BleedoutOverride Flag",
             Severity.Suggestion)
         .WithoutFormatting("Npc has ghost script but no BleedoutOverride flag");
 
-    public static readonly TopicDefinition GhostFlagMissingKeyword = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition GhostFlagMissingKeyword = MutagenTopicBuilder.FromDiscussion(
+            321,
             "Ghost With Flag Missing Keyword",
             Severity.Suggestion)
         .WithoutFormatting("Npc has ghost flag but no ghost keyword");

@@ -7,12 +7,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Armor;
 
 public class VendorKeywordAnalyzer : IIsolatedRecordAnalyzer<IArmorGetter>
 {
-    public static readonly TopicDefinition<FormLink<IKeywordGetter>> ArmorMissingVendorKeyword = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<FormLink<IKeywordGetter>> ArmorMissingVendorKeyword = MutagenTopicBuilder.FromDiscussion(
+            219,
             "Armor is missing Vendor Keyword",
-            Severity.Suggestion)
+            Severity.Warning)
         .WithFormatting<FormLink<IKeywordGetter>>("Missing vendor keyword {0}");
 
-    public static readonly TopicDefinition UnsuitableVendorKeyword = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition UnsuitableVendorKeyword = MutagenTopicBuilder.FromDiscussion(
+            303,
             "Armor has unsuitable Vendor Keyword",
             Severity.Suggestion)
         .WithoutFormatting("Armor has unsuitable vendor keywords");
@@ -58,10 +60,7 @@ public class VendorKeywordAnalyzer : IIsolatedRecordAnalyzer<IArmorGetter>
         if (armor.Keywords is null) return;
 
         // No sale or Daedric artifact or the default armor vendor keywords are always allowed
-        if (armor.Keywords.Intersect(AlwaysValidVendorKeywords).Any())
-        {
-            return;
-        }
+        if (armor.Keywords.Intersect(AlwaysValidVendorKeywords).Any()) return;
 
         // Determine the expected vendor keyword based on the armor type
         var expectedVendorKeyword = armor.BodyTemplate?.ArmorType switch

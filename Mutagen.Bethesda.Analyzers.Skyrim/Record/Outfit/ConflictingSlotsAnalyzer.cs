@@ -8,7 +8,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Outfit;
 
 public class ConflictingSlotsAnalyzer : IContextualRecordAnalyzer<IOutfitGetter>
 {
-    public static readonly TopicDefinition<BipedObjectFlag> ConflictingSlotsTopic = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<BipedObjectFlag> ConflictingSlotsTopic = MutagenTopicBuilder.FromDiscussion(
+            247,
             "Conflicting Slots",
             Severity.Warning)
         .WithFormatting<BipedObjectFlag>("Outfit entries are conflicting in slot {0}");

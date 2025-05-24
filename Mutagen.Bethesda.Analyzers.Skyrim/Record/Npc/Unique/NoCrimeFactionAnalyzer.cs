@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
 public class NoCrimeFactionAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition NoCrimeFaction = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoCrimeFaction = MutagenTopicBuilder.FromDiscussion(
+            280,
             "No Crime Faction",
             Severity.Warning)
         .WithoutFormatting("Npc has no crime faction");

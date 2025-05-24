@@ -8,12 +8,14 @@ public class NoHavokAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 {
     private const string DisableHavokScript = "defaultDisableHavokOnLoad";
 
-    public static readonly TopicDefinition<string> NonHavokObjectHasFlag = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string> NonHavokObjectHasFlag = MutagenTopicBuilder.FromDiscussion(
+            289,
             "Redundant No Havok Flag on static object",
             Severity.Warning)
         .WithFormatting<string>("{0} placement is static and doesn't need the No Havok flag");
 
-    public static readonly TopicDefinition<string> NonHavokObjectHasScript = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string> NonHavokObjectHasScript = MutagenTopicBuilder.FromDiscussion(
+            350,
             "Redundant disable havok script on static object",
             Severity.Warning)
         .WithFormatting<string>("{0} placement is static and doesn't need the defaultDisableHavokOnLoad script");

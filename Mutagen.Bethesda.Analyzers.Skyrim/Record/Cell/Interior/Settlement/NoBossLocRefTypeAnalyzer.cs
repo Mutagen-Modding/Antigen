@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior.Settlement;
 
 public class NoBossLocRefTypeAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition<IPlacedNpcGetter> NoBossLocRefType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IPlacedNpcGetter> NoBossLocRefType = MutagenTopicBuilder.FromDiscussion(
+            294,
             "No Boss Location Reference Type",
             Severity.Suggestion)
         .WithFormatting<IPlacedNpcGetter>("{0} is a unique NPC and should be marked as a boss");

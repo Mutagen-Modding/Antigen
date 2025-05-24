@@ -7,12 +7,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
 public class NotTrimmedAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
 {
-    public static readonly TopicDefinition<string> PromptNotTrimmed = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string> PromptNotTrimmed = MutagenTopicBuilder.FromDiscussion(
+            270,
             "Prompt Not Trimmed",
             Severity.Suggestion)
         .WithFormatting<string>("Prompt '{0}' is not trimmed");
 
-    public static readonly TopicDefinition<string> ResponseNotTrimmed = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string> ResponseNotTrimmed = MutagenTopicBuilder.FromDiscussion(
+            339,
             "Response Not Trimmed",
             Severity.Suggestion)
         .WithFormatting<string>("Response '{0}' is not trimmed");

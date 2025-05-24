@@ -8,15 +8,17 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Package;
 
 public partial class InconsistentTimeframeAnalyzer : IContextualRecordAnalyzer<IPackageGetter>
 {
-    public static readonly TopicDefinition<int, int> InconsistentHourTopic = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<int, int> InconsistentHourTopic = MutagenTopicBuilder.FromDiscussion(
+            249,
             "Inconsistent Timeframe",
             Severity.Suggestion)
-        .WithFormatting<int, int>("Starting hour {0} doesn't match starting hour in the editor id {1}");
+        .WithFormatting<int, int>("Starting hour {0} doesn't match starting hour in the EditorID {1}");
 
-    public static readonly TopicDefinition<int, int> InconsistentDurationTopic = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<int, int> InconsistentDurationTopic = MutagenTopicBuilder.FromDiscussion(
+            322,
             "Inconsistent Timeframe",
             Severity.Suggestion)
-        .WithFormatting<int, int>("Duration {0} doesn't match duration in the editor id {1}");
+        .WithFormatting<int, int>("Duration {0} doesn't match duration in the EditorID {1}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [InconsistentHourTopic, InconsistentDurationTopic];
 

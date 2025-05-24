@@ -8,17 +8,20 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
     private const string CleanupScriptName = "WIDeadBodyCleanupScript";
 
-    public static readonly TopicDefinition NoCleanupScript = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoCleanupScript = MutagenTopicBuilder.FromDiscussion(
+            279,
             "No Cleanup Script",
             Severity.Warning)
         .WithoutFormatting("Npc has no cleanup script");
 
-    public static readonly TopicDefinition DeathContainerPropertyNotFilled = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition DeathContainerPropertyNotFilled = MutagenTopicBuilder.FromDiscussion(
+            343,
             "Death Container Not Found",
             Severity.Warning)
         .WithoutFormatting("Death container property is not filled in cleanup script");
 
-    public static readonly TopicDefinition WIPropertyNotFilled = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition WIPropertyNotFilled = MutagenTopicBuilder.FromDiscussion(
+            344,
             "WI quest Property Not Found",
             Severity.Warning)
         .WithoutFormatting("WI quest property is not filled in cleanup script");

@@ -6,12 +6,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class DefaultFaceAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition DefaultFaceMorph = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition DefaultFaceMorph = MutagenTopicBuilder.FromDiscussion(
+            243,
             "Default Face Morph",
             Severity.Suggestion)
         .WithoutFormatting("Npc has no custom face morph data");
 
-    public static readonly TopicDefinition DefaultFaceParts = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition DefaultFaceParts = MutagenTopicBuilder.FromDiscussion(
+            318,
             "Default Face Parts",
             Severity.Suggestion)
         .WithoutFormatting("Npc has no custom face parts data");

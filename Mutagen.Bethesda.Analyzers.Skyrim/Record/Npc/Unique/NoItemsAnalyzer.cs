@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
 public class NoItemsAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition NoItems = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoItems = MutagenTopicBuilder.FromDiscussion(
+            281,
             "Empty Inventory",
             Severity.Warning)
         .WithoutFormatting("Npc has no items in inventory");

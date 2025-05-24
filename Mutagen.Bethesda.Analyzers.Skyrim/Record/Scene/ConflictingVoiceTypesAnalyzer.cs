@@ -8,7 +8,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Scene;
 
 public class ConflictingVoiceTypesAnalyzer : IContextualRecordAnalyzer<ISceneGetter>
 {
-    public static readonly TopicDefinition<ISceneGetter, int, IFormLinkNullableGetter<IVoiceTypeGetter>> NpcsWithSameVoiceType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<ISceneGetter, int, IFormLinkNullableGetter<IVoiceTypeGetter>> NpcsWithSameVoiceType = MutagenTopicBuilder.FromDiscussion(
+            255,
             "NPCs with the same voice type in same scene",
             Severity.Suggestion)
         .WithFormatting<ISceneGetter, int, IFormLinkNullableGetter<IVoiceTypeGetter>>("Scene {0} includes {1} npcs with the same voice type {2}");

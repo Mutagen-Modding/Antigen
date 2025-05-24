@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior.Settlement;
 
 public class NoLockListAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition NoLockList = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoLockList = MutagenTopicBuilder.FromDiscussion(
+            295,
             "No Lock List",
             Severity.Suggestion)
         .WithoutFormatting("Cell has no lock list");

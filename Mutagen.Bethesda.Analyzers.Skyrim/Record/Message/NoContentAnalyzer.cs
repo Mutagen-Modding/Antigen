@@ -7,7 +7,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Message;
 
 public class NoContentAnalyzer : IIsolatedRecordAnalyzer<IMessageGetter>
 {
-    public static readonly TopicDefinition NoContent = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoContent = MutagenTopicBuilder.FromDiscussion(
+            236,
             "No Content",
             Severity.Suggestion)
         .WithoutFormatting("Message has no content");

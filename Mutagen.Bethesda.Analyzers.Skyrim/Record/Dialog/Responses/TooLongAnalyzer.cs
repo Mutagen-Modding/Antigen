@@ -10,12 +10,14 @@ public class TooLongAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
     private const int DialogPromptLengthLimit = 80;
     private const int DialogResponseLengthLimit = 149;
 
-    public static readonly TopicDefinition<string, int> PromptTooLong = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, int> PromptTooLong = MutagenTopicBuilder.FromDiscussion(
+            274,
             "Prompt Too Long",
             Severity.Suggestion)
         .WithFormatting<string, int>("Prompt '{0}' is {1} longer than the recommended limit " + DialogPromptLengthLimit);
 
-    public static readonly TopicDefinition<string, int> ResponseTooLong = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, int> ResponseTooLong = MutagenTopicBuilder.FromDiscussion(
+            341,
             "Response Too Long",
             Severity.Suggestion)
         .WithFormatting<string, int>("Response '{0}' is {1} longer than the recommended limit " + DialogResponseLengthLimit);

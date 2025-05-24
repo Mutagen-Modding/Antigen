@@ -7,10 +7,11 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Location;
 
 public class RefTypeSettlementHouseAnalyzer : IContextualRecordAnalyzer<ILocationGetter>
 {
-    public static readonly TopicDefinition NoHouseContainerRefType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoHouseContainerRefType = MutagenTopicBuilder.FromDiscussion(
+            235,
             "No House Container Ref Type",
             Severity.Suggestion)
-        .WithoutFormatting("Settlement house location has no House Container Ref Type - this is likely a mistake");
+        .WithoutFormatting("Settlement house location has no House Container Ref Type");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoHouseContainerRefType];
 

@@ -6,10 +6,11 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Faction;
 
 public class VendorHourAnalyzer : IIsolatedRecordAnalyzer<IFactionGetter>
 {
-    public static readonly TopicDefinition<ushort, ushort> WrongVendorHourOrder = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<ushort, ushort> WrongVendorHourOrder = MutagenTopicBuilder.FromDiscussion(
+            222,
             "Wrong Vendor Hour Order",
             Severity.Error)
-        .WithFormatting<ushort, ushort>("Vendor hours are set to start at {0} and end at {1}, but the start hour is after the end hour, this vendor will never be available");
+        .WithFormatting<ushort, ushort>("Vendor hours are set to start at {0} and end at {1}, but the start hour is after or equal to the end hour");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [WrongVendorHourOrder];
 
@@ -32,6 +33,6 @@ public class VendorHourAnalyzer : IIsolatedRecordAnalyzer<IFactionGetter>
     public IEnumerable<Func<IFactionGetter, object?>> FieldsOfInterest()
     {
         yield return x => x.Flags;
-        yield return x => x.VendorLocation;
+        yield return x => x.VendorValues;
     }
 }

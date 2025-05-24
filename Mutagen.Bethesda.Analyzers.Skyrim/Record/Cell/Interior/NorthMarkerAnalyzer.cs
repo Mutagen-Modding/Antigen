@@ -6,12 +6,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior;
 
 public class NorthMarkerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition NoNorthMarker = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoNorthMarker = MutagenTopicBuilder.FromDiscussion(
+            262,
             "No North Marker",
             Severity.Suggestion)
         .WithoutFormatting("Missing north marker");
 
-    public static readonly TopicDefinition<int> MoreThanOneNorthMarker = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<int> MoreThanOneNorthMarker = MutagenTopicBuilder.FromDiscussion(
+            335,
             "More Than One North Marker",
             Severity.Suggestion)
         .WithFormatting<int>("Cell has {0} north markers when only one is permitted");
