@@ -17,6 +17,7 @@
     <PackageVersion Include="Mutagen.Bethesda.Skyrim" Version="0.50.1.0-alpha.20" />
     <PackageVersion Include="Mutagen.Bethesda.Testing" Version="0.50.1.0-alpha.20" />
     <PackageVersion Include="Noggog.CSharpExt" Version="2.71.0" />
+    <PackageVersion Include="Octokit.GraphQL" Version="0.4.0-beta" />
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.assert" Version="2.9.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.0.2">
