@@ -1,6 +1,7 @@
 ﻿using CommandLine;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Strings;
 
 namespace Mutagen.Bethesda.Analyzers.Cli.Args;
 
@@ -9,6 +10,9 @@ public class RunAnalyzersCommand : IMinimumSeverityConfiguration
 {
     [Option('g', "GameRelease", Required = true, HelpText = "Game Release to target")]
     public GameRelease GameRelease { get; set; }
+
+    [Option('l', "Language", Required = false, HelpText = "Language to target, defaults to English")]
+    public Language Language { get; set; } = Language.English;
 
     [Option("PrintTopics", Required = false, HelpText = "Whether to print the topics being run")]
     public bool PrintTopics { get; set; } = false;
