@@ -26,7 +26,7 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         .WithoutFormatting("Trainer npc does not have a specialized trainer faction");
 
     public static readonly TopicDefinition TrainerWithLevel1 = MutagenTopicBuilder.FromDiscussion(
-            199,
+            357,
             "Trainer npc has level 1",
             Severity.Warning)
         .WithoutFormatting("Trainer npc has level 1, they won't be able to train you");
