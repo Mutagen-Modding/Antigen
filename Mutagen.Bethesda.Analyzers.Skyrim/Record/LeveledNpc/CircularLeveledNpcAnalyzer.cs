@@ -4,7 +4,7 @@ using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
-namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
+namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.LeveledNpc;
 
 public class CircularLeveledNpcListAnalyzer : IContextualRecordAnalyzer<ILeveledNpcGetter>
 {
