@@ -18,7 +18,13 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
             Severity.Error)
         .WithFormatting<int, IConditionGetter>("Quest stage {0} referenced in condition {0} is invalid");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [InvalidConditionReference];
+    private static readonly TopicDefinition<INpcGetter> GetDeadCondition = MutagenTopicBuilder.FromDiscussion(
+            361,
+            "GetDead condition used on unique npc",
+            Severity.Warning)
+        .WithFormatting<INpcGetter>("GetDead used on unique npc {0} instead of GetDeadCount");
+
+    public IEnumerable<TopicDefinition> Topics { get; } = [InvalidConditionReference, InvalidStageCondition, GetDeadCondition];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
     {
@@ -40,6 +46,16 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                             InvalidConditionReference.Format(conditionData.Function.ToString()));
                         break;
                 }
+            }
+            else if (condition.Data is IGetDeadConditionDataGetter
+                     && condition.Data.RunOnType == Condition.RunOnType.Reference
+                     && condition.Data.Reference.TryResolve(param.LinkCache, out var reference)
+                     && reference is IPlacedNpcGetter placedNpc
+                     && placedNpc.Base.TryResolve(param.LinkCache, out var npc)
+                     && npc.IsUnique())
+            {
+                param.AddTopic(
+                    GetDeadCondition.Format(npc));
             }
             else if (condition is IConditionFloatGetter { Data: IGetStageConditionDataGetter getStage } floatCondition
                      && getStage.Quest.UsesLink() && getStage.Quest.Link.TryResolve(param.LinkCache, out var quest)
