@@ -11,9 +11,6 @@ public class RunAnalyzersCommand : IMinimumSeverityConfiguration
     [Option('g', "GameRelease", Required = true, HelpText = "Game Release to target")]
     public GameRelease GameRelease { get; set; }
 
-    [Option('l', "Language", Required = false, HelpText = "Language to target, defaults to English")]
-    public Language Language { get; set; } = Language.English;
-
     [Option("PrintTopics", Required = false, HelpText = "Whether to print the topics being run")]
     public bool PrintTopics { get; set; } = false;
 
