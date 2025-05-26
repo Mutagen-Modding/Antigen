@@ -2,20 +2,24 @@
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Fonts;
 using Mutagen.Bethesda.Fonts.DI;
+using Mutagen.Bethesda.Plugins.Meta;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Strings;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
-public class InvalidCharactersAnalyzerDialogResponses(IFontProviderFactory fontProviderFactory, Language language) : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
+public class InvalidCharactersAnalyzerDialogResponses(IFontProviderFactory fontProviderFactory, GameConstants gameConstants) : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
 {
-    private readonly IFontProvider _fontProvider = fontProviderFactory.Create(language);
+    private readonly Dictionary<Language, IFontProvider> _fontProviders = gameConstants.Languages.Append(Language.Japanese)
+        .ToDictionary(
+            l => l,
+            fontProviderFactory.Create);
 
-    public static readonly TopicDefinition<string> InvalidCharactersDialogResponses = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<string, Language> InvalidCharactersDialogResponses = MutagenTopicBuilder.FromDiscussion(
             268,
             "Dialog Responses Contains Invalid Characters",
             Severity.Error)
-        .WithFormatting<string>("Dialog response '{0}' contain invalid characters");
+        .WithFormatting<string, Language>("Dialog response '{0}' in {1} contain invalid characters");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [InvalidCharactersDialogResponses];
 
@@ -25,20 +29,23 @@ public class InvalidCharactersAnalyzerDialogResponses(IFontProviderFactory fontP
 
         foreach (var response in dialogResponses.Responses)
         {
-            if (!response.Text.TryLookup(language, out var str)) continue;
+            foreach (var (language, text) in response.Text)
+            {
+                var validNameChars = _fontProviders[language].ValidNameChars;
+                var invalidChars = text
+                    .ToCharArray()
+                    .Distinct()
+                    .Where(c => c != '"')
+                    .Where(c => !validNameChars.Contains(c))
+                    .ToArray();
 
-            var invalidChars = str
-                .ToCharArray()
-                .Distinct()
-                .Where(c => c != '"')
-                .Where(c => !_fontProvider.ValidNameChars.Contains(c))
-                .ToArray();
+                if (invalidChars.Length == 0) continue;
 
-            if (invalidChars.Length == 0) continue;
-
-            param.AddTopic(
-                InvalidCharactersDialogResponses.Format(),
+                param.AddTopic(
+                    InvalidCharactersDialogResponses.Format(text, language),
                     ("Invalid Characters", invalidChars));
+
+            }
         }
     }
 

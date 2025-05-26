@@ -1,6 +1,7 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Strings;
 using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
@@ -10,17 +11,17 @@ public class TooLongAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
     private const int DialogPromptLengthLimit = 80;
     private const int DialogResponseLengthLimit = 149;
 
-    public static readonly TopicDefinition<string, int> PromptTooLong = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<string, Language, int> PromptTooLong = MutagenTopicBuilder.FromDiscussion(
             274,
             "Prompt Too Long",
             Severity.Suggestion)
-        .WithFormatting<string, int>("Prompt '{0}' is {1} longer than the recommended limit " + DialogPromptLengthLimit);
+        .WithFormatting<string, Language, int>("Prompt '{0}' in {1} is {2} longer than the recommended limit " + DialogPromptLengthLimit);
 
-    public static readonly TopicDefinition<string, int> ResponseTooLong = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<string, Language, int> ResponseTooLong = MutagenTopicBuilder.FromDiscussion(
             341,
             "Response Too Long",
             Severity.Suggestion)
-        .WithFormatting<string, int>("Response '{0}' is {1} longer than the recommended limit " + DialogResponseLengthLimit);
+        .WithFormatting<string, Language, int>("Response '{0}' in {1} is {2} longer than the recommended limit " + DialogResponseLengthLimit);
 
     public IEnumerable<TopicDefinition> Topics { get; } = [PromptTooLong, ResponseTooLong];
 
@@ -29,20 +30,28 @@ public class TooLongAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
         var dialogResponses = param.Record;
 
         // Check prompt
-        if (dialogResponses.Prompt?.String is { Length: > DialogPromptLengthLimit })
+        if (dialogResponses.Prompt is {} prompt)
         {
-            param.AddTopic(
-                PromptTooLong.Format(dialogResponses.Prompt.String, dialogResponses.Prompt.String.Length - DialogPromptLengthLimit));
+            foreach (var (language, promptStr) in prompt) {
+                if (promptStr.Length > DialogPromptLengthLimit)
+                {
+                    param.AddTopic(
+                        PromptTooLong.Format(promptStr, language, promptStr.Length - DialogPromptLengthLimit));
+                }
+            }
         }
 
         // Check responses
-        foreach (var response in dialogResponses.Responses
-                     .Select(x => x.Text.String)
-                     .WhereNotNull()
-                     .Where(text => text is { Length: > DialogResponseLengthLimit }))
+        foreach (var response in dialogResponses.Responses)
         {
-            param.AddTopic(
-                ResponseTooLong.Format(response, response.Length - DialogResponseLengthLimit));
+            foreach (var (language, text) in response.Text)
+            {
+                if (text.Length > DialogPromptLengthLimit)
+                {
+                    param.AddTopic(
+                        ResponseTooLong.Format(text, language, text.Length - DialogResponseLengthLimit));
+                }
+            }
         }
     }
 

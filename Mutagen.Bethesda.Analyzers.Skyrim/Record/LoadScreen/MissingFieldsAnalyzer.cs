@@ -1,17 +1,18 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Strings;
 using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.LoadScreen;
 
 public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<ILoadScreenGetter>
 {
-    public static readonly TopicDefinition NoDescription = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<Language> NoDescription = MutagenTopicBuilder.FromDiscussion(
             232,
             "No Description",
             Severity.Suggestion)
-        .WithoutFormatting("LoadScreen has no description");
+        .WithFormatting<Language>("LoadScreen has no description in {0}");
 
     public static readonly TopicDefinition No3DModel = MutagenTopicBuilder.FromDiscussion(
             311,
@@ -25,9 +26,12 @@ public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<ILoadScreenGetter>
     {
         var loadScreen = param.Record;
 
-        if (loadScreen.Description.String.IsNullOrWhitespace())
+        foreach (var (language, desc) in loadScreen.Description)
         {
-            param.AddTopic(NoDescription.Format());
+            if (desc.IsNullOrWhitespace())
+            {
+                param.AddTopic(NoDescription.Format(language));
+            }
         }
 
         if (loadScreen.LoadingScreenNif.IsNull)

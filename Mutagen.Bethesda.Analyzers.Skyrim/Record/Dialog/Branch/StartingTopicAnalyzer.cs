@@ -1,11 +1,13 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins.Meta;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Strings;
 using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Branch;
 
-public class StartingTopicAnalyzer : IContextualRecordAnalyzer<IDialogBranchGetter>
+public class StartingTopicAnalyzer(GameConstants gameConstants) : IContextualRecordAnalyzer<IDialogBranchGetter>
 {
     public static readonly TopicDefinition NoStartingTopic = MutagenTopicBuilder.FromDiscussion(
             265,
@@ -13,11 +15,11 @@ public class StartingTopicAnalyzer : IContextualRecordAnalyzer<IDialogBranchGett
             Severity.Error)
         .WithoutFormatting("Branch has no starting topic");
 
-    public static readonly TopicDefinition<IDialogResponsesGetter> NoPromptOnStartingTopic = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<Language, IDialogResponsesGetter> NoPromptOnStartingTopic = MutagenTopicBuilder.FromDiscussion(
             336,
             "No Prompt On Starting Topic",
             Severity.Error)
-        .WithFormatting<IDialogResponsesGetter>("Top level branch has starting topic with no prompt on topic or response {0}");
+        .WithFormatting<Language, IDialogResponsesGetter>("Top level branch has starting topic with no prompt in {0} on topic or response {1}");
 
     public IEnumerable<TopicDefinition> Topics => [NoStartingTopic, NoPromptOnStartingTopic];
 
@@ -41,13 +43,21 @@ public class StartingTopicAnalyzer : IContextualRecordAnalyzer<IDialogBranchGett
             // Rumors are not required to have a prompt - it will default to a prompt set by a game setting
             if (topic.SubtypeName == "RUMO") return;
 
-            if (topic.Name is not null && !topic.Name.String.IsNullOrEmpty()) return;
+            var name = topic.Name;
+            foreach (var language in gameConstants.Languages)
+            {
+                if (name is not null
+                    && name.TryLookup(language, out var nameStr)
+                    && !nameStr.IsNullOrEmpty()) continue;
 
-            foreach (var responses in topic.Responses) {
-                if (responses.Prompt?.String is null)
+                foreach (var responses in topic.Responses)
                 {
-                    param.AddTopic(
-                        NoPromptOnStartingTopic.Format(responses));
+                    if (responses.Prompt is null
+                        || (responses.Prompt.TryLookup(language, out var prompt) && prompt.IsNullOrEmpty()))
+                    {
+                        param.AddTopic(
+                            NoPromptOnStartingTopic.Format(language, responses));
+                    }
                 }
             }
         }

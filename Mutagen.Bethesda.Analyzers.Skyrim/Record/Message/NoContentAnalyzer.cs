@@ -1,30 +1,36 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins.Meta;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Strings;
 using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Message;
 
-public class NoContentAnalyzer : IIsolatedRecordAnalyzer<IMessageGetter>
+public class NoContentAnalyzer(GameConstants gameConstants) : IIsolatedRecordAnalyzer<IMessageGetter>
 {
-    public static readonly TopicDefinition NoContent = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<Language> NoContent = MutagenTopicBuilder.FromDiscussion(
             236,
             "No Content",
             Severity.Suggestion)
-        .WithoutFormatting("Message has no content");
+        .WithFormatting<Language>("Message has no content in {0}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoContent];
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IMessageGetter> param)
     {
         var message = param.Record;
+        if (message.Name is null) return;
 
-        if ((message.Name is null || message.Name.String.IsNullOrWhitespace())
-            && message.Description.String.IsNullOrWhitespace()
-            && message.MenuButtons.Count == 0)
+        foreach (var language in gameConstants.Languages)
         {
-            param.AddTopic(
-                NoContent.Format());
+            if (message.MenuButtons.Count == 0
+                && message.Name.TryLookup(language, out var name) && name.IsNullOrWhitespace()
+                && message.Description.TryLookup(language, out var desc) && desc.IsNullOrWhitespace())
+            {
+                param.AddTopic(
+                    NoContent.Format(language));
+            }
         }
     }
 

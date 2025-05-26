@@ -1,42 +1,48 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
-using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Fonts;
 using Mutagen.Bethesda.Fonts.DI;
+using Mutagen.Bethesda.Plugins.Meta;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Strings;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Book;
 
-public class InvalidCharactersAnalyzerBook(IFontProviderFactory fontProviderFactory, Language language) : IIsolatedRecordAnalyzer<IBookGetter>
+public class InvalidCharactersAnalyzerBook(IFontProviderFactory fontProviderFactory, GameConstants gameConstants) : IIsolatedRecordAnalyzer<IBookGetter>
 {
-    private readonly IFontProvider _fontProvider = fontProviderFactory.Create(language);
+    private readonly Dictionary<Language, IFontProvider> _fontProviders = gameConstants.Languages.Append(Language.Japanese)
+        .ToDictionary(
+            l => l,
+            fontProviderFactory.Create);
 
-    public static readonly TopicDefinition InvalidCharactersBookText = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<Language> InvalidCharactersBookText = MutagenTopicBuilder.FromDiscussion(
             220,
             "Book Text Contains Invalid Characters",
             Severity.Error)
-        .WithoutFormatting("Book text contains invalid characters");
+        .WithFormatting<Language>("Book text contains invalid characters in {0}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [InvalidCharactersBookText];
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IBookGetter> param)
     {
         var book = param.Record;
-        if (!book.BookText.TryLookup(language, out var str)) return;
 
-        var invalidChars = str
-            .ToCharArray()
-            .Distinct()
-            .Where(c => c != '"' && c != '\r' && c != '\n' && c != '\t')
-            .Where(c => !_fontProvider.ValidNameChars.Contains(c))
-            .ToArray();
+        foreach (var (language, text) in book.BookText)
+        {
+            var invalidChars = text
+                .ToCharArray()
+                .Distinct()
+                .Where(c => c != '"' && c != '\r' && c != '\n' && c != '\t')
+                .Where(c => !_fontProviders[language].ValidNameChars.Contains(c))
+                .ToArray();
 
-        if (invalidChars.Length == 0) return;
+            if (invalidChars.Length == 0) return;
 
-        param.AddTopic(
-            InvalidCharactersBookText.Format(),
-            ("Invalid Characters", invalidChars));
+            param.AddTopic(
+                InvalidCharactersBookText.Format(),
+                ("Invalid Characters", invalidChars));
+
+        }
     }
 
     IEnumerable<Func<IBookGetter, object?>> IIsolatedRecordAnalyzer<IBookGetter>.FieldsOfInterest()
