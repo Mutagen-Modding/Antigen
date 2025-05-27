@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Outfit;
 
 public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IOutfitGetter>
 {
-    public static readonly TopicDefinition NoItems = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoItems = MutagenTopicBuilder.FromDiscussion(
+            248,
             "No Items",
             Severity.Warning)
         .WithoutFormatting("Outfit has no items");

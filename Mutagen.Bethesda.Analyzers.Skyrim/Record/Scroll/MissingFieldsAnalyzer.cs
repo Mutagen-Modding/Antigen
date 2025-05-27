@@ -6,15 +6,17 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Scroll;
 
 public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IScrollGetter>
 {
-    public static readonly TopicDefinition MissingVendorKeyword = MutagenTopicBuilder.DevelopmentTopic(
-            "Missing Vendor Keyword",
-            Severity.Suggestion)
+    public static readonly TopicDefinition MissingVendorKeyword = MutagenTopicBuilder.FromDiscussion(
+            256,
+            "Missing VendorItemScroll Keyword",
+            Severity.Warning)
         .WithoutFormatting("Scroll is missing VendorItemScroll keyword");
 
-    public static readonly TopicDefinition EmptyEffectList = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition EmptyEffectList = MutagenTopicBuilder.FromDiscussion(
+            331,
             "Empty Effect List",
             Severity.Suggestion)
-        .WithoutFormatting("Spell has no effect");
+        .WithoutFormatting("Scroll has no effect");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [MissingVendorKeyword, EmptyEffectList];
 

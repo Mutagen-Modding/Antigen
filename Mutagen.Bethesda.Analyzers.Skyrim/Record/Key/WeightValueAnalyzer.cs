@@ -6,12 +6,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Key;
 
 public class WeightValueAnalyzer : IIsolatedRecordAnalyzer<IKeyGetter>
 {
-    public static readonly TopicDefinition<float> WeightNotZero = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<float> WeightNotZero = MutagenTopicBuilder.FromDiscussion(
+            229,
             "Weight Not Zero",
             Severity.Suggestion)
         .WithFormatting<float>("Key weight {0} is not zero");
 
-    public static readonly TopicDefinition<uint> ValueNotZero = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<uint> ValueNotZero = MutagenTopicBuilder.FromDiscussion(
+            310,
             "Value Not Zero",
             Severity.Suggestion)
         .WithFormatting<uint>("Key value {0} is not zero");

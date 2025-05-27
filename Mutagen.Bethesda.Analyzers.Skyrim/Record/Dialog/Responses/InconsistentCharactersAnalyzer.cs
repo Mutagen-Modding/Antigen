@@ -2,21 +2,24 @@
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Strings;
 using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
 public class InconsistentCharactersAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
 {
-    public static readonly TopicDefinition<string> PromptInconsistentCharacters = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, Language> PromptInconsistentCharacters = MutagenTopicBuilder.FromDiscussion(
+            275,
             "Prompt Has Inconsistent Characters",
             Severity.Suggestion)
-        .WithFormatting<string>("Response {0} contains characters which are not usually used in dialog");
+        .WithFormatting<string, Language>("Prompt {0} in {1} contains characters which are not usually used in dialog");
 
-    public static readonly TopicDefinition<string> ResponseInconsistentCharacters = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, Language> ResponseInconsistentCharacters = MutagenTopicBuilder.FromDiscussion(
+            337,
             "Response Has Inconsistent Characters",
             Severity.Suggestion)
-        .WithFormatting<string>("Response {0} contains characters which are not usually used in dialog");
+        .WithFormatting<string, Language>("Response {0} in {1} contains characters which are not usually used in dialog");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [PromptInconsistentCharacters, ResponseInconsistentCharacters];
 
@@ -25,17 +28,20 @@ public class InconsistentCharactersAnalyzer : IIsolatedRecordAnalyzer<IDialogRes
         var dialogResponses = param.Record;
 
         // Check prompt
-        if (dialogResponses.Prompt?.String is not null)
+        if (dialogResponses.Prompt is {} prompt)
         {
-            InvalidCharactersAnalyzerUtil.CheckInconsistentCharacters(param, dialogResponses.Prompt.String, PromptInconsistentCharacters);
+            foreach (var (language, promptStr) in prompt) {
+                InvalidCharactersAnalyzerUtil.CheckInconsistentCharacters(param, promptStr, language, PromptInconsistentCharacters);
+            }
         }
 
         // Check responses
-        foreach (var response in dialogResponses.Responses
-                     .Select(x => x.Text.String)
-                     .WhereNotNull())
+        foreach (var response in dialogResponses.Responses)
         {
-            InvalidCharactersAnalyzerUtil.CheckInconsistentCharacters(param, response, ResponseInconsistentCharacters);
+            foreach (var (language, text) in response.Text)
+            {
+                InvalidCharactersAnalyzerUtil.CheckInconsistentCharacters(param, text, language, ResponseInconsistentCharacters);
+            }
         }
     }
 

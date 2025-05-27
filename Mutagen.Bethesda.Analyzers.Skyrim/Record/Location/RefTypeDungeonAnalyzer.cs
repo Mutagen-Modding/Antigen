@@ -6,12 +6,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Location;
 
 public class RefTypeDungeonAnalyzer : IContextualRecordAnalyzer<ILocationGetter>
 {
-    public static readonly TopicDefinition NoBossRefType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoBossRefType = MutagenTopicBuilder.FromDiscussion(
+            234,
             "No Boss",
             Severity.Suggestion)
         .WithoutFormatting("Dungeon location has no Boss Ref Type - not set up for radiant quests");
 
-    public static readonly TopicDefinition NoBossContainerRefType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoBossContainerRefType = MutagenTopicBuilder.FromDiscussion(
+            312,
             "No Boss Container",
             Severity.Suggestion)
         .WithoutFormatting("Dungeon location has no Boss Container Ref Type - not set up for radiant quests");

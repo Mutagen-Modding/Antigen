@@ -7,7 +7,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Object;
 
 public class MineOreAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 {
-    public static readonly TopicDefinition NoFurnitureLinked = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoFurnitureLinked = MutagenTopicBuilder.FromDiscussion(
+            287,
             "No Furniture Linked",
             Severity.Error)
         .WithoutFormatting("Mine Ore has no furniture linked");

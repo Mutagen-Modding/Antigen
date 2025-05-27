@@ -6,12 +6,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Npc;
 
 public class UniquePlacedNpcAnalyzer : IContextualRecordAnalyzer<IPlacedNpcGetter>
 {
-    public static readonly TopicDefinition UniqueNpcNotInPersistenceLocation = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition UniqueNpcNotInPersistenceLocation = MutagenTopicBuilder.FromDiscussion(
+            285,
             "Unique NPC not in Persistence Location",
             Severity.Error)
         .WithoutFormatting("Placed NPCs should be placed in persistence location, otherwise they might not be loaded");
 
-    public static readonly TopicDefinition UniqueNpcWithoutPersistenceLocation = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition UniqueNpcWithoutPersistenceLocation = MutagenTopicBuilder.FromDiscussion(
+            345,
             "Unique NPC without Persistence Location",
             Severity.Error)
         .WithoutFormatting("Placed NPCs should have a persistence location if the NPC is unique, excludes always persistent npc or initially disabled NPCs");

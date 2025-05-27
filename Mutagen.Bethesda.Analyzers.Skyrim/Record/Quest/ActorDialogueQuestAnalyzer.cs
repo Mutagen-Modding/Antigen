@@ -6,47 +6,56 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest;
 
 public class ActorDialogueQuestAnalyzer : IIsolatedRecordAnalyzer<IQuestGetter>
 {
-    public static readonly TopicDefinition NoAliases = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoAliases = MutagenTopicBuilder.FromDiscussion(
+            251,
             "No Aliases",
             Severity.Error)
         .WithoutFormatting("Quest has no aliases");
 
-    public static readonly TopicDefinition OddNumberOfAliases = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition OddNumberOfAliases = MutagenTopicBuilder.FromDiscussion(
+            323,
             "Odd Number Of Aliases",
-            Severity.Error)
+            Severity.Warning)
         .WithoutFormatting("Quest has an odd number of aliases");
 
-    public static readonly TopicDefinition<string?> AliasWithoutFindMatchingRefFromEvent = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string?> AliasWithoutFindMatchingRefFromEvent = MutagenTopicBuilder.FromDiscussion(
+            324,
             "Alias without Find Matching Reference From Event",
             Severity.Error)
-        .WithFormatting<string?>("Alias {0} isn't Find Matching Reference From Event");
+        .WithFormatting<string?>("Alias {0} is not filled with Find Matching Reference From Event fill type");
 
-    public static readonly TopicDefinition<string?, int, int> AliasWithoutSameNumberOfConditionsAsNpcs = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string?, int, int> AliasWithoutSameNumberOfConditionsAsNpcs = MutagenTopicBuilder.FromDiscussion(
+            325,
             "Alias without same number of conditions as npcs",
             Severity.Error)
         .WithFormatting<string?, int, int>("Alias {0} has {1} conditions, which doesn't match the {2} npcs in the scene");
 
-    public static readonly TopicDefinition<string?> AliasWithoutGetIsIDCondition = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string?> AliasWithoutGetIsIDCondition = MutagenTopicBuilder.FromDiscussion(
+            326,
             "Alias without GetIsID condition",
             Severity.Error)
         .WithFormatting<string?>("Alias {0} uses conditions which are not GetIsID");
 
-    public static readonly TopicDefinition<string?, int, int> AliasWithoutSameNumberOfGetIsIDConditionsAsNpcs = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string?, int, int> AliasWithoutSameNumberOfGetIsIDConditionsAsNpcs = MutagenTopicBuilder.FromDiscussion(
+            327,
             "Alias without same number of GetIsID conditions as npcs",
             Severity.Error)
         .WithFormatting<string?, int, int>("Alias {0} has {1} GetIsID conditions, which doesn't match the {2} npcs in the scene");
 
-    public static readonly TopicDefinition<string?, int> AliasWithoutGetDistanceCondition = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string?, int> AliasWithoutGetDistanceCondition = MutagenTopicBuilder.FromDiscussion(
+            328,
             "Alias without GetDistance condition",
             Severity.Error)
         .WithFormatting<string?, int>("Alias {0} has {1} GetDistance conditions, not 1");
 
-    public static readonly TopicDefinition<string?> AliasWithoutUniqueActor = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string?> AliasWithoutUniqueActor = MutagenTopicBuilder.FromDiscussion(
+            329,
             "Alias without Unique Actor",
             Severity.Error)
-        .WithFormatting<string?>("Alias {0} doesn't have a Unique Actor");
+        .WithFormatting<string?>("Alias {0} is not filled with Unique Actor fill type");
 
-    public static readonly TopicDefinition<string?> AliasWithoutAllowReuseInQuestFlag = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string?> AliasWithoutAllowReuseInQuestFlag = MutagenTopicBuilder.FromDiscussion(
+            330,
             "Alias without Allow Reuse In Quest flag",
             Severity.Error)
         .WithFormatting<string?>("Alias {0} doesn't have Allow Reuse In Quest flag");

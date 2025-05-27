@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Spell;
 
 public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<ISpellGetter>
 {
-    public static readonly TopicDefinition EmptyEffectList = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition EmptyEffectList = MutagenTopicBuilder.FromDiscussion(
+            257,
             "Empty Effect List",
             Severity.Suggestion)
         .WithoutFormatting("Spell has no effect");

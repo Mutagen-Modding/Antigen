@@ -6,9 +6,10 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
 public class NoVoiceTypeAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition NoVoiceType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoVoiceType = MutagenTopicBuilder.FromDiscussion(
+            284,
             "No Voice Type",
-            Severity.Warning)
+            Severity.Error)
         .WithoutFormatting("Npc has no voice type");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoVoiceType];

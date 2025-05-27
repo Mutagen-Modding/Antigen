@@ -6,22 +6,26 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior.Settlement;
 
 public class DoorAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition<IPlacedObjectGetter> NotLocked = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IPlacedObjectGetter> NotLocked = MutagenTopicBuilder.FromDiscussion(
+            292,
             "Door Not Locked",
             Severity.Warning)
         .WithFormatting<IPlacedObjectGetter>("{0} is a door leading to the exterior and should be locked");
 
-    public static readonly TopicDefinition<IPlacedObjectGetter> NoKey = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IPlacedObjectGetter> NoKey = MutagenTopicBuilder.FromDiscussion(
+            351,
             "Door Has No Key",
             Severity.Suggestion)
         .WithFormatting<IPlacedObjectGetter>("{0} is missing a key");
 
-    public static readonly TopicDefinition<IPlacedObjectGetter> NoOwner = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IPlacedObjectGetter> NoOwner = MutagenTopicBuilder.FromDiscussion(
+            352,
             "Door Has No Owner",
             Severity.Warning)
         .WithFormatting<IPlacedObjectGetter>("{0} is not owned");
 
-    public static readonly TopicDefinition<IPlacedObjectGetter> ExteriorDoorLocked = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IPlacedObjectGetter> ExteriorDoorLocked = MutagenTopicBuilder.FromDiscussion(
+            353,
             "Exterior Door Is Locked",
             Severity.Warning)
         .WithFormatting<IPlacedObjectGetter>("{0} should not be locked, just the interior door");

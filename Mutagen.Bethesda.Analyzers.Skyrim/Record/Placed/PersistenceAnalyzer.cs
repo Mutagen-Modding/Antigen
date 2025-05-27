@@ -7,7 +7,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed;
 
 public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
 {
-    public static readonly TopicDefinition UnnecessaryPersistence = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition UnnecessaryPersistence = MutagenTopicBuilder.FromDiscussion(
+            250,
             "Unnecessary Persistence",
             Severity.Warning)
         .WithoutFormatting("Placed record is persistent but does not need to be");

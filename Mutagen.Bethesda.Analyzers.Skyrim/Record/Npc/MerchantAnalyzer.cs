@@ -6,10 +6,11 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class MerchantAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition MerchantWithoutSpecialization = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition MerchantWithoutSpecialization = MutagenTopicBuilder.FromDiscussion(
+            200,
             "Merchant without specialization",
             Severity.Warning)
-        .WithoutFormatting("Npc has JobMerchant faction, but doesn't have any other Job faction");
+        .WithoutFormatting("Merchant npc does not have a specialized merchant faction");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [MerchantWithoutSpecialization];
 

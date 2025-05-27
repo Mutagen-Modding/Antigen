@@ -7,7 +7,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Armor;
 
 public class KeywordArmorTypeAnalyzer : IIsolatedRecordAnalyzer<IArmorGetter>
 {
-    public static readonly TopicDefinition<ArmorType> ArmorMatchingKeywordArmorType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<ArmorType> ArmorMatchingKeywordArmorType = MutagenTopicBuilder.FromDiscussion(
+            216,
             "Armor keywords don't match their equipped armor type",
             Severity.Suggestion)
         .WithFormatting<ArmorType>("Has armor type {0} but doesn't have matching keywords");
@@ -27,7 +28,7 @@ public class KeywordArmorTypeAnalyzer : IIsolatedRecordAnalyzer<IArmorGetter>
         // Ignore armor with no keywords, these are usually skin armor
         if (armor.Keywords is null) return;
 
-        // Shields are always have the same keyword ArmorShield
+        // Shields always have the same keyword ArmorShield
         if (armor.BodyTemplate.FirstPersonFlags.HasFlag(BipedObjectFlag.Shield)) return;
 
         List<FormLink<IKeywordGetter>> matchingKeywords = armor.BodyTemplate.ArmorType switch

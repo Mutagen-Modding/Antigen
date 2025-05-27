@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Static;
 
 public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IStaticGetter>
 {
-    public static readonly TopicDefinition MissingLod = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition MissingLod = MutagenTopicBuilder.FromDiscussion(
+            259,
             "Missing LOD",
             Severity.Suggestion)
         .WithoutFormatting("Static has LOD flag but no LOD models");

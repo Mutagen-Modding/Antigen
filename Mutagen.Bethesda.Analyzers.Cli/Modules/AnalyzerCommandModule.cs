@@ -11,7 +11,9 @@ using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Meta;
 using Mutagen.Bethesda.Plugins.Order.DI;
+using Mutagen.Bethesda.Strings;
 using Noggog;
 using Noggog.WorkEngine;
 
@@ -24,6 +26,7 @@ public class AnalyzerCommandModule(RunAnalyzersCommand command) : Module
         builder.RegisterInstance(command).AsImplementedInterfaces();
         builder.RegisterInstance(new GameReleaseInjection(command.GameRelease)).AsImplementedInterfaces();
         builder.RegisterInstance(new NumWorkThreadsConstant(command.NumThreads)).AsImplementedInterfaces();
+        builder.RegisterInstance(GameConstants.Get(command.GameRelease)).As<GameConstants>();
 
         var runConfig = new RunConfig();
         if (command.RunConfigPath is not null)

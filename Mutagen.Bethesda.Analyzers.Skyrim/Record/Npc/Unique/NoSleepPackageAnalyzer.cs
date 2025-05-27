@@ -7,7 +7,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
 public class NoSleepPackageAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition NoSleepPackage = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoSleepPackage = MutagenTopicBuilder.FromDiscussion(
+            283,
             "No Sleep Package",
             Severity.Warning)
         .WithoutFormatting("Npc has no sleep package");

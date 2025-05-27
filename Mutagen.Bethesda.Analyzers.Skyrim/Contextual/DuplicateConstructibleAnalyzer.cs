@@ -8,7 +8,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Contextual;
 
 public class DuplicateConstructibleAnalyzer : IContextualAnalyzer
 {
-    private static readonly TopicDefinition<int, IFormLinkNullableGetter<IConstructibleGetter>> DuplicateConstructibleReference = MutagenTopicBuilder.DevelopmentTopic(
+    private static readonly TopicDefinition<int, IFormLinkNullableGetter<IConstructibleGetter>> DuplicateConstructibleReference = MutagenTopicBuilder.FromDiscussion(
+            206,
             "Duplicate Constructible Object",
             Severity.Warning)
         .WithFormatting<int, IFormLinkNullableGetter<IConstructibleGetter>>("{0} Constructibles are creating the same item {1}, all but one should be removed.");

@@ -8,22 +8,26 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Armor;
 
 public class FootstepAnalyzer : IContextualRecordAnalyzer<IArmorGetter>
 {
-    public static readonly TopicDefinition<ArmorType> UnknownArmorType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<ArmorType> UnknownArmorType = MutagenTopicBuilder.FromDiscussion(
+            215,
             "Unknown Armor Type",
-            Severity.Suggestion)
+            Severity.Error)
         .WithFormatting<ArmorType>("Armor type is set to unknown value {0}");
 
-    public static readonly TopicDefinition<ArmorType, IArmorAddonGetter, IFormLinkGetter<IFootstepSetGetter>> ArmorMatchingFootstepArmorType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<ArmorType, IArmorAddonGetter, IFormLinkGetter<IFootstepSetGetter>> ArmorMatchingFootstepArmorType = MutagenTopicBuilder.FromDiscussion(
+            300,
             "Footsteps on armor don't match their equipped armor type",
-            Severity.Suggestion)
+            Severity.Warning)
         .WithFormatting<ArmorType, IArmorAddonGetter, IFormLinkGetter<IFootstepSetGetter>>("Armor has armor type {0} but armor addon {1} doesn't have footstep {2}");
 
-    public static readonly TopicDefinition ArmorMissingFootstep = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition ArmorMissingFootstep = MutagenTopicBuilder.FromDiscussion(
+            301,
             "Armor has no footstep sound",
             Severity.Warning)
         .WithoutFormatting("Armor has no armor addon that adds footstep sounds");
 
-    public static readonly TopicDefinition<IFormLinkGetter<IRaceGetter>> ArmorDuplicateFootstep = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IFormLinkGetter<IRaceGetter>> ArmorDuplicateFootstep = MutagenTopicBuilder.FromDiscussion(
+            302,
             "Armor has more than one armor addon that adds footstep sound",
             Severity.Suggestion)
         .WithFormatting<IFormLinkGetter<IRaceGetter>>("Armor has multiple armor addons that have footstep sounds which are enabled for the same race {0}");

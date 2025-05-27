@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior.Settlement;
 
 public class NoOwnerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition NoOwner = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoOwner = MutagenTopicBuilder.FromDiscussion(
+            297,
             "No Owner",
             Severity.Suggestion)
         .WithoutFormatting("Cell has no owner");

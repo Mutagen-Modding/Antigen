@@ -7,12 +7,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Object;
 
 public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 {
-    public static readonly TopicDefinition<string, IPlaceableObjectGetter, float> ScaleTooSmall = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, IPlaceableObjectGetter, float> ScaleTooSmall = MutagenTopicBuilder.FromDiscussion(
+            291,
             "Scale Too Small",
             Severity.Warning)
         .WithFormatting<string, IPlaceableObjectGetter, float>("A {0} placement of {1} with scale {2} is too small");
 
-    public static readonly TopicDefinition<string, IPlaceableObjectGetter, float> ScaleTooLarge = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<string, IPlaceableObjectGetter, float> ScaleTooLarge = MutagenTopicBuilder.FromDiscussion(
+            350,
             "Scale Too Large",
             Severity.Warning)
         .WithFormatting<string, IPlaceableObjectGetter, float>("A {0} placement of {1} with scale {2} is too large");

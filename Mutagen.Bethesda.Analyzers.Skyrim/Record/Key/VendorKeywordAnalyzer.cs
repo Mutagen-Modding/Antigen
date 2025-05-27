@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Key;
 
 public class VendorKeywordAnalyzer : IIsolatedRecordAnalyzer<IKeyGetter>
 {
-    public static readonly TopicDefinition MissingVendorItemKeyword = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition MissingVendorItemKeyword = MutagenTopicBuilder.FromDiscussion(
+            228,
             "Missing VendorItemKey Keyword",
             Severity.Suggestion)
         .WithoutFormatting("Key is missing the VendorItemKey keyword");

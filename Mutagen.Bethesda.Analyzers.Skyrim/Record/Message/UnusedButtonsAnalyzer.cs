@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Message;
 
 public class UnusedButtonsAnalyzer : IIsolatedRecordAnalyzer<IMessageGetter>
 {
-    public static readonly TopicDefinition<int> UnusedButtons = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<int> UnusedButtons = MutagenTopicBuilder.FromDiscussion(
+            237,
             "Unused Buttons",
             Severity.Suggestion)
         .WithFormatting<int>("Notification message has {0} buttons that will not be displayed");

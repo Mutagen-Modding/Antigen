@@ -7,7 +7,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest;
 
 public class ObjectWindowFilterAnalyzer : IIsolatedRecordAnalyzer<IQuestGetter>
 {
-    public static readonly TopicDefinition NoObjectWindowFilter = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoObjectWindowFilter = MutagenTopicBuilder.FromDiscussion(
+            253,
             "No Object Window Filter",
             Severity.Suggestion)
         .WithoutFormatting("Quest has no Object Window Filter");

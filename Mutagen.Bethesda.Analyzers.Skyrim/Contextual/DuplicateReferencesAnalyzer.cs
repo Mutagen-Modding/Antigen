@@ -8,7 +8,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Contextual;
 
 public class DuplicateReferencesAnalyzer : IContextualAnalyzer
 {
-    public static readonly TopicDefinition<ICellGetter, IFormLinkNullableGetter<IPlaceableObjectGetter>> DuplicateReferences = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<ICellGetter, IFormLinkNullableGetter<IPlaceableObjectGetter>> DuplicateReferences = MutagenTopicBuilder.FromDiscussion(
+            207,
             "Duplicate References",
             Severity.Suggestion)
         .WithFormatting<ICellGetter, IFormLinkNullableGetter<IPlaceableObjectGetter>>("Cell {0} has multiple identical references of {1}");

@@ -1,30 +1,50 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
-using Mutagen.Bethesda.Analyzers.Skyrim.Util;
+using Mutagen.Bethesda.Fonts;
+using Mutagen.Bethesda.Fonts.DI;
 using Mutagen.Bethesda.Plugins.Aspects;
+using Mutagen.Bethesda.Plugins.Meta;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Strings;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Named;
 
-public class InvalidCharactersAnalyzerNamed : IIsolatedRecordAnalyzer<ISkyrimMajorRecordGetter>
+public class InvalidCharactersAnalyzerNamed(IFontProviderFactory fontProviderFactory, GameConstants gameConstants) : IIsolatedRecordAnalyzer<ISkyrimMajorRecordGetter>
 {
-    public static readonly TopicDefinition InvalidCharactersName = MutagenTopicBuilder.DevelopmentTopic(
+    private readonly Dictionary<Language, IFontProvider> _fontProviders = gameConstants.Languages.Append(Language.Japanese)
+        .ToDictionary(
+            l => l,
+            fontProviderFactory.Create);
+
+    public static readonly TopicDefinition<string?, Language> InvalidCharactersName = MutagenTopicBuilder.FromDiscussion(
+            238,
             "Invalid Characters in Name",
-            Severity.Warning)
-        .WithoutFormatting("The name contains invalid characters");
+            Severity.Error)
+        .WithFormatting<string?, Language>("The name {0} contains invalid characters in {1}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [InvalidCharactersName];
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
     {
-        if (param.Record is not INamedGetter { Name: not null } named) return;
+        if (param.Record is not ITranslatedNamedGetter { Name: not null } named) return;
 
-        var invalidStrings = InvalidCharactersAnalyzerUtil.InvalidStrings.Where(invalidString => named.Name.Contains(invalidString.Key)).ToList();
-        if (invalidStrings.Count == 0) return;
 
-        param.AddTopic(
-            InvalidCharactersName.Format(),
-            ("Invalid Strings", invalidStrings.Select(x => x.Key)));
+        foreach (var (language, name) in named.Name)
+        {
+            var invalidChars = name
+                .ToCharArray()
+                .Distinct()
+                .Where(c => c != '"')
+                .Where(c => !_fontProviders[language].ValidNameChars.Contains(c))
+                .ToArray();
+
+            if (invalidChars.Length == 0) return;
+
+            param.AddTopic(
+                InvalidCharactersName.Format(name, language),
+                ("Invalid Characters", invalidChars));
+
+        }
     }
 
     public IEnumerable<Func<ISkyrimMajorRecordGetter, object?>> FieldsOfInterest()

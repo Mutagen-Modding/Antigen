@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class ChildLowConfidenceAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition ChildLowConfidence = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition ChildLowConfidence = MutagenTopicBuilder.FromDiscussion(
+            241,
             "Child low confidence",
             Severity.Suggestion)
         .WithoutFormatting("Child  doesn't have low confidence");
@@ -29,6 +30,7 @@ public class ChildLowConfidenceAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public IEnumerable<Func<INpcGetter, object?>> FieldsOfInterest()
     {
         yield return x => x.MajorFlags;
+        yield return x => x.AIData.Confidence;
         yield return x => x.Race;
     }
 }

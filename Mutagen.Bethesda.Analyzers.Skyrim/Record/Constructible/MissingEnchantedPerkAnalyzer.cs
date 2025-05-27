@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Constructible;
 
 public class MissingEnchantedPerkAnalyzer : IIsolatedRecordAnalyzer<IConstructibleObjectGetter>
 {
-    public static readonly TopicDefinition MissingCreatedObject = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition MissingCreatedObject = MutagenTopicBuilder.FromDiscussion(
+            221,
             "Missing Perk for Enchanted Weapon/Armor",
             Severity.Suggestion)
         .WithoutFormatting("Temper recipes need to have condition EPTemperingItemIsEnchanted = 0 or HasPerk ArcaneBlacksmith");

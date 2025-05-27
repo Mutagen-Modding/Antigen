@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Object;
 
 public class MultiBoundMarkerAnalyzer : IIsolatedRecordAnalyzer<IPlacedObjectGetter>
 {
-    public static readonly TopicDefinition MultiBoundMarker = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition MultiBoundMarker = MutagenTopicBuilder.FromDiscussion(
+            288,
             "MultiBound Marker Placement",
             Severity.Warning)
         .WithoutFormatting("Placed Object is a MultiBound Marker which doesn't work in Skyrim");

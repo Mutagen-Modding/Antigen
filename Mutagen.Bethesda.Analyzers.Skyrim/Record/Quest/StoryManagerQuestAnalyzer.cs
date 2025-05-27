@@ -6,9 +6,10 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest;
 
 public class StoryManagerQuestAnalyzer : IContextualRecordAnalyzer<IQuestGetter>
 {
-    public static readonly TopicDefinition StoryManagerQuestNotAssigned = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition StoryManagerQuestNotAssigned = MutagenTopicBuilder.FromDiscussion(
+            254,
             "Story Manager Quest not assigned",
-            Severity.Warning)
+            Severity.Error)
         .WithoutFormatting("Quest with Story Manager Event not assigned to any Story Manager Quest Node");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [StoryManagerQuestNotAssigned];

@@ -7,22 +7,26 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Object;
 
 public class MapMarkerAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 {
-    public static readonly TopicDefinition NoMenuDisplayObject = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoMenuDisplayObject = MutagenTopicBuilder.FromDiscussion(
+            286,
             "Not Persistent",
             Severity.Error)
         .WithoutFormatting("Map marker not persistent");
 
-    public static readonly TopicDefinition NoLocRefType = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoLocRefType = MutagenTopicBuilder.FromDiscussion(
+            346,
             "No Loc Ref Type",
             Severity.Suggestion)
         .WithoutFormatting("Map marker missing location reference type MapMarkerRefType");
 
-    public static readonly TopicDefinition NoEditorID = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoEditorID = MutagenTopicBuilder.FromDiscussion(
+            347,
             "No EditorID",
             Severity.None)
-        .WithoutFormatting("Map marker missing editor ID");
+        .WithoutFormatting("Map marker missing EditorID");
 
-    public static readonly TopicDefinition NoLinkedReference = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoLinkedReference = MutagenTopicBuilder.FromDiscussion(
+            348,
             "No Linked Reference",
             Severity.Suggestion)
         .WithoutFormatting("Map marker missing linked reference for player spawn location");

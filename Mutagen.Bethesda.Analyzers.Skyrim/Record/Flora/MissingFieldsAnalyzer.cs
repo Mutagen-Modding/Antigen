@@ -6,12 +6,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Flora;
 
 public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IFloraGetter>
 {
-    public static readonly TopicDefinition NoHarvestSound = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoHarvestSound = MutagenTopicBuilder.FromDiscussion(
+            223,
             "No Harvest Sound",
             Severity.Suggestion)
         .WithoutFormatting("Flora has no harvest sound");
 
-    public static readonly TopicDefinition NoIngredient = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition NoIngredient = MutagenTopicBuilder.FromDiscussion(
+            305,
             "No Ingredient",
             Severity.Warning)
         .WithoutFormatting("Flora has no ingredient");

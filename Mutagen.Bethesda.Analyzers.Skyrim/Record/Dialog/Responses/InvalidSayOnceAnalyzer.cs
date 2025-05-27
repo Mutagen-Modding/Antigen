@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
 public class InvalidSayOnceAnalyzer : IContextualRecordAnalyzer<IDialogResponsesGetter>
 {
-    public static readonly TopicDefinition<IQuestGetter> InvalidSayOnce = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IQuestGetter> InvalidSayOnce = MutagenTopicBuilder.FromDiscussion(
+            269,
             "Invalid SayOnce",
             Severity.Error)
         .WithFormatting<IQuestGetter>("Dialog is say once although its quest {0} is not Start Game Enabled");
