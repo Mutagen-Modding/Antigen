@@ -10,7 +10,7 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
 public class InvalidCharactersAnalyzerDialogResponses(IFontProviderFactory fontProviderFactory, GameConstants gameConstants) : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
 {
-    private readonly Dictionary<Language, IFontProvider> _fontProviders = gameConstants.Languages.Append(Language.Japanese)
+    private readonly Dictionary<Language, IFontProvider> _fontProviders = gameConstants.Languages
         .ToDictionary(
             l => l,
             fontProviderFactory.Create);

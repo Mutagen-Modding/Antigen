@@ -11,7 +11,7 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Named;
 
 public class InvalidCharactersAnalyzerNamed(IFontProviderFactory fontProviderFactory, GameConstants gameConstants) : IIsolatedRecordAnalyzer<ISkyrimMajorRecordGetter>
 {
-    private readonly Dictionary<Language, IFontProvider> _fontProviders = gameConstants.Languages.Append(Language.Japanese)
+    private readonly Dictionary<Language, IFontProvider> _fontProviders = gameConstants.Languages
         .ToDictionary(
             l => l,
             fontProviderFactory.Create);
