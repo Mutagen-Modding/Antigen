@@ -81,9 +81,4 @@ public static class LocationExtensions
 
         return location.Keywords.Any(k => k.FormKey == FormKeys.SkyrimSE.Skyrim.Keyword.LocTypeInn.FormKey);
     }
-
-    public static IEnumerable<ILocationCellStaticReferenceGetter> GetReferenceTypes(this ILocationGetter location)
-    {
-        return (location.LocationCellStaticReferences ?? []).Concat(location.ActorCellStaticReferences ?? []);
-    }
 }

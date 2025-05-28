@@ -34,7 +34,7 @@ public class RefTypeSettlementHouseAnalyzer : IContextualRecordAnalyzer<ILocatio
         if (!location.IsSettlementHouseLocationNotPlayerHome()) return;
         if (!location.IsLocationAppliedToInterior(param.LinkCache)) return;
 
-        if (location.GetReferenceTypes().Any(staticRef => HouseContainerRefTypes.Contains(staticRef.LocationRefType)))
+        if (location.LocationRefTypesReferences().Any(staticRef => HouseContainerRefTypes.Contains(staticRef.LocationRefType)))
         {
             return;
         }
@@ -45,7 +45,8 @@ public class RefTypeSettlementHouseAnalyzer : IContextualRecordAnalyzer<ILocatio
     public IEnumerable<Func<ILocationGetter, object?>> FieldsOfInterest()
     {
         yield return x => x.Keywords;
-        yield return x => x.LocationCellUniques;
-        yield return x => x.ActorCellStaticReferences;
+         yield return x => x.LocationRefTypeReferencesStatic;
+        yield return x => x.LocationRefTypeReferencesAdded;
+        yield return x => x.LocationRefTypeReferencesRemoved;
     }
 }

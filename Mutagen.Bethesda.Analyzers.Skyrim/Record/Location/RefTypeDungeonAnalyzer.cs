@@ -26,7 +26,7 @@ public class RefTypeDungeonAnalyzer : IContextualRecordAnalyzer<ILocationGetter>
 
         if (location.Keywords is null || location.Keywords.All(k => k.FormKey != FormKeys.SkyrimSE.Skyrim.Keyword.LocTypeDungeon.FormKey)) return;
 
-        var referenceTypes = location.GetReferenceTypes().ToList();
+        var referenceTypes = location.LocationRefTypeReference().ToList();
 
         if (!referenceTypes.Exists(staticRef => staticRef.LocationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.Boss.FormKey))
         {
@@ -44,7 +44,8 @@ public class RefTypeDungeonAnalyzer : IContextualRecordAnalyzer<ILocationGetter>
     public IEnumerable<Func<ILocationGetter, object?>> FieldsOfInterest()
     {
         yield return x => x.Keywords;
-        yield return x => x.LocationCellStaticReferences;
-        yield return x => x.ActorCellStaticReferences;
+        yield return x => x.LocationRefTypeReferencesStatic;
+        yield return x => x.LocationRefTypeReferencesAdded;
+        yield return x => x.LocationRefTypeReferencesRemoved;
     }
 }
