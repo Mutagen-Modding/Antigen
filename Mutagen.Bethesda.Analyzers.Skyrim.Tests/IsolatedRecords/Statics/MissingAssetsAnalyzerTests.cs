@@ -1,4 +1,4 @@
-using Mutagen.Bethesda.Analyzers.Skyrim.Record.Static;
+﻿using Mutagen.Bethesda.Analyzers.Skyrim.Record.Static;
 using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
 using Mutagen.Bethesda.Plugins.Assets;
 using Mutagen.Bethesda.Skyrim;
