@@ -4,6 +4,7 @@ using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.GitHub.Args;
 using Mutagen.Bethesda.Analyzers.Skyrim;
 using Mutagen.Bethesda.Environments.DI;
+using Mutagen.Bethesda.Plugins.Meta;
 
 namespace Mutagen.Bethesda.Analyzers.GitHub;
 
@@ -30,6 +31,7 @@ public static class RunDiscussionsCreator
         var builder = new ContainerBuilder();
         builder.RegisterInstance(new FileSystem()).As<IFileSystem>();
         builder.RegisterInstance(new GameReleaseInjection(cmd.GameRelease)).AsImplementedInterfaces();
+        builder.RegisterInstance(GameConstants.Get(cmd.GameRelease)).As<GameConstants>();
         builder.RegisterModule<MainModule>();
         builder.RegisterModule<SkyrimAnalyzerModule>();
         builder.RegisterType<GetTopicDefinitions>().AsSelf();
