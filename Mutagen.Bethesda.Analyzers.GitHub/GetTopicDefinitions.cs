@@ -7,7 +7,7 @@ namespace Mutagen.Bethesda.Analyzers.GitHub;
 public partial class GetTopicDefinitions(IAnalyzer[] analyzers)
 {
     [GeneratedRegex("""
-        MutagenTopicBuilder\.DevelopmentTopic\([\s\r\n]*"(.+)",[\s\r\n]*Severity\.(\w+)\)[\s\r\n]*.+\("(.+)"
+        MutagenTopicBuilder\.DevelopmentTopic\([\s\r\n]*"(.+)",[\s\r\n]*Severity\.(\w+)\)[\s\r\n]*.+\(.*"(.+)"
         """)]
     public static partial Regex TopicRegex { get; }
 
