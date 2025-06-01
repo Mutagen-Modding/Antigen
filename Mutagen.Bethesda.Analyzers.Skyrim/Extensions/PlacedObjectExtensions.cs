@@ -54,4 +54,73 @@ public static class PlacedObjectExtensions
         return placedObject.LocationRefTypes is not null
                && placedObject.LocationRefTypes.Any(r => r.FormKey == locRefType.FormKey);
     }
+
+    public static IPlacedGetter? GetLinkedReference(this IPlacedObjectGetter placedObject, ILinkCache linkCache, IFormLinkGetter<IKeywordGetter>? keyword = null)
+    {
+        if (keyword is null)
+        {
+            foreach (var linkedRef in placedObject.LinkedReferences)
+            {
+                if (linkedRef.KeywordOrReference.IsNull)
+                {
+                    var placed = linkedRef.Reference.TryResolve<IPlacedGetter>(linkCache);
+                    if (placed is not null)
+                    {
+                        return placed;
+                    }
+                }
+                else
+                {
+                    // In case keyword or reference is not null, we check if it's a reference
+                    var placed = linkedRef.KeywordOrReference.TryResolve<IPlacedGetter>(linkCache);
+                    if (placed is not null)
+                    {
+                        return placed;
+                    }
+                }
+            }
+        }
+        else
+        {
+            foreach (var linkedRef in placedObject.LinkedReferences)
+            {
+                if (linkedRef.KeywordOrReference.FormKey == keyword.FormKey)
+                {
+                    return linkedRef.Reference.TryResolve<IPlacedGetter>(linkCache);
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public static (IScriptEntryGetter? Script, TProperty? Property) GetScriptPropertyFromSelfOrBase<TProperty>(
+        this IPlacedObjectGetter placed,
+        ILinkCache linkCache,
+        string scriptName,
+        string propertyName)
+        where TProperty : class, IScriptPropertyGetter
+    {
+        var script = placed.GetScript(scriptName);
+        if (script?.Flags is ScriptEntry.Flag.Removed or ScriptEntry.Flag.InheritedAndRemoved) return (null, null);
+
+        var property = script?.GetProperty<TProperty>(propertyName);
+        if (property is not null)
+        {
+            return (script, property.Flags == ScriptProperty.Flag.Removed ? null : property);
+        }
+
+        // Didn't find the property on the placed object directly - check base object
+        var baseObject = placed.Base.TryResolve(linkCache);
+        if (baseObject is IHaveVirtualMachineAdapterGetter scriptedBaseObject)
+        {
+            script = scriptedBaseObject.GetScript(scriptName);
+            if (script is not null)
+            {
+                property = script.GetProperty<TProperty>(propertyName);
+            }
+        }
+
+        return (script, property?.Flags == ScriptProperty.Flag.Removed ? null : property);
+    }
 }
