@@ -26,7 +26,7 @@ public class RefTypeDungeonAnalyzer : IContextualRecordAnalyzer<ILocationGetter>
 
         if (location.Keywords is null || location.Keywords.All(k => k.FormKey != FormKeys.SkyrimSE.Skyrim.Keyword.LocTypeDungeon.FormKey)) return;
 
-        var referenceTypes = location.LocationRefTypeReference().ToList();
+        var referenceTypes = location.LocationRefTypesReferences().ToList();
 
         if (!referenceTypes.Exists(staticRef => staticRef.LocationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.Boss.FormKey))
         {

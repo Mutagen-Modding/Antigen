@@ -75,7 +75,7 @@ public class EditorIdEnricherTests
             LinkCache = mod.ToImmutableLinkCache()
         }, topic);
         payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
-            .ShouldEqual(new MajorRecordIdentifier()
+            .ShouldEqualEnumerable(new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
                 EditorID = npc.EditorID
@@ -116,7 +116,7 @@ public class EditorIdEnricherTests
             .First().ShouldBeOfType<object[]>();
         var arr = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as object[];
-        arr!.ShouldEqual(
+        arr!.ShouldEqualEnumerable(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -160,7 +160,7 @@ public class EditorIdEnricherTests
             .First().ShouldBeOfType<object[]>();
         var arr = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as object[];
-        arr!.ShouldEqual(
+        arr!.ShouldEqualEnumerable(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -207,7 +207,7 @@ public class EditorIdEnricherTests
             .First().ShouldBeOfType<Dictionary<object, object>>();
         var dict = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as Dictionary<object, object>;
-        dict!.Keys.ShouldEqual(
+        dict!.Keys.ShouldEqualEnumerable(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -218,7 +218,7 @@ public class EditorIdEnricherTests
                 FormKey = npc2.FormKey,
                 EditorID = npc2.EditorID
             });
-        dict!.Values.ShouldEqual("Hello", "World");
+        dict!.Values.ShouldEqualEnumerable("Hello", "World");
     }
 
     [Theory, MutagenModAutoData]
@@ -255,8 +255,8 @@ public class EditorIdEnricherTests
             .First().ShouldBeOfType<Dictionary<object, object>>();
         var dict = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as Dictionary<object, object>;
-        dict!.Keys.ShouldEqual("Hello", "World");
-        dict!.Values.ShouldEqual(
+        dict!.Keys.ShouldEqualEnumerable("Hello", "World");
+        dict!.Values.ShouldEqualEnumerable(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -303,7 +303,7 @@ public class EditorIdEnricherTests
             .First().ShouldBeOfType<Dictionary<object, object>>();
         var dict = payload.TestReportDropbox.Dropoffs.SelectMany(x => x.Topics.MetaData.Select(x => x.Value))
             .First() as Dictionary<object, object>;
-        dict!.Keys.ShouldEqual(
+        dict!.Keys.ShouldEqualEnumerable(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,
@@ -314,7 +314,7 @@ public class EditorIdEnricherTests
                 FormKey = npc2.FormKey,
                 EditorID = npc2.EditorID
             });
-        dict!.Values.ShouldEqual(
+        dict!.Values.ShouldEqualEnumerable(
             new MajorRecordIdentifier()
             {
                 FormKey = npc.FormKey,

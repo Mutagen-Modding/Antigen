@@ -52,7 +52,7 @@ public class RunConfigReaderTests
         RunConfigReader sut)
     {
         sut.Reader.ReadInto(line.AsSpan(), config);
-        config.LoadOrderSetToMods!.ShouldEqual([FormKeys.SkyrimSE.Skyrim.ModKey, Update.ModKey]);
+        config.LoadOrderSetToMods!.ShouldEqualEnumerable(FormKeys.SkyrimSE.Skyrim.ModKey, Update.ModKey);
     }
 
     [Theory, AnalyzerAutoData]
