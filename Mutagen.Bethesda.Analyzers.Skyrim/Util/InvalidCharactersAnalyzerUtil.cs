@@ -7,6 +7,16 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Util;
 
 public static class InvalidCharactersAnalyzerUtil
 {
+    public static Dictionary<char, string> InvalidStrings { get; } = new()
+    {
+        { '’', "'" },
+        { '`', "'" },
+        { '”', "\"" },
+        { '“', "\"" },
+        { '…', "..." },
+        { '—', "-" },
+    };
+
     public static char[] InconsistentStrings { get; } = ['[', ']'];
 
     public static void CheckInconsistentCharacters<T>(IsolatedRecordAnalyzerParams<T> param, string text, Language language, TopicDefinition<string, Language> topic) where T : IMajorRecordGetter

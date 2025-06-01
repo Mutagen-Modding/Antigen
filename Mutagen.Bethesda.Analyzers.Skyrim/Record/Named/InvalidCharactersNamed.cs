@@ -1,5 +1,6 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Fonts;
 using Mutagen.Bethesda.Fonts.DI;
 using Mutagen.Bethesda.Plugins.Aspects;
@@ -9,13 +10,8 @@ using Mutagen.Bethesda.Strings;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Named;
 
-public class InvalidCharactersAnalyzerNamed(IFontProviderFactory fontProviderFactory, GameConstants gameConstants) : IIsolatedRecordAnalyzer<ISkyrimMajorRecordGetter>
+public class InvalidCharactersAnalyzerNamed : IIsolatedRecordAnalyzer<ISkyrimMajorRecordGetter>
 {
-    private readonly Dictionary<Language, IFontProvider> _fontProviders = gameConstants.Languages
-        .ToDictionary(
-            l => l,
-            fontProviderFactory.Create);
-
     public static readonly TopicDefinition<string?, Language> InvalidCharactersName = MutagenTopicBuilder.FromDiscussion(
             238,
             "Invalid Characters in Name",
@@ -35,7 +31,7 @@ public class InvalidCharactersAnalyzerNamed(IFontProviderFactory fontProviderFac
                 .ToCharArray()
                 .Distinct()
                 .Where(c => c != '"')
-                .Where(c => !_fontProviders[language].ValidNameChars.Contains(c))
+                .Where(c => InvalidCharactersAnalyzerUtil.InvalidStrings.ContainsKey(c))
                 .ToArray();
 
             if (invalidChars.Length == 0) return;

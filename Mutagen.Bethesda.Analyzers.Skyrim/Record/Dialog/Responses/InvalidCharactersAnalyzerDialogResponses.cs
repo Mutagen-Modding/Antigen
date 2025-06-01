@@ -1,5 +1,6 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Fonts;
 using Mutagen.Bethesda.Fonts.DI;
 using Mutagen.Bethesda.Plugins.Meta;
@@ -8,13 +9,8 @@ using Mutagen.Bethesda.Strings;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
-public class InvalidCharactersAnalyzerDialogResponses(IFontProviderFactory fontProviderFactory, GameConstants gameConstants) : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
+public class InvalidCharactersAnalyzerDialogResponses : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
 {
-    private readonly Dictionary<Language, IFontProvider> _fontProviders = gameConstants.Languages
-        .ToDictionary(
-            l => l,
-            fontProviderFactory.Create);
-
     public static readonly TopicDefinition<string, Language> InvalidCharactersDialogResponses = MutagenTopicBuilder.FromDiscussion(
             268,
             "Dialog Responses Contains Invalid Characters",
@@ -31,12 +27,11 @@ public class InvalidCharactersAnalyzerDialogResponses(IFontProviderFactory fontP
         {
             foreach (var (language, text) in response.Text)
             {
-                var validNameChars = _fontProviders[language].ValidNameChars;
                 var invalidChars = text
                     .ToCharArray()
                     .Distinct()
                     .Where(c => c != '"')
-                    .Where(c => !validNameChars.Contains(c))
+                    .Where(c => InvalidCharactersAnalyzerUtil.InvalidStrings.ContainsKey(c))
                     .ToArray();
 
                 if (invalidChars.Length == 0) continue;
