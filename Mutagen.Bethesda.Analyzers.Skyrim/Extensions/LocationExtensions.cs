@@ -81,4 +81,19 @@ public static class LocationExtensions
 
         return location.Keywords.Any(k => k.FormKey == FormKeys.SkyrimSE.Skyrim.Keyword.LocTypeInn.FormKey);
     }
+
+    public static IEnumerable<ILocationGetter> GetParentLocations(this ILocationGetter location, ILinkCache linkCache, bool includeSelf = false)
+    {
+        if (includeSelf)
+        {
+            yield return location;
+        }
+
+        var parentLocation = location.ParentLocation.TryResolve(linkCache);
+        while (parentLocation is not null)
+        {
+            yield return parentLocation;
+            parentLocation = parentLocation.ParentLocation.TryResolve(linkCache);
+        }
+    }
 }

@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
@@ -122,5 +123,20 @@ public static class PlacedObjectExtensions
         }
 
         return (script, property?.Flags == ScriptProperty.Flag.Removed ? null : property);
+    }
+
+    public static ICellGetter? GetCell(this IPlacedGetter placed, ILinkCache linkCache)
+    {
+        if (!placed.ToLink().TryResolveSimpleContext(linkCache, out var context)) return null;
+        if (context.Parent?.Record is not ICellGetter cell) return null;
+
+        if (cell.IsInteriorCell()) return cell;
+
+        if (context.Parent?.Parent?.Record is not IWorldspaceGetter worldspace) return null;
+
+        var cellCoordinates = placed.GetCellCoordinates();
+        if (cellCoordinates is null) return null;
+
+        return worldspace.GetCell(cellCoordinates.Value);
     }
 }
