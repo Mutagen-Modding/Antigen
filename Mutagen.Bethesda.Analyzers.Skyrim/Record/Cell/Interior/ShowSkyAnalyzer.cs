@@ -23,7 +23,9 @@ public class ShowSkyAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
  
         if (!cell.Flags.HasFlag(Bethesda.Skyrim.Cell.Flag.ShowSky)) return;
 
-        if (cell.Regions is null || cell.Regions?.Count < 1)
+        var regions = cell.Regions;
+
+        if (regions is null || regions.Count < 1)
         {
             param.AddTopic(ShowSkyWithoutRegion.Format());
         }
