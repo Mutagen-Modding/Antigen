@@ -1,21 +1,28 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
 
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior;
 
-public class ShowSkyAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
+public class ShowSkyAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
+    public static readonly TopicDefinition<IFormLinkNullableGetter<IRegionGetter>, IPlacedObjectGetter, ICellGetter> WrongRegion = MutagenTopicBuilder.FromDiscussion(
+            391,
+            "Weather/Sky Region Mismatch",
+            Severity.Warning)
+        .WithFormatting<IFormLinkNullableGetter<IRegionGetter>, IPlacedObjectGetter, ICellGetter>("The cell has sky enabled but its sky/weather from region {0} does not match the region of the cell {1} that the door {2} leads to");
+
     public static readonly TopicDefinition ShowSkyWithoutRegion = MutagenTopicBuilder.FromDiscussion(
             394,
             "ShowSky with no region",
             Severity.Warning)
         .WithoutFormatting("Cell has ShowSky flag but no sky/weather from region assigned");
 
-    IEnumerable<TopicDefinition> IAnalyzer.Topics => [ShowSkyWithoutRegion];
+    IEnumerable<TopicDefinition> IAnalyzer.Topics => [WrongRegion, ShowSkyWithoutRegion];
 
-    void IIsolatedRecordAnalyzer<ICellGetter>.AnalyzeRecord(IsolatedRecordAnalyzerParams<ICellGetter> param)
+    void IContextualRecordAnalyzer<ICellGetter>.AnalyzeRecord(ContextualRecordAnalyzerParams<ICellGetter> param)
     {
         var cell = param.Record;
 
@@ -28,12 +35,25 @@ public class ShowSkyAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
         {
             param.AddTopic(ShowSkyWithoutRegion.Format());
         }
+
+        foreach (var exteriorDoor in cell.GetExteriorDoorsGoingIntoInteriorRecursively(param.LinkCache)) {
+            var exteriorCell = exteriorDoor.GetCell(param.LinkCache);
+            if (exteriorCell?.Regions is null) continue;
+
+            if (!exteriorCell.Regions.Contains(cellSkyAndWeatherFromRegion))
+            {
+                param.AddTopic(
+                    WrongRegion.Format(cellSkyAndWeatherFromRegion, exteriorDoor, exteriorCell));
+            }
+        }
     }
 
-    IEnumerable<Func<ICellGetter, object?>> IIsolatedRecordAnalyzer<ICellGetter>.FieldsOfInterest()
+    IEnumerable<Func<ICellGetter, object?>> IContextualRecordAnalyzer<ICellGetter>.FieldsOfInterest()
     {
         yield return x => x.Flags;
         yield return x => x.SkyAndWeatherFromRegion;
+        yield return x => x.Temporary;
+        yield return x => x.Persistent;
     }
 }
 
