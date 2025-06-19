@@ -10,7 +10,7 @@ public class ShowSkyAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
     public static readonly TopicDefinition ShowSkyWithoutRegion = MutagenTopicBuilder.FromDiscussion(
             394,
             "ShowSky with no region",
-            Severity.Warning)
+            Severity.Suggestion)
         .WithoutFormatting("Cell has ShowSky flag but no region assigned");
 
     IEnumerable<TopicDefinition> IAnalyzer.Topics => [ShowSkyWithoutRegion];
@@ -24,7 +24,6 @@ public class ShowSkyAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
         if (!cell.Flags.HasFlag(Bethesda.Skyrim.Cell.Flag.ShowSky)) return;
 
         var regions = cell.Regions;
-
         if (regions is null || regions.Count < 1)
         {
             param.AddTopic(ShowSkyWithoutRegion.Format());
