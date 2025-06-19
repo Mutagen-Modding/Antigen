@@ -1,4 +1,5 @@
-﻿using Mutagen.Bethesda.Plugins.Cache;
+﻿using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -81,6 +82,50 @@ public static class CellExtensions
                 foreach (var placed in cellGetter.Temporary.Concat(cellGetter.Persistent))
                 {
                     yield return placed;
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// Finds all doors from a given interior cell to the next exterior cell.
+    /// Linked interior cells are traversed recursively until an exterior cell is found.
+    /// </summary>
+    /// <param name="cell">Interior cell to start from</param>
+    /// <param name="linkCache">Link cache to resolve cell links</param>
+    /// <returns>All doors leading to an exterior cell</returns>
+    public static IEnumerable<IPlacedObjectGetter> GetExteriorDoorsGoingIntoInteriorRecursively(this ICellGetter cell, ILinkCache linkCache)
+    {
+        HashSet<FormKey> visitedCells = [cell.FormKey];
+        var queue = new Queue<ICellGetter>();
+        queue.Enqueue(cell);
+
+        while (queue.Count > 0)
+        {
+            var currentCell = queue.Dequeue();
+
+            foreach (var placedObject in currentCell.GetAllPlaced(linkCache).OfType<IPlacedObjectGetter>())
+            {
+                // Has a teleport destination
+                if (placedObject.TeleportDestination is null || placedObject.TeleportDestination.Door.IsNull) continue;
+
+                // Teleport destination is a door
+                if (!linkCache.TryResolve<IDoorGetter>(placedObject.Base.FormKey, out _)) continue;
+
+                if (placedObject.TeleportDestination.Door.TryResolveSimpleContext(linkCache, out var destinationDoor)
+                    && destinationDoor.Parent?.Record is ICellGetter destinationCell)
+                {
+                    if (destinationCell.IsInteriorCell())
+                    {
+                        if (visitedCells.Add(destinationCell.FormKey))
+                        {
+                            queue.Enqueue(destinationCell);
+                        }
+                    }
+                    else
+                    {
+                        yield return destinationDoor.Record;
+                    }
                 }
             }
         }

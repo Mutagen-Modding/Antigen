@@ -2,13 +2,22 @@
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
-using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
 public static class PlacedObjectExtensions
 {
-    public static bool LeadsToExterior(this IPlacedObjectGetter placedDoor, ILinkCache linkCache, [MaybeNullWhen(false)] out IPlacedObjectGetter exteriorDoor)
+    /// <summary>
+    /// Checks if the placed door leads to an exterior cell and returns the exterior door if it does.
+    /// </summary>
+    /// <param name="placedDoor">Placed door to check.</param>
+    /// <param name="linkCache">Link cache to resolve references.</param>
+    /// <param name="exteriorDoor">Output parameter that will contain the exterior door if the placed door leads to an exterior cell.</param>
+    /// <returns>True if the placed door leads to an exterior cell, false otherwise.</returns>
+    public static bool LeadsToExterior(
+        this IPlacedObjectGetter placedDoor,
+        ILinkCache linkCache,
+        [MaybeNullWhen(false)] out IPlacedObjectGetter exteriorDoor)
     {
         exteriorDoor = null;
 
