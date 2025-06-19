@@ -1,5 +1,6 @@
 using Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior;
 using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Testing.AutoData;
 using Xunit;
@@ -23,7 +24,7 @@ public class ShowSkyAnalyzerTests
             {
                 cell.EditorID = "TestCell";
                 cell.Flags = Cell.Flag.IsInteriorCell | Cell.Flag.ShowSky;
-                cell.Regions = [FormKeys.SkyrimSE.Skyrim.Region.WeatherMountains];
+                cell.SkyAndWeatherFromRegion = new FormLinkNullable<IRegionGetter>(FormKeys.SkyrimSE.Skyrim.Region.WeatherMountains.FormKey);
             },
             ShowSkyAnalyzer.ShowSkyWithoutRegion);
     }

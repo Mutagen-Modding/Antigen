@@ -11,7 +11,7 @@ public class ShowSkyAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
             394,
             "ShowSky with no region",
             Severity.Suggestion)
-        .WithoutFormatting("Cell has ShowSky flag but no region assigned");
+        .WithoutFormatting("Cell has ShowSky flag but no sky/weather from region assigned");
 
     IEnumerable<TopicDefinition> IAnalyzer.Topics => [ShowSkyWithoutRegion];
 
@@ -20,11 +20,11 @@ public class ShowSkyAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
         var cell = param.Record;
 
         if (cell.IsExteriorCell()) return;
- 
+
         if (!cell.Flags.HasFlag(Bethesda.Skyrim.Cell.Flag.ShowSky)) return;
 
-        var regions = cell.Regions;
-        if (regions is null || regions.Count < 1)
+        var cellSkyAndWeatherFromRegion = cell.SkyAndWeatherFromRegion;
+        if (cellSkyAndWeatherFromRegion.IsNull)
         {
             param.AddTopic(ShowSkyWithoutRegion.Format());
         }
@@ -33,7 +33,7 @@ public class ShowSkyAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
     IEnumerable<Func<ICellGetter, object?>> IIsolatedRecordAnalyzer<ICellGetter>.FieldsOfInterest()
     {
         yield return x => x.Flags;
-        yield return x => x.Regions;
+        yield return x => x.SkyAndWeatherFromRegion;
     }
 }
 
