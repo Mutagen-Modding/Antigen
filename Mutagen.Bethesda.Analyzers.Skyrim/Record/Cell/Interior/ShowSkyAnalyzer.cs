@@ -10,7 +10,7 @@ public class ShowSkyAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
     public static readonly TopicDefinition ShowSkyWithoutRegion = MutagenTopicBuilder.FromDiscussion(
             394,
             "ShowSky with no region",
-            Severity.Suggestion)
+            Severity.Warning)
         .WithoutFormatting("Cell has ShowSky flag but no sky/weather from region assigned");
 
     IEnumerable<TopicDefinition> IAnalyzer.Topics => [ShowSkyWithoutRegion];
