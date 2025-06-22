@@ -12,28 +12,28 @@ public class RackAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
     private const string ActivatorPropertyName = "WRackActivator";
 
     public static readonly TopicDefinition RackTriggerMissingKeywordProperty = MutagenTopicBuilder.FromDiscussion(
-            376,
+            367,
             "Rack Trigger Missing Keyword Property",
             Severity.Error)
         .WithoutFormatting($"Placed Object has a {TriggerScriptName} but property {ActivatorPropertyName} is not filled");
 
     public static readonly TopicDefinition<IKeywordGetter> RackActivatorMissing = MutagenTopicBuilder.FromDiscussion(
-            367,
+            368,
             "Rack Activator Missing",
             Severity.Error)
         .WithFormatting<IKeywordGetter>("Placed Object has a " + TriggerScriptName + " but no linked ref with keyword {0} to a rack activator");
 
     public static readonly TopicDefinition<IPlacedObjectGetter> RackActivatorInvalid = MutagenTopicBuilder.FromDiscussion(
-            368,
+            369,
             "Rack Activator Invalid",
             Severity.Error)
         .WithFormatting<IPlacedObjectGetter>($"Placed Object has a {TriggerScriptName} but the linked ref activator {{0}} does not have the script {ActivatorScriptName}");
 
     public static readonly TopicDefinition<IPlacedObjectGetter> RackActivatorMissingKeywordProperty = MutagenTopicBuilder.FromDiscussion(
-            369,
+            397,
             "Rack Activator Missing Keyword Property",
             Severity.Error)
-        .WithFormatting<IPlacedObjectGetter>($"Placed Object has a {TriggerScriptName} but the linked ref activator {{0}} with script {ActivatorPropertyName} but property {TriggerPropertyName} is not filled");
+        .WithFormatting<IPlacedObjectGetter>($"Placed Object has a {TriggerScriptName} but the linked ref activator {{0}} with script {ActivatorPropertyName} doesn't have property {TriggerPropertyName} filled");
 
     public static readonly TopicDefinition<IPlacedObjectGetter, IKeywordGetter> RackActivatorNoTrigger = MutagenTopicBuilder.FromDiscussion(
             370,
