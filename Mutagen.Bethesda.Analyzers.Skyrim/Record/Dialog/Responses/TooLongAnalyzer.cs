@@ -46,7 +46,7 @@ public class TooLongAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
         {
             foreach (var (language, text) in response.Text)
             {
-                if (text.Length > DialogPromptLengthLimit)
+                if (text.Length > DialogResponseLengthLimit)
                 {
                     param.AddTopic(
                         ResponseTooLong.Format(text, language, text.Length - DialogResponseLengthLimit));
