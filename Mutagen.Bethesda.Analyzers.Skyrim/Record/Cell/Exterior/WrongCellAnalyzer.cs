@@ -22,65 +22,20 @@ public class WrongCellAnalyzer : IContextualRecordAnalyzer<ICellGetter>
         // Skip non-exterior cells
         if (!cell.IsExteriorCell()) return;
         if (cell.Grid is not { Point: var actualCell }) return;
-        if (((Bethesda.Skyrim.Cell.MajorFlag)cell.SkyrimMajorRecordFlags).HasFlag(Bethesda.Skyrim.Cell.MajorFlag.Persistent)) return;
+        if (cell.MajorFlags.HasFlag(Bethesda.Skyrim.Cell.MajorFlag.Persistent)) return;
 
         foreach (var placed in cell.Temporary.Concat(cell.Persistent))
         {
             if (placed.Placement is null) continue;
 
-            var position = placed.Placement.Position;
+            var expectedCell = placed.Placement.GetCellCoordinates();
+            if (expectedCell == actualCell) continue;
 
-            const int cellLength = 4096;
-            var cellX = position.X / cellLength;
-            var cellY = position.Y / cellLength;
-
-            var expectedCell = new P2Int(
-                cellX < 0 ? (int)Math.Floor(cellX) : (int)cellX,
-                cellY < 0 ? (int)Math.Floor(cellY) : (int)cellY);
-
-            if (actualCell != expectedCell)
-            {
-                // If the cell is exactly at the border of two cell (so something like 4096.) then both cells are allowed
-                if (Math.Abs(cellX % 1) < 0.00001)
-                {
-                    expectedCell.X += (cellX < 0) ? -1 : 1;
-                    if (actualCell == expectedCell)
-                    {
-                        continue;
-                    }
-
-                    if (Math.Abs(cellY % 1) < 0.00001)
-                    {
-                        expectedCell.Y += (cellY < 0) ? -1 : 1;
-                        if (actualCell == expectedCell)
-                        {
-                            continue;
-                        }
-                    }
-                }
-                else
-                {
-                    if (Math.Abs(cellY % 1) < 0.00001)
-                    {
-                        expectedCell.Y += (cellY < 0) ? -1 : 1;
-                        if (actualCell == expectedCell)
-                        {
-                            continue;
-                        }
-                    }
-                }
-
-                // Revert expected cell to the original calculation
-                expectedCell = new P2Int(
-                    cellX < 0 ? (int)Math.Floor(cellX) : (int)cellX,
-                    cellY < 0 ? (int)Math.Floor(cellY) : (int)cellY);
-
-                param.AddTopic(
-                    WrongCell.Format(
-                        placed,
-                        actualCell,
-                        expectedCell));
-            }
+            param.AddTopic(
+                WrongCell.Format(
+                    placed,
+                    actualCell,
+                    expectedCell));
         }
     }
 
