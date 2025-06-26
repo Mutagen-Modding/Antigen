@@ -1,5 +1,6 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -25,32 +26,32 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Warning)
         .WithoutFormatting("Trainer npc does not have a specialized trainer faction");
 
-    public static readonly TopicDefinition TrainerWithLevel1 = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<Skill, int> LowSkillLevel = MutagenTopicBuilder.FromDiscussion(
             357,
-            "Trainer npc has level 1",
+            "Trainer npc has low skill level",
             Severity.Warning)
-        .WithoutFormatting("Trainer npc has level 1, they won't be able to train you");
+        .WithFormatting<Skill, int>("Npc is a {0} trainer but only has their {0} skill set to {1}");
 
-    public static readonly TopicDefinition TrainerWithLevel1Min = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<Skill, int, IFormLinkGetter<IClassGetter>, int> LowSkillLevelAutoCalc = MutagenTopicBuilder.FromDiscussion(
             199,
-            "Trainer npc has min level 1",
+            "Trainer npc auto calculated skill level too low",
             Severity.Warning)
-        .WithoutFormatting("Trainer npc has min level 1, they won't be able to train you");
+        .WithFormatting<Skill, int, IFormLinkGetter<IClassGetter>, int>("Npc is {0} trainer but only reaches {0} {1} with class {2}, at their minimum npc level {3}");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [TrainerFactionMissingScript, TrainerScriptMissingFaction, TrainerWithoutSpecialization];
+    public IEnumerable<TopicDefinition> Topics { get; } = [TrainerFactionMissingScript, TrainerScriptMissingFaction, TrainerWithoutSpecialization, LowSkillLevel, LowSkillLevelAutoCalc];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
         if (!npc.Template.IsNull) return;
 
-        var faction = npc.Factions
+        var factions = npc.Factions
             .Select(x => x.Faction.TryResolve(param.LinkCache))
             .WhereNotNull()
             .ToList();
 
         var hasTrainerGoldScript = npc.VirtualMachineAdapter is not null && npc.HasScript("TrainerGoldScript");
-        var trainerFaction = faction.Find(x => x.EditorID?.Contains("JobTrainer", StringComparison.OrdinalIgnoreCase) ?? false);
+        var trainerFaction = factions.Find(x => x.EditorID?.Contains("JobTrainer", StringComparison.OrdinalIgnoreCase) ?? false);
 
         if (hasTrainerGoldScript && trainerFaction is null)
         {
@@ -66,38 +67,33 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 
         if (hasTrainerGoldScript || trainerFaction is not null)
         {
-            var hasTrainerSpecialization = faction.Exists(f =>
-                f.EditorID is not null
-                && !f.EditorID.EndsWith("JobTrainer", StringComparison.OrdinalIgnoreCase)
-                && f.EditorID.Contains("JobTrainer", StringComparison.OrdinalIgnoreCase));
+            var trainerType = npc.GetTrainerType(param.LinkCache);
 
-            if (!hasTrainerSpecialization)
+            if (trainerType is null)
             {
                 param.AddTopic(
                     TrainerWithoutSpecialization.Format());
             }
-
-            if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.AutoCalcStats))
+            else
             {
-                switch (npc.Configuration.Level)
+                var minimumSkillLevel = npc.GetMinimumSkillLevel(trainerType.Value, param.LinkCache);
+                if (minimumSkillLevel < 25)
                 {
-                    case INpcLevelGetter npcLevel:
+                    if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.AutoCalcStats))
                     {
-                        if (npcLevel.Level <= 1)
-                        {
-                            param.AddTopic(
-                                TrainerWithLevel1.Format());
-                        }
-                        break;
+                        param.AddTopic(
+                            LowSkillLevelAutoCalc.Format(
+                                trainerType.Value,
+                                minimumSkillLevel,
+                                npc.Class,
+                                npc.Configuration.CalcMinLevel));
                     }
-                    case IPcLevelMultGetter:
+                    else
                     {
-                        if (npc.Configuration.CalcMinLevel <= 1)
-                        {
-                            param.AddTopic(
-                                TrainerWithLevel1Min.Format());
-                        }
-                        break;
+                        param.AddTopic(
+                            LowSkillLevel.Format(
+                                trainerType.Value,
+                                minimumSkillLevel));
                     }
                 }
             }
@@ -108,6 +104,8 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     {
         yield return x => x.Template;
         yield return x => x.Factions;
+        yield return x => x.Class;
+        yield return x => x.PlayerSkills;
         yield return x => x.VirtualMachineAdapter;
         yield return x => x.Configuration.Level;
         yield return x => x.Configuration.CalcMinLevel;
