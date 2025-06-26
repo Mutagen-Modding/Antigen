@@ -65,7 +65,8 @@ public class OwnershipAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 
     public IEnumerable<Func<ICellGetter, object?>> FieldsOfInterest()
     {
-        yield return x => x.EditorID;
+        yield return x => x.Temporary;
+        yield return x => x.Persistent;
     }
 
     public IEnumerable<TopicDefinition> Topics => RedundantOwnership.AsEnumerable();
