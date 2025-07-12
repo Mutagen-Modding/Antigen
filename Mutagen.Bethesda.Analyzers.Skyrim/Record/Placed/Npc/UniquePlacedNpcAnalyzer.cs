@@ -8,15 +8,15 @@ public class UniquePlacedNpcAnalyzer : IContextualRecordAnalyzer<IPlacedNpcGette
 {
     public static readonly TopicDefinition UniqueNpcNotInPersistenceLocation = MutagenTopicBuilder.FromDiscussion(
             285,
-            "Unique NPC not in Persistence Location",
+            "Unique Npc not in Persistence Location",
             Severity.Error)
-        .WithoutFormatting("Placed NPCs should be placed in persistence location, otherwise they might not be loaded");
+        .WithoutFormatting("Placed Npcs should be placed in persistence location, otherwise they might not be loaded");
 
     public static readonly TopicDefinition UniqueNpcWithoutPersistenceLocation = MutagenTopicBuilder.FromDiscussion(
             345,
-            "Unique NPC without Persistence Location",
+            "Unique Npc without Persistence Location",
             Severity.Error)
-        .WithoutFormatting("Placed NPCs should have a persistence location if the NPC is unique, excludes always persistent npc or initially disabled NPCs");
+        .WithoutFormatting("Placed Npcs should have a persistence location if the Npc is unique, excludes always persistent npcs or initially disabled npcs");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [];
 

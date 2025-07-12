@@ -8,31 +8,31 @@ public class PersistenceLocationAnalyzer : IContextualRecordAnalyzer<IPlacedNpcG
 {
     public static readonly TopicDefinition<ILocationGetter, ICellGetter> PersistenceLocationWithCellWithoutLocation = MutagenTopicBuilder.FromDiscussion(
             385,
-            "Placed Object Persistence Location With Cell Without Location",
+            "Placed Npc Persistence Location With Cell Without Location",
             Severity.Error)
-        .WithFormatting<ILocationGetter, ICellGetter>("Placed Object has persistence location {0} but the cell it is placed in {1} has no location defined");
+        .WithFormatting<ILocationGetter, ICellGetter>("Placed Npc has persistence location {0} but the cell it is placed in {1} has no location defined");
 
     public static readonly TopicDefinition<ILocationGetter, ICellGetter, ILocationGetter> NotInsidePersistenceLocation = MutagenTopicBuilder.FromDiscussion(
             386,
-            "Placed Object Not Inside Persistence Location",
+            "Placed Npc Not Inside Persistence Location",
             Severity.Error)
-        .WithFormatting<ILocationGetter, ICellGetter, ILocationGetter>("Placed Object has persistence location {0} but the cell it is placed in {1} has location {2} which is not in the persistence location");
+        .WithFormatting<ILocationGetter, ICellGetter, ILocationGetter>("Placed Npc has persistence location {0} but the cell it is placed in {1} has location {2} which is not in the persistence location");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [PersistenceLocationWithCellWithoutLocation, NotInsidePersistenceLocation,];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedNpcGetter> param)
     {
-        var placedObject = param.Record;
-        if (placedObject.IsDeleted) return;
+        var placedNpc = param.Record;
+        if (placedNpc.IsDeleted) return;
 
-        if (placedObject.PersistentLocation.IsNull) return;
-        if (placedObject.PersistentLocation.FormKey == FormKeys.SkyrimSE.Skyrim.Location.PersistAll.FormKey) return;
-        if (placedObject.PersistentLocation.FormKey == FormKeys.SkyrimSE.Skyrim.Location.VirtualLocation.FormKey) return;
+        if (placedNpc.PersistentLocation.IsNull) return;
+        if (placedNpc.PersistentLocation.FormKey == FormKeys.SkyrimSE.Skyrim.Location.PersistAll.FormKey) return;
+        if (placedNpc.PersistentLocation.FormKey == FormKeys.SkyrimSE.Skyrim.Location.VirtualLocation.FormKey) return;
 
-        var persistenceLocation = placedObject.PersistentLocation.TryResolve(param.LinkCache);
+        var persistenceLocation = placedNpc.PersistentLocation.TryResolve(param.LinkCache);
         if (persistenceLocation is null) return;
 
-        var cell = placedObject.GetCell(param.LinkCache);
+        var cell = placedNpc.GetCell(param.LinkCache);
         if (cell is null) return;
 
         var location = cell.Location.TryResolve(param.LinkCache);
