@@ -72,8 +72,8 @@ public static class CellExtensions
         var allCells = linkCache.ResolveAll<ICellGetter>(cell.FormKey).ToArray();
 
         return PlacedObjectsImpl()
-            .Where(x => includeDeleted || !x.IsDeleted)
-            .DistinctBy(x => x.FormKey);
+            .DistinctBy(x => x.FormKey)
+            .Where(x => includeDeleted || !x.IsDeleted);
 
         IEnumerable<IPlacedGetter> PlacedObjectsImpl()
         {
