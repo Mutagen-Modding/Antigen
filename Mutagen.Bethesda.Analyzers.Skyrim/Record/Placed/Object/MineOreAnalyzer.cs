@@ -9,7 +9,7 @@ public class MineOreAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 {
     public static readonly TopicDefinition NoFurnitureLinked = MutagenTopicBuilder.FromDiscussion(
             287,
-            "No Furniture Linked",
+            "Mine Ore without Linked Furniture",
             Severity.Error)
         .WithoutFormatting("Mine Ore has no furniture linked");
 
