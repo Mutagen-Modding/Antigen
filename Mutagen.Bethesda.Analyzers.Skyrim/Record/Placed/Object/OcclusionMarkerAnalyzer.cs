@@ -14,9 +14,9 @@ public class OcclusionMarkerAnalyzer : IIsolatedRecordAnalyzer<IPlacedObjectGett
 
     public static readonly TopicDefinition OcclusionBoxShouldBePlaneMarker = MutagenTopicBuilder.FromDiscussion(
             390,
-            "Occlusion Box Should Be Plane Marker",
+            "Occlusion Box Should Be Occlusion Plane",
             Severity.Warning)
-        .WithoutFormatting("Occlusion marker placement is a box, but half-extent is smaller than 32, so it should be a plane marker instead");
+        .WithoutFormatting("Occlusion Box placement has half-extent smaller than 32, so it should be a Occlusion Plane instead");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoPrimitive];
 
@@ -35,7 +35,7 @@ public class OcclusionMarkerAnalyzer : IIsolatedRecordAnalyzer<IPlacedObjectGett
             return;
         }
 
-        if (primitive.Bounds.X < 32 || primitive.Bounds.Y < 32 || primitive.Bounds.Z < 32)
+        if (primitive.Type == PlacedPrimitive.TypeEnum.Box && (primitive.Bounds.X < 32 || primitive.Bounds.Y < 32 || primitive.Bounds.Z < 32))
         {
             param.AddTopic(
                 OcclusionBoxShouldBePlaneMarker.Format());
