@@ -33,6 +33,7 @@ public class NoHavokAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 
         var canMove = baseObject switch
         {
+            IActivatorGetter => true,
             IAmmunitionGetter => true,
             IArmorGetter => true,
             IBookGetter => true,
