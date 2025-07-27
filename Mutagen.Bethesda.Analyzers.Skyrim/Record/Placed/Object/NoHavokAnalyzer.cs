@@ -37,6 +37,7 @@ public class NoHavokAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
             IAmmunitionGetter => true,
             IArmorGetter => true,
             IBookGetter => true,
+            IFloraGetter => true,
             IIngestibleGetter => true,
             IIngredientGetter => true,
             IKeyGetter => true,
