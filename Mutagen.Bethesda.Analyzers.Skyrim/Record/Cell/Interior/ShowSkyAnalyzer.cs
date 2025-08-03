@@ -8,11 +8,11 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior;
 
 public class ShowSkyAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition<IFormLinkNullableGetter<IRegionGetter>, IPlacedObjectGetter, ICellGetter> WrongRegion = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<IFormLinkNullableGetter<IRegionGetter>, ICellGetter, IPlacedObjectGetter> WrongRegion = MutagenTopicBuilder.FromDiscussion(
             391,
             "Weather/Sky Region Mismatch",
             Severity.Warning)
-        .WithFormatting<IFormLinkNullableGetter<IRegionGetter>, IPlacedObjectGetter, ICellGetter>("The cell has sky enabled but its sky/weather from region {0} does not match the region of the cell {1} that the door {2} leads to");
+        .WithFormatting<IFormLinkNullableGetter<IRegionGetter>, ICellGetter, IPlacedObjectGetter>("The cell has sky enabled but its sky/weather from region {0} does not match the region of the cell {1} that the door {2} leads to");
 
     public static readonly TopicDefinition ShowSkyWithoutRegion = MutagenTopicBuilder.FromDiscussion(
             394,
@@ -43,7 +43,7 @@ public class ShowSkyAnalyzer : IContextualRecordAnalyzer<ICellGetter>
             if (!exteriorCell.Regions.Contains(cellSkyAndWeatherFromRegion))
             {
                 param.AddTopic(
-                    WrongRegion.Format(cellSkyAndWeatherFromRegion, exteriorDoor, exteriorCell));
+                    WrongRegion.Format(cellSkyAndWeatherFromRegion, exteriorCell, exteriorDoor));
             }
         }
     }
