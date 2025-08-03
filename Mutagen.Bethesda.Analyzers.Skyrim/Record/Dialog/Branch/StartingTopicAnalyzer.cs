@@ -52,8 +52,8 @@ public class StartingTopicAnalyzer(GameConstants gameConstants) : IContextualRec
 
                 foreach (var responses in topic.Responses)
                 {
-                    if (responses.Prompt is null
-                        || (responses.Prompt.TryLookup(language, out var prompt) && prompt.IsNullOrEmpty()))
+                    if ((name is null && responses.Prompt is null)
+                        || (responses.Prompt is not null && responses.Prompt.TryLookup(language, out var prompt) && prompt.IsNullOrEmpty()))
                     {
                         param.AddTopic(
                             NoPromptOnStartingTopic.Format(language, responses));
