@@ -18,7 +18,7 @@ public class NoSleepPackageAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (!npc.IsEligibleForTest()) return;
+        if (!npc.IsEligibleForTest(param.LinkCache)) return;
 
         // Skip NPCs using templates for AI packages
         if (npc.Configuration.TemplateFlags.HasFlag(NpcConfiguration.TemplateFlag.AIPackages)) return;

@@ -4,7 +4,7 @@ using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
-public class NoItemsAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
+public class NoItemsAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
     public static readonly TopicDefinition NoItems = MutagenTopicBuilder.FromDiscussion(
             281,
@@ -14,10 +14,10 @@ public class NoItemsAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoItems];
 
-    public void AnalyzeRecord(IsolatedRecordAnalyzerParams<INpcGetter> param)
+    public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (!npc.IsEligibleForTest()) return;
+        if (!npc.IsEligibleForTest(param.LinkCache)) return;
 
         // Skip NPCs using templates for inventory
         if (npc.Configuration.TemplateFlags.HasFlag(NpcConfiguration.TemplateFlag.Inventory)) return;

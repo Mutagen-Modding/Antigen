@@ -1,11 +1,12 @@
-﻿using Mutagen.Bethesda.Skyrim;
+﻿using Mutagen.Bethesda.Plugins.Cache;
+using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
 public static class UniqueNpcsConstants
 {
-    public static bool IsEligibleForTest(this INpcGetter npc)
+    public static bool IsEligibleForTest(this INpcGetter npc, ILinkCache linkCache)
     {
-        return npc.IsUnique() && npc.HasKeyword(FormKeys.SkyrimSE.Skyrim.Keyword.ActorTypeNPC);
+        return npc.IsUnique() && npc.HasKeyword(linkCache, FormKeys.SkyrimSE.Skyrim.Keyword.ActorTypeNPC);
     }
 }

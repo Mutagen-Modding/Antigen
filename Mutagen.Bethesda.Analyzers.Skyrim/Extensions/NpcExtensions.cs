@@ -1,4 +1,5 @@
-﻿using Mutagen.Bethesda.Plugins.Cache;
+﻿using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -21,6 +22,13 @@ public static class NpcExtensions
     public static bool HasFaction(this INpcGetter npc, ILinkCache linkCache, string editorId)
     {
         return npc.HasFaction(linkCache, npcEditorId => string.Equals(npcEditorId, editorId, StringComparison.OrdinalIgnoreCase));
+    }
+
+    public static bool HasKeyword(this INpcGetter npc, ILinkCache linkCache, IFormLinkGetter<IKeywordGetter> keyword)
+    {
+        if (npc.HasKeyword(keyword)) return true;
+
+        return npc.Race.TryResolve(linkCache, out var race) && race.HasKeyword(keyword);
     }
 
     public static bool IsUnique(this INpcGetter npc)
