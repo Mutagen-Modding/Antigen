@@ -23,7 +23,7 @@ public class ConflictingVoiceTypesAnalyzer : IContextualRecordAnalyzer<ISceneGet
         if (!param.LinkCache.TryResolve<IQuestGetter>(scene.Quest.FormKey, out var quest)) return;
 
         var npcVoiceTypes = scene.Actors
-            .Select(a => quest.Aliases.FirstOrDefault(x => x.ID == a.ID))
+            .Select(a => quest.GetAlias(a.ID))
             .WhereNotNull()
             .Select(a => a.UniqueActor.TryResolve(param.LinkCache))
             .WhereNotNull()

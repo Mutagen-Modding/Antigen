@@ -55,7 +55,7 @@ public static partial class TextReplacementUtil
                 // Player can be referenced without there being an alias named Player
                 if (aliasName.Equals("Player", StringComparison.OrdinalIgnoreCase)) return;
 
-                var alias = quest.Aliases.FirstOrDefault(a => string.Equals(a.Name, aliasName, StringComparison.OrdinalIgnoreCase));
+                var alias = quest.GetAlias(aliasName);
                 if (alias is null)
                 {
                     missingAlias(language, aliasName);
