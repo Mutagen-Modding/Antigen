@@ -7,6 +7,6 @@ public static class UniqueNpcsConstants
 {
     public static bool IsEligibleForTest(this INpcGetter npc, ILinkCache linkCache)
     {
-        return npc.IsUnique() && npc.HasKeyword(linkCache, FormKeys.SkyrimSE.Skyrim.Keyword.ActorTypeNPC);
+        return npc.IsUnique() && npc.IsActorTypeNpc(linkCache);
     }
 }

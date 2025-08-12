@@ -31,6 +31,16 @@ public static class NpcExtensions
         return npc.Race.TryResolve(linkCache, out var race) && race.HasKeyword(keyword);
     }
 
+    public static bool IsActorTypeNpc(this INpcGetter npc, ILinkCache linkCache)
+    {
+        return npc.HasKeyword(linkCache, FormKeys.SkyrimSE.Skyrim.Keyword.ActorTypeNPC);
+    }
+
+    public static bool IsActorTypeCreature(this INpcGetter npc, ILinkCache linkCache)
+    {
+        return npc.HasKeyword(linkCache, FormKeys.SkyrimSE.Skyrim.Keyword.ActorTypeCreature);
+    }
+
     public static bool IsUnique(this INpcGetter npc)
     {
         return npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.Unique);
