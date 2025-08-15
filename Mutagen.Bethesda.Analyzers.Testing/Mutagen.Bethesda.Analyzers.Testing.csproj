@@ -10,7 +10,6 @@
 
     <ItemGroup>
       <PackageReference Include="Mutagen.Bethesda.Testing" />
-        <PackageReference Include="Noggog.CSharpExt" />
     </ItemGroup>
 
     <ItemGroup>

@@ -15,9 +15,5 @@
         <PackageReference Include="Autofac" />
         <PackageReference Include="Mutagen.Bethesda.Autofac" />
     </ItemGroup>
-    
-    <ItemGroup>
-      <Compile Remove="CellUnderscoreAnalyzer.cs" />
-    </ItemGroup>
 
 </Project>
