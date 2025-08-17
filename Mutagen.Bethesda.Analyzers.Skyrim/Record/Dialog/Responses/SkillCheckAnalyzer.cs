@@ -6,17 +6,17 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
 public class SkillCheckAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
 {
-    public static readonly TopicDefinition<float> NonPlayerSkillCheck = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<Condition.RunOnType> NonPlayerSkillCheck = MutagenTopicBuilder.FromDiscussion(
             273,
             "Non-Player Skill Check",
             Severity.Warning)
-        .WithFormatting<float>("Skill check in dialog are not checked on the player but on {0} - this is usually a sign of a mistake");
+        .WithFormatting<Condition.RunOnType>("Skill check in dialog are not checked on the player but on {0} - this is usually a sign of a mistake");
 
-    public static readonly TopicDefinition<Condition.RunOnType> NonGlobalSkillCheck = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<float> NonGlobalSkillCheck = MutagenTopicBuilder.FromDiscussion(
             340,
             "Non-Global Skill Check",
             Severity.Suggestion)
-        .WithFormatting<Condition.RunOnType>("Skill check in dialog doesn't use global to evaluate skill level but {0} - this is usually a sign of a mistake");
+        .WithFormatting<float>("Skill check in dialog doesn't use global to evaluate skill level but {0} - this is usually a sign of a mistake");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NonPlayerSkillCheck, NonGlobalSkillCheck];
 
@@ -33,14 +33,13 @@ public class SkillCheckAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter
             if (getActorValue.RunOnType != Condition.RunOnType.Target && !getActorValue.RunsOnPlayer())
             {
                 param.AddTopic(
-                    NonGlobalSkillCheck.Format(condition.Data.RunOnType));
+                    NonPlayerSkillCheck.Format(condition.Data.RunOnType));
             }
-
-            // Non-Global Skill Check
-            if (condition is IConditionFloatGetter conditionFloatGetter && condition.Data.RunsOnPlayer())
+            else if (condition is IConditionFloatGetter conditionFloatGetter)
             {
+                // Non-Global Skill Check on player
                 param.AddTopic(
-                    NonPlayerSkillCheck.Format(conditionFloatGetter.ComparisonValue));
+                    NonGlobalSkillCheck.Format(conditionFloatGetter.ComparisonValue));
             }
         }
     }
