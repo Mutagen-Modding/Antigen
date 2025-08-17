@@ -45,7 +45,7 @@ public class SceneAliasAnalyzer : IContextualRecordAnalyzer<ISceneGetter>
 
         foreach (var action in scene.Actions)
         {
-            if (action.ActorID is not null)
+            if (action.ActorID is not null && action.ActorID >= 0)
             {
                 var id = (uint)action.ActorID;
                 if (!quest.HasAlias(id))
@@ -55,7 +55,7 @@ public class SceneAliasAnalyzer : IContextualRecordAnalyzer<ISceneGetter>
                 }
             }
 
-            if (action.HeadtrackActorID is not null)
+            if (action.HeadtrackActorID is not null && action.HeadtrackActorID >= 0)
             {
                 var id = (uint)action.HeadtrackActorID;
                 if (!quest.HasAlias(id))
