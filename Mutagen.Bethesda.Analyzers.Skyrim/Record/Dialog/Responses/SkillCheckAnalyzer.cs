@@ -35,7 +35,8 @@ public class SkillCheckAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter
                 param.AddTopic(
                     NonPlayerSkillCheck.Format(condition.Data.RunOnType));
             }
-            else if (condition is IConditionFloatGetter conditionFloatGetter)
+            else if (condition is IConditionFloatGetter conditionFloatGetter
+                     && getActorValue.ActorValue == ActorValue.Speech)
             {
                 // Non-Global Skill Check on player
                 param.AddTopic(
