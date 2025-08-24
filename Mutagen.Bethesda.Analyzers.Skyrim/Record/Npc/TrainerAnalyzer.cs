@@ -32,11 +32,11 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Warning)
         .WithFormatting<Skill, int>("Npc is a {0} trainer but only has their {0} skill set to {1}");
 
-    public static readonly TopicDefinition<Skill, int, IFormLinkGetter<IClassGetter>, int> LowSkillLevelAutoCalc = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<string, int, IFormLinkGetter<IClassGetter>, int> LowSkillLevelAutoCalc = MutagenTopicBuilder.FromDiscussion(
             199,
             "Trainer npc auto calculated skill level too low",
             Severity.Warning)
-        .WithFormatting<Skill, int, IFormLinkGetter<IClassGetter>, int>("Npc is {0} trainer but only reaches {0} {1} with class {2}, at their minimum npc level {3}");
+        .WithFormatting<string, int, IFormLinkGetter<IClassGetter>, int>("Npc is {0} trainer but only reaches skill level {1} with class {2}, at their minimum npc level {3}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [TrainerFactionMissingScript, TrainerScriptMissingFaction, TrainerWithoutSpecialization, LowSkillLevel, LowSkillLevelAutoCalc];
 
@@ -76,17 +76,18 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             }
             else
             {
-                var minimumSkillLevel = npc.GetMinimumSkillLevel(trainerType.Value, param.LinkCache);
+                var minimumLevel = npc.GetMinimumLevel();
+                var minimumSkillLevel = npc.GetSkillLevel(trainerType.Value, minimumLevel, param.LinkCache);
                 if (minimumSkillLevel < 25)
                 {
                     if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.AutoCalcStats))
                     {
                         param.AddTopic(
                             LowSkillLevelAutoCalc.Format(
-                                trainerType.Value,
+                                trainerType.Value.ToString(),
                                 minimumSkillLevel,
                                 npc.Class,
-                                npc.Configuration.CalcMinLevel));
+                                minimumLevel));
                     }
                     else
                     {
