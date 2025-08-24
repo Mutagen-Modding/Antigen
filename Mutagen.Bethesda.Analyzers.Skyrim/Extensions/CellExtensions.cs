@@ -21,11 +21,10 @@ public static class CellExtensions
         // Get world locations
         if (!cell.Flags.HasFlag(Cell.Flag.IsInteriorCell))
         {
-            var context = linkCache.ResolveSimpleContext<ICellGetter>(cell.FormKey);
-            var world = (IWorldspaceGetter?)context.Parent?.Record;
-            if (world is not null)
+            var worldspace = cell.GetWorldspace(linkCache);
+            if (worldspace is not null)
             {
-                foreach (var worldLocation in world.GetWorldLocations(linkCache))
+                foreach (var worldLocation in worldspace.GetWorldLocations(linkCache))
                 {
                     cellLocations.Add(worldLocation);
                 }
@@ -57,6 +56,12 @@ public static class CellExtensions
     public static bool IsPublic(this ICellGetter cell)
     {
         return (cell.Flags & Cell.Flag.PublicArea) != 0;
+    }
+
+    public static IWorldspaceGetter? GetWorldspace(this ICellGetter cell, ILinkCache linkCache)
+    {
+        var context = linkCache.ResolveSimpleContext(cell);
+        return context.Parent?.Record as IWorldspaceGetter;
     }
 
     /// <summary>
