@@ -8,7 +8,7 @@ public class UnnecessaryOwnershipAnalyzer : IContextualRecordAnalyzer<IPlacedObj
 {
     public static readonly TopicDefinition<IPlaceableObjectGetter> UnnecessaryOwnership = MutagenTopicBuilder.FromDiscussion(
             381,
-            "Unnecessary  Ownership",
+            "Unnecessary Ownership",
             Severity.Suggestion)
         .WithFormatting<IPlaceableObjectGetter>("Placed record has an owner but it has no effect on {0}");
 
