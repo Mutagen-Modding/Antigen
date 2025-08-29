@@ -1,7 +1,9 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
@@ -23,15 +25,33 @@ public class CarryPackageAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             316,
             "Carry package with wrong StopCarryingEvent property",
             Severity.Warning)
-        .WithFormatting< IFormLinkGetter<ISkyrimMajorRecordGetter>>("Npc uses carry package, but StopCarryingEvent property in carry script is not set to OffsetStop but {0}");
+        .WithFormatting<IFormLinkGetter<ISkyrimMajorRecordGetter>>("Npc uses carry package, but StopCarryingEvent property in carry script is not set to OffsetStop but {0}");
 
     public static readonly TopicDefinition<IFormLinkGetter<ISkyrimMajorRecordGetter>> NoCarryItemProperty = MutagenTopicBuilder.FromDiscussion(
             317,
             "Carry package without CarryItem property",
             Severity.Warning)
-        .WithFormatting< IFormLinkGetter<ISkyrimMajorRecordGetter>>("Npc uses carry package, but has no CarryItem property filled");
+        .WithFormatting<IFormLinkGetter<ISkyrimMajorRecordGetter>>("Npc uses carry package, but has no CarryItem property filled");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [CarryPackageWithoutScript, NoStopCarryingEventProperty, NoCarryItemProperty];
+    public static readonly TopicDefinition<IPlacedNpcGetter> NoLinkCarryStart = MutagenTopicBuilder.FromDiscussion(
+            490,
+            "Carry package without LinkCarryStart",
+            Severity.Warning)
+        .WithFormatting<IPlacedNpcGetter>("Npc placement {0} does not have a linked reference with LinkCarryStart keyword");
+
+    public static readonly TopicDefinition<IPlacedNpcGetter> NoLinkCarryEnd = MutagenTopicBuilder.FromDiscussion(
+            491,
+            "Carry package without LinkCarryEnd",
+            Severity.Warning)
+        .WithFormatting<IPlacedNpcGetter>("Npc placement {0} does not have a linked reference with LinkCarryEnd keyword");
+
+    public static readonly TopicDefinition<IPlacedNpcGetter, ICellGetter, ICellGetter> LinkCarryStartEndWithLoadScreenInBetween = MutagenTopicBuilder.FromDiscussion(
+            492,
+            "Carry package with LinkCarryStart and LinkCarryEnd have Load Screen in between",
+            Severity.Warning)
+        .WithFormatting<IPlacedNpcGetter, ICellGetter, ICellGetter>("Npc placement {0} has LinkCarryStart in cell {1} and LinkCarryEnd in cell {2} with a load door between them, resetting the carry animation");
+
+    public IEnumerable<TopicDefinition> Topics { get; } = [CarryPackageWithoutScript, NoStopCarryingEventProperty, NoCarryItemProperty, StopCarryingEventPropertyNotIdleAnimation, NoLinkCarryStart, NoLinkCarryEnd, LinkCarryStartEndWithLoadScreenInBetween];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
@@ -62,16 +82,81 @@ public class CarryPackageAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         }
 
         var carryItemMiscProperty = scriptEntry.GetProperty<IScriptObjectPropertyGetter>("CarryItemMisc");
-        if (carryItemMiscProperty is not null) return;
+        if (carryItemMiscProperty is null)
+        {
+            var carryItemPotionProperty = scriptEntry.GetProperty<IScriptObjectPropertyGetter>("CarryItemPotion");
+            if (carryItemPotionProperty is null)
+            {
+                var carryItemIngredientProperty = scriptEntry.GetProperty<IScriptObjectPropertyGetter>("CarryItemIngredient");
+                if (carryItemIngredientProperty is null)
+                {
+                    param.AddTopic(
+                        NoCarryItemProperty.Format());
+                }
+            }
+        }
 
-        var carryItemPotionProperty = scriptEntry.GetProperty<IScriptObjectPropertyGetter>("CarryItemPotion");
-        if (carryItemPotionProperty is not null) return;
+        var placedNpc = UsageCacheUtil.GetUsageCache(param.LinkCache)
+            .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks
+            .Select(x => x.TryResolve(param.LinkCache))
+            .WhereNotNull()
+            .FirstOrDefault();
 
-        var carryItemIngredientProperty = scriptEntry.GetProperty<IScriptObjectPropertyGetter>("CarryItemIngredient");
-        if (carryItemIngredientProperty is not null) return;
+        if (placedNpc is null) return;
 
-        param.AddTopic(
-            NoCarryItemProperty.Format());
+        IPlacedGetter? carryLinkStart = null;
+        IPlacedGetter? carryLinkEnd = null;
+        foreach (var linkedReference in placedNpc.LinkedReferences)
+        {
+            var keyword = linkedReference.KeywordOrReference.TryResolve<IKeywordGetter>(param.LinkCache);
+
+            if (keyword is null) continue;
+
+            if (keyword.FormKey == FormKeys.SkyrimSE.Skyrim.Keyword.LinkCarryStart.FormKey)
+            {
+                carryLinkStart = linkedReference.Reference.TryResolve(param.LinkCache);
+            }
+            else if (keyword.FormKey == FormKeys.SkyrimSE.Skyrim.Keyword.LinkCarryEnd.FormKey)
+            {
+                carryLinkEnd = linkedReference.Reference.TryResolve(param.LinkCache);
+            }
+        }
+
+        if (carryLinkStart is null)
+        {
+            param.AddTopic(
+                NoLinkCarryStart.Format(placedNpc));
+
+            if (carryLinkEnd is null)
+            {
+                param.AddTopic(
+                    NoLinkCarryEnd.Format(placedNpc));
+            }
+        }
+        else
+        {
+            if (carryLinkEnd is null)
+            {
+                param.AddTopic(
+                    NoLinkCarryEnd.Format(placedNpc));
+            }
+            else
+            {
+                if (param.LinkCache.TryResolveSimpleContext<IPlacedGetter>(carryLinkEnd.FormKey, out var endContext) &&
+                    param.LinkCache.TryResolveSimpleContext<IPlacedGetter>(carryLinkStart.FormKey, out var startContext) &&
+                    startContext.Parent?.Record is ICellGetter startCell &&
+                    endContext.Parent?.Record is ICellGetter endCell)
+                {
+                    if (startCell.IsInteriorCell() && startCell.FormKey != endCell.FormKey
+                        || endCell.IsInteriorCell() && endCell.FormKey != startCell.FormKey
+                        || (startCell.IsExteriorCell() && endCell.IsExteriorCell() && startCell.GetWorldspace(param.LinkCache)?.FormKey != endCell.GetWorldspace(param.LinkCache)?.FormKey))
+                    {
+                        param.AddTopic(
+                            LinkCarryStartEndWithLoadScreenInBetween.Format(placedNpc, startCell, endCell));
+                    }
+                }
+            }
+        }
     }
 
     public IEnumerable<Func<INpcGetter, object?>> FieldsOfInterest()
