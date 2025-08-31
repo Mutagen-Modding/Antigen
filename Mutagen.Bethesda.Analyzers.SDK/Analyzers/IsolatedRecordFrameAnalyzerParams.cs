@@ -19,7 +19,7 @@ public readonly struct IsolatedRecordFrameAnalyzerParams<TMajor>
 
     public readonly MajorRecordFrame Frame;
 
-    internal IsolatedRecordFrameAnalyzerParams(IReportDropbox reportDropbox,
+    public IsolatedRecordFrameAnalyzerParams(IReportDropbox reportDropbox,
         IModGetter mod,
         IMajorRecordIdentifierGetter record,
         ReportContextParameters parameters,

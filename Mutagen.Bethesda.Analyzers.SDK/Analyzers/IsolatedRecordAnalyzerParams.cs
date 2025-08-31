@@ -22,7 +22,7 @@ public readonly record struct IsolatedRecordAnalyzerParams<TMajor>
     /// </summary>
     public readonly TMajor Record;
 
-    internal IsolatedRecordAnalyzerParams(
+    public IsolatedRecordAnalyzerParams(
         ModKey mod,
         TMajor record,
         ReportContextParameters parameters,

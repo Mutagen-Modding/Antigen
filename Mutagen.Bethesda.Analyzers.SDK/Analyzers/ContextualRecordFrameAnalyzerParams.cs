@@ -12,7 +12,7 @@ public readonly struct ContextualRecordFrameAnalyzerParams<TMajor>
     public readonly ILoadOrderGetter<IModListingGetter<IModGetter>> LoadOrder;
     public readonly MajorRecordFrame Frame;
 
-    internal ContextualRecordFrameAnalyzerParams(ILinkCache linkCache, ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder, MajorRecordFrame frame)
+    public ContextualRecordFrameAnalyzerParams(ILinkCache linkCache, ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder, MajorRecordFrame frame)
     {
         LinkCache = linkCache;
         LoadOrder = loadOrder;
@@ -26,7 +26,7 @@ public readonly struct ContextualRecordFrameAnalyzerParams
     public readonly ILoadOrderGetter<IModListingGetter<IModGetter>> LoadOrder;
     public readonly MajorRecordFrame Frame;
 
-    internal ContextualRecordFrameAnalyzerParams(ILinkCache linkCache, ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder, MajorRecordFrame frame)
+    public ContextualRecordFrameAnalyzerParams(ILinkCache linkCache, ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder, MajorRecordFrame frame)
     {
         LinkCache = linkCache;
         LoadOrder = loadOrder;

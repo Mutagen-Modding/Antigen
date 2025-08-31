@@ -18,7 +18,7 @@ public readonly struct ContextualRecordAnalyzerParams<TMajor>
     private readonly IReportDropbox _reportDropbox;
     private readonly ReportContextParameters _parameters;
 
-    internal ContextualRecordAnalyzerParams(ILinkCache linkCache,
+    public ContextualRecordAnalyzerParams(ILinkCache linkCache,
         ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder,
         IModGetter mod,
         TMajor record,

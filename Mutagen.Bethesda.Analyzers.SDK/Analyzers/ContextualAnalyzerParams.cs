@@ -26,7 +26,7 @@ public readonly struct ContextualAnalyzerParams
     /// </summary>
     public readonly ILoadOrderGetter<IModListingGetter<IModGetter>> LoadOrder;
 
-    internal ContextualAnalyzerParams(
+    public ContextualAnalyzerParams(
         ILinkCache linkCache,
         ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder,
         IReportDropbox reportDropbox,
