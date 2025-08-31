@@ -12,9 +12,9 @@ public interface ISeverityLookup
     Severity LookupSeverity(TopicDefinition def);
 }
 
-public class TopicConfig : ITopicConfig
+public class TopicConfig(Dictionary<TopicId, Severity>? overrides = null) : ITopicConfig
 {
-    private readonly Dictionary<TopicId, Severity> _severityOverrides = new();
+    private readonly Dictionary<TopicId, Severity> _severityOverrides = overrides ?? [];
 
     public void Override(TopicId id, Severity severity)
     {
