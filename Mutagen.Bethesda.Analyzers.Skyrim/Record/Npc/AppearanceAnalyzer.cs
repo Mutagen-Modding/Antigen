@@ -66,34 +66,44 @@ public class AppearanceAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         var headData = race.HeadData[maleFemaleGender];
         if (headData is null) return;
 
+        var morphRace = race.MorphRace.TryResolve(param.LinkCache);
+        var inheritedHeadData = morphRace?.HeadData?[maleFemaleGender];
+
         // Hair Color
-        if (!npc.HairColor.FormKey.IsNull && headData.AvailableHairColors.All(c => c.FormKey != npc.HairColor.FormKey))
+        if (!npc.HairColor.FormKey.IsNull
+            && headData.AvailableHairColors.All(c => c.FormKey != npc.HairColor.FormKey)
+            && (inheritedHeadData is null || inheritedHeadData.AvailableHairColors.All(c => c.FormKey != npc.HairColor.FormKey)))
         {
             param.AddTopic(
                 InvalidHairColor.Format(npc.HairColor, race));
         }
 
+        // Face Parts
         if (npc.FaceParts is not null)
         {
-            if (!headData.IsNoseMorphAvailable(npc.FaceParts.Nose))
+            if (!headData.IsNoseMorphAvailable(npc.FaceParts.Nose)
+                && (inheritedHeadData is null || !inheritedHeadData.IsNoseMorphAvailable(npc.FaceParts.Nose)))
             {
                 param.AddTopic(
                     InvalidNose.Format(npc.FaceParts.Nose, race));
             }
 
-            if (!headData.IsEyeMorphAvailable(npc.FaceParts.Eyes))
+            if (!headData.IsEyeMorphAvailable(npc.FaceParts.Eyes)
+                && (inheritedHeadData is null || !inheritedHeadData.IsEyeMorphAvailable(npc.FaceParts.Eyes)))
             {
                 param.AddTopic(
                     InvalidEye.Format(npc.FaceParts.Eyes, race));
             }
 
-            if (!headData.IsLipMorphAvailable(npc.FaceParts.Mouth))
+            if (!headData.IsLipMorphAvailable(npc.FaceParts.Mouth)
+                && (inheritedHeadData is null || !inheritedHeadData.IsLipMorphAvailable(npc.FaceParts.Mouth)))
             {
                 param.AddTopic(
                     InvalidLip.Format(npc.FaceParts.Mouth, race));
             }
         }
 
+        // Head Parts
         foreach (var headPartLink in npc.HeadParts)
         {
             var headPart = headPartLink.TryResolve(param.LinkCache);
@@ -102,17 +112,23 @@ public class AppearanceAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             CheckHeadPart(headPart);
         }
 
+        // Tint Layers
         foreach (var tintLayer in npc.TintLayers)
         {
             var raceTintLayer = headData.TintMasks.FirstOrDefault(x => x.Index == tintLayer.Index);
-            if (raceTintLayer is null)
-            {
-                param.AddTopic(
-                    MissingTintLayer.Format(tintLayer.Index, race));
-            }
+            if (raceTintLayer is not null) continue;
+
+            var inheritedRaceTintLayer = inheritedHeadData?.TintMasks.FirstOrDefault(x => x.Index == tintLayer.Index);
+            if (inheritedRaceTintLayer is not null) continue;
+
+            param.AddTopic(
+                MissingTintLayer.Format(tintLayer.Index, race));
         }
 
-        if (!npc.HeadTexture.FormKey.IsNull && headData.FaceDetails.All(f => f.FormKey != npc.HeadTexture.FormKey))
+        // Head Texture
+        if (!npc.HeadTexture.FormKey.IsNull
+            && headData.FaceDetails.All(f => f.FormKey != npc.HeadTexture.FormKey)
+            && (inheritedHeadData is null || inheritedHeadData.FaceDetails.All(f => f.FormKey != npc.HeadTexture.FormKey)))
         {
             param.AddTopic(
                 InvalidHeadTexture.Format(npc.HeadTexture, race));
@@ -121,7 +137,7 @@ public class AppearanceAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         void CheckHeadPart(IHeadPartGetter headPart)
         {
             var formList = headPart.ValidRaces.TryResolve(param.LinkCache);
-            if (formList is not null && formList.Items.All(x => x.FormKey != race.FormKey))
+            if (formList is not null && formList.Items.All(x => x.FormKey != race.FormKey && (morphRace is null || x.FormKey != morphRace.FormKey)))
             {
                 param.AddTopic(
                     InvalidHeadPart.Format(headPart, race));
