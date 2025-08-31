@@ -21,5 +21,6 @@ public class RunAnalyzerModule : Module
         builder.RegisterType<ConsoleReportHandler>().AsImplementedInterfaces();
 
         builder.RegisterModule<MainModule>();
+        builder.RegisterModule<ConfigModule>();
     }
 }

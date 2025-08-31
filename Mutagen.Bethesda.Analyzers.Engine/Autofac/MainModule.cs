@@ -1,5 +1,4 @@
 ﻿using Autofac;
-using Mutagen.Bethesda.Analyzers.Config;
 using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.Engines;
 using Mutagen.Bethesda.Autofac;
@@ -17,8 +16,7 @@ public class MainModule : Module
         builder.RegisterModule<ReflectionDriverModule>();
         builder.RegisterAssemblyTypes(typeof(IsolatedEngine).Assembly)
             .InNamespacesOf(
-                typeof(ContextualEngine),
-                typeof(ConfigReader<>))
+                typeof(ContextualEngine))
             .AsImplementedInterfaces()
             .AsSelf()
             .SingleInstance();
@@ -28,8 +26,6 @@ public class MainModule : Module
         builder.RegisterGeneric(typeof(InjectionDriverProvider<>))
             .As(typeof(IDriverProvider<>))
             .SingleInstance();
-        builder.RegisterGeneric(typeof(ConfigReader<>))
-            .As(typeof(ConfigReader<>));
         builder.RegisterGeneric(typeof(FilteredAnalyzerProvider<>))
             .As(typeof(IAnalyzerProvider<>));
     }
