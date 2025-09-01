@@ -35,6 +35,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutagen.Bethesda.Analyzers.
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutagen.Bethesda.Analyzers.GitHub", "Mutagen.Bethesda.Analyzers.GitHub\Mutagen.Bethesda.Analyzers.GitHub.csproj", "{DAF2B1F1-7C08-43B5-BC82-70DFD37A7A26}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{09A079AB-5093-4230-9A24-CAF0B562053B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutagen.Bethesda.Analyzers.Api", "Mutagen.Bethesda.Analyzers.Api\Mutagen.Bethesda.Analyzers.Api.csproj", "{B15ABA88-B221-427E-8531-7B146C61630D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -77,6 +81,10 @@ Global
 		{DAF2B1F1-7C08-43B5-BC82-70DFD37A7A26}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DAF2B1F1-7C08-43B5-BC82-70DFD37A7A26}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DAF2B1F1-7C08-43B5-BC82-70DFD37A7A26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B15ABA88-B221-427E-8531-7B146C61630D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B15ABA88-B221-427E-8531-7B146C61630D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B15ABA88-B221-427E-8531-7B146C61630D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B15ABA88-B221-427E-8531-7B146C61630D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{099DF49C-B15B-407C-93B3-4C63FBB50ACB} = {57D0B11F-05A3-44F3-9E34-FA371A806C6A}
@@ -88,5 +96,6 @@ Global
 		{9B31E5F4-5E2A-4DFF-A1A7-958CF5F570B7} = {5F4F559E-143A-45A5-8EBB-CE759A7D67EC}
 		{CC2208AD-9845-4CE6-A478-3B916EF7A2A3} = {65ADC99E-9E67-43B5-AEF5-A8975A1E6FFA}
 		{DAF2B1F1-7C08-43B5-BC82-70DFD37A7A26} = {DD3585F6-7D5E-4561-95BB-B48D754B792C}
+		{B15ABA88-B221-427E-8531-7B146C61630D} = {09A079AB-5093-4230-9A24-CAF0B562053B}
 	EndGlobalSection
 EndGlobal
