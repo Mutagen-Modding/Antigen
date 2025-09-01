@@ -41,7 +41,7 @@ public class ByGenericTypeRecordContextualDriver<TMajor> : IContextualDriver
                 var param = new ContextualRecordAnalyzerParams<TMajor>(
                     driverParams.LinkCache,
                     driverParams.LoadOrder,
-                    listing.Mod,
+                    listing.Mod.ModKey,
                     rec,
                     driverParams.ReportDropbox);
                 return _contextualRecordAnalyzers.Select(analyzer =>
