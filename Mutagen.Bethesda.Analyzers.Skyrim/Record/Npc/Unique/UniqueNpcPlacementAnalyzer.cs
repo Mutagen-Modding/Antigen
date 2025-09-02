@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
@@ -30,18 +31,29 @@ public class UniqueNpcPlacementAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks
             .ToArray();
 
-        switch (placements.Length) {
+        switch (placements.Length)
+        {
             case 0:
                 param.AddTopic(
                     PlacedNever.Format());
                 break;
             case > 1:
-                param.AddTopic(
-                    PlacedMultiple.Format(),
-                    ("Placements", placements));
+                var notDeadNpcs = placements
+                    .Select(p => p.TryResolve(param.LinkCache))
+                    .WhereNotNull()
+                    .Where(p => !p.MajorFlags.HasFlag(PlacedNpc.MajorFlag.StartsDead))
+                    .ToArray();
+
+                if (notDeadNpcs.Length > 1)
+                {
+                    // There are more than one placement where the Npc is not dead from the start
+                    param.AddTopic(
+                        PlacedMultiple.Format(),
+                        ("Placements", notDeadNpcs));
+                }
+
                 break;
         }
-
     }
 
     public IEnumerable<Func<INpcGetter, object?>> FieldsOfInterest()
