@@ -96,63 +96,64 @@ public class CarryPackageAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             }
         }
 
-        var placedNpc = UsageCacheUtil.GetUsageCache(param.LinkCache)
+        var placedNpcs = UsageCacheUtil.GetUsageCache(param.LinkCache)
             .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks
             .Select(x => x.TryResolve(param.LinkCache))
-            .WhereNotNull()
-            .FirstOrDefault();
+            .WhereNotNull();
 
-        if (placedNpc is null) return;
-
-        IPlacedGetter? carryLinkStart = null;
-        IPlacedGetter? carryLinkEnd = null;
-        foreach (var linkedReference in placedNpc.LinkedReferences)
+        foreach (var placedNpc in placedNpcs)
         {
-            var keyword = linkedReference.KeywordOrReference.TryResolve<IKeywordGetter>(param.LinkCache);
 
-            if (keyword is null) continue;
-
-            if (keyword.FormKey == FormKeys.SkyrimSE.Skyrim.Keyword.LinkCarryStart.FormKey)
+            IPlacedGetter? carryLinkStart = null;
+            IPlacedGetter? carryLinkEnd = null;
+            foreach (var linkedReference in placedNpc.LinkedReferences)
             {
-                carryLinkStart = linkedReference.Reference.TryResolve(param.LinkCache);
-            }
-            else if (keyword.FormKey == FormKeys.SkyrimSE.Skyrim.Keyword.LinkCarryEnd.FormKey)
-            {
-                carryLinkEnd = linkedReference.Reference.TryResolve(param.LinkCache);
-            }
-        }
+                var keyword = linkedReference.KeywordOrReference.TryResolve<IKeywordGetter>(param.LinkCache);
 
-        if (carryLinkStart is null)
-        {
-            param.AddTopic(
-                NoLinkCarryStart.Format(placedNpc));
+                if (keyword is null) continue;
 
-            if (carryLinkEnd is null)
+                if (keyword.FormKey == FormKeys.SkyrimSE.Skyrim.Keyword.LinkCarryStart.FormKey)
+                {
+                    carryLinkStart = linkedReference.Reference.TryResolve(param.LinkCache);
+                }
+                else if (keyword.FormKey == FormKeys.SkyrimSE.Skyrim.Keyword.LinkCarryEnd.FormKey)
+                {
+                    carryLinkEnd = linkedReference.Reference.TryResolve(param.LinkCache);
+                }
+            }
+
+            if (carryLinkStart is null)
             {
                 param.AddTopic(
-                    NoLinkCarryEnd.Format(placedNpc));
-            }
-        }
-        else
-        {
-            if (carryLinkEnd is null)
-            {
-                param.AddTopic(
-                    NoLinkCarryEnd.Format(placedNpc));
+                    NoLinkCarryStart.Format(placedNpc));
+
+                if (carryLinkEnd is null)
+                {
+                    param.AddTopic(
+                        NoLinkCarryEnd.Format(placedNpc));
+                }
             }
             else
             {
-                if (param.LinkCache.TryResolveSimpleContext<IPlacedGetter>(carryLinkEnd.FormKey, out var endContext) &&
-                    param.LinkCache.TryResolveSimpleContext<IPlacedGetter>(carryLinkStart.FormKey, out var startContext) &&
-                    startContext.Parent?.Record is ICellGetter startCell &&
-                    endContext.Parent?.Record is ICellGetter endCell)
+                if (carryLinkEnd is null)
                 {
-                    if (startCell.IsInteriorCell() && startCell.FormKey != endCell.FormKey
-                        || endCell.IsInteriorCell() && endCell.FormKey != startCell.FormKey
-                        || (startCell.IsExteriorCell() && endCell.IsExteriorCell() && startCell.GetWorldspace(param.LinkCache)?.FormKey != endCell.GetWorldspace(param.LinkCache)?.FormKey))
+                    param.AddTopic(
+                        NoLinkCarryEnd.Format(placedNpc));
+                }
+                else
+                {
+                    if (param.LinkCache.TryResolveSimpleContext<IPlacedGetter>(carryLinkEnd.FormKey, out var endContext) &&
+                        param.LinkCache.TryResolveSimpleContext<IPlacedGetter>(carryLinkStart.FormKey, out var startContext) &&
+                        startContext.Parent?.Record is ICellGetter startCell &&
+                        endContext.Parent?.Record is ICellGetter endCell)
                     {
-                        param.AddTopic(
-                            LinkCarryStartEndWithLoadScreenInBetween.Format(placedNpc, startCell, endCell));
+                        if (startCell.IsInteriorCell() && startCell.FormKey != endCell.FormKey
+                            || endCell.IsInteriorCell() && endCell.FormKey != startCell.FormKey
+                            || (startCell.IsExteriorCell() && endCell.IsExteriorCell() && startCell.GetWorldspace(param.LinkCache)?.FormKey != endCell.GetWorldspace(param.LinkCache)?.FormKey))
+                        {
+                            param.AddTopic(
+                                LinkCarryStartEndWithLoadScreenInBetween.Format(placedNpc, startCell, endCell));
+                        }
                     }
                 }
             }
