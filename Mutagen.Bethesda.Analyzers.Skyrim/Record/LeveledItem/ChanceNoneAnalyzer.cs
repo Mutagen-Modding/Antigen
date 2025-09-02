@@ -14,7 +14,7 @@ public partial class ChanceNoneAnalyzer : IIsolatedRecordAnalyzer<ILeveledItemGe
     public static readonly TopicDefinition<Percent, int> InvalidChanceNoneEditorID = MutagenTopicBuilder.FromDiscussion(
             471,
             "Invalid Chance in Editor ID",
-            Severity.Error)
+            Severity.Suggestion)
         .WithFormatting<Percent, int>("Leveled Item has a Chance None of {0} but the EditorID which should end with the Chance ends with '{1}'");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [InvalidChanceNoneEditorID];
