@@ -37,7 +37,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutagen.Bethesda.Analyzers.
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{09A079AB-5093-4230-9A24-CAF0B562053B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutagen.Bethesda.Analyzers.Api", "Mutagen.Bethesda.Analyzers.Api\Mutagen.Bethesda.Analyzers.Api.csproj", "{B15ABA88-B221-427E-8531-7B146C61630D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Mutagen.Bethesda.Analyzers", "Mutagen.Bethesda.Analyzers\Mutagen.Bethesda.Analyzers.csproj", "{B15ABA88-B221-427E-8531-7B146C61630D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

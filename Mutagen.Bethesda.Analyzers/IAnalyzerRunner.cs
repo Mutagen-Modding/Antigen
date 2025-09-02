@@ -19,7 +19,7 @@ using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog.WorkEngine;
 
-namespace Mutagen.Bethesda.Analyzers.Api;
+namespace Mutagen.Bethesda.Analyzers;
 
 public class AnalyzerRunnerBuilder
 {
