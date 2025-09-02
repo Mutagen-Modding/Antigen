@@ -9,7 +9,7 @@ public class EncounterZoneAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
     public static readonly TopicDefinition<IFormLinkGetter<ILocationGetter>, IFormLinkNullableGetter<ILocationGetter>> EncounterZoneLocationMismatch = MutagenTopicBuilder.FromDiscussion(
             457,
-            "Encounter Zone / Location Mismatch",
+            "Encounter Zone - Location Mismatch",
             Severity.Warning)
         .WithFormatting<IFormLinkGetter<ILocationGetter>, IFormLinkNullableGetter<ILocationGetter>>("Encounter Zone assigned to cell has location {0} which is different from the cell's directly assigned location {1}");
 
