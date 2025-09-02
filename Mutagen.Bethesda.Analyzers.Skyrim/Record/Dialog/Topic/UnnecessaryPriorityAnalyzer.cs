@@ -1,6 +1,7 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Topic;
 
@@ -28,7 +29,7 @@ public class UnnecessaryPriorityAnalyzer : IContextualRecordAnalyzer<IDialogTopi
         var branch = dialogTopic.Branch.TryResolve(param.LinkCache);
         if (branch is not null && branch.StartingTopic.FormKey == dialogTopic.FormKey) return;
 
-        if (Math.Abs(dialogTopic.Priority - DefaultDialogTopicPriority) < float.Epsilon)
+        if ((dialogTopic.Priority - DefaultDialogTopicPriority).EqualsWithin(0))
         {
             return;
         }

@@ -1,6 +1,7 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
@@ -41,7 +42,7 @@ public class Level0Analyzer : IIsolatedRecordAnalyzer<INpcGetter>
                 }
                 break;
             case IPcLevelMultGetter pcLevelMult:
-                if (Math.Abs(pcLevelMult.LevelMult) < 0.001)
+                if (pcLevelMult.LevelMult.EqualsWithin(0))
                 {
                     param.AddTopic(LevelMultTooSmall.Format(pcLevelMult.LevelMult));
                 }

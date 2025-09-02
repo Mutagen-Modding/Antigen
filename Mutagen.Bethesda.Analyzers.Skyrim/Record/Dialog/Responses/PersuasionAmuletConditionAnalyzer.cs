@@ -1,6 +1,7 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
@@ -29,7 +30,7 @@ public class PersuasionAmuletConditionAnalyzer : IIsolatedRecordAnalyzer<IDialog
                     when getEquipped.Reference.Equals(FormKeys.SkyrimSE.Skyrim.PlayerRef)
                          && getEquipped.ItemOrList.Link.FormKey.Equals(FormKeys.SkyrimSE.Skyrim.FormList.TGAmuletofArticulationList.FormKey)
                          && conditionGetter.CompareOperator == CompareOperator.EqualTo
-                         && Math.Abs(((IConditionFloatGetter) conditionGetter).ComparisonValue - 1) < float.Epsilon:
+                         && ((IConditionFloatGetter) conditionGetter).ComparisonValue.EqualsWithin(1):
                     hasAmuletOfArticulation = true;
                     break;
             }

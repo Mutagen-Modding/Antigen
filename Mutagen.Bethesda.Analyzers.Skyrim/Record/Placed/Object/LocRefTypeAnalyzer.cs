@@ -94,7 +94,7 @@ public class LocRefTypeAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
 
         foreach (var locationRefType in placed.LocationRefTypes)
         {
-            if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.HouseBedRefType.FormKey)
+            if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.HouseBedRefType))
             {
                 CheckObject(placeableObject => placeableObject is not IFurnitureGetter furniture || !furniture.IsBed(), InvalidHouseBedRefType);
             }

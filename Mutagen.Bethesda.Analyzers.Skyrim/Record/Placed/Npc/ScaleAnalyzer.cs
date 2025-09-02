@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Npc;
 
@@ -26,7 +27,7 @@ public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedNpcGetter>
 
         var scale = scaleNullable.Value;
 
-        if (Math.Abs(scale - 1) > 0.01)
+        if (scale.EqualsWithin(1))
         {
             param.AddTopic(
                 ScaleNotOne.Format(placedNpc.Base, placedNpc.Scale));

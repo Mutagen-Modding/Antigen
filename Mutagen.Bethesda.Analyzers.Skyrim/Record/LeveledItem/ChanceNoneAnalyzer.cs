@@ -32,7 +32,7 @@ public partial class ChanceNoneAnalyzer : IIsolatedRecordAnalyzer<ILeveledItemGe
 
         if (!int.TryParse(match.Groups[1].Value, out var editorIdChance)) return;
 
-        if (Math.Abs(editorIdChance + leveledItem.ChanceNone - 1) < 0.001)
+        if ((editorIdChance + leveledItem.ChanceNone).EqualsWithin(1))
         {
             param.AddTopic(
                 InvalidChanceNoneEditorID.Format(leveledItem.ChanceNone, editorIdChance));
