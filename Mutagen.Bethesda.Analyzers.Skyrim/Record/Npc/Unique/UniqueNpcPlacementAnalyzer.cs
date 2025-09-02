@@ -11,7 +11,7 @@ public class UniqueNpcPlacementAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition PlacedNever = MutagenTopicBuilder.FromDiscussion(
             484,
             "Unique NPC Never Placed",
-            Severity.Warning)
+            Severity.Suggestion)
         .WithoutFormatting("Unique NPC is never placed in the world");
 
     public static readonly TopicDefinition PlacedMultiple = MutagenTopicBuilder.FromDiscussion(
