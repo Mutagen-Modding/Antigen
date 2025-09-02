@@ -70,7 +70,7 @@ public class Analyzer : IAnalyzer
         builder.RegisterModule<SkyrimAnalyzerModule>();
 
         // Custom topic and analyzer config
-        builder.RegisterInstance(new TopicConfig(options.SeverityOverrides))
+        builder.RegisterInstance(options.TopicConfig)
             .AsSelf()
             .AsImplementedInterfaces();
 
