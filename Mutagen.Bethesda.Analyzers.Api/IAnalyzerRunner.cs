@@ -20,13 +20,13 @@ namespace Mutagen.Bethesda.Analyzers.Api;
 
 public static class AnalyzerExtensions
 {
-    public static IAnalyzer Analyzer(this IGameEnvironment gameEnvironment, AnalyzerOptions? options = null)
+    public static IAnalyzerRunner Analyzer(this IGameEnvironment gameEnvironment, AnalyzerOptions? options = null)
     {
-        return new Analyzer(gameEnvironment, options);
+        return new AnalyzerRunner(gameEnvironment, options);
     }
 }
 
-public interface IAnalyzer
+public interface IAnalyzerRunner
 {
     /// <summary>
     /// Analyze a mod for issues.
@@ -44,7 +44,7 @@ public interface IAnalyzer
         where TMajorRecord : IMajorRecordGetter;
 }
 
-public class Analyzer : IAnalyzer
+public class AnalyzerRunner : IAnalyzerRunner
 {
     private readonly IGameEnvironment _gameEnvironment;
     private readonly IWorkDropoff _workDropoff;
@@ -53,7 +53,7 @@ public class Analyzer : IAnalyzer
     public IDriverProvider<IContextualDriver> ContextualModDrivers { get; }
     public IDriverProvider<IIsolatedDriver> IsolatedModDrivers { get; }
 
-    public Analyzer(IGameEnvironment gameEnvironment, AnalyzerOptions? options = null)
+    public AnalyzerRunner(IGameEnvironment gameEnvironment, AnalyzerOptions? options = null)
     {
         _gameEnvironment = gameEnvironment;
 
