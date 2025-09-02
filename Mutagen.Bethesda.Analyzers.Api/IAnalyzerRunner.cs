@@ -8,21 +8,104 @@ using Mutagen.Bethesda.Analyzers.Reporting.Drops;
 using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
+using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim;
 using Mutagen.Bethesda.Environments;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Meta;
+using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog.WorkEngine;
 
 namespace Mutagen.Bethesda.Analyzers.Api;
 
+public class AnalyzerRunnerBuilder
+{
+    private readonly GameRelease _gameRelease;
+    private readonly ILinkCache _linkCache;
+    private readonly ILoadOrderGetter<IModListingGetter<IModGetter>> _loadOrder;
+
+    private IFileSystem? _fileSystem;
+    private INumWorkThreadsController? _numWorkThreadsController;
+    private Severity _minimumSeverity = Severity.Suggestion;
+    private TopicConfig? _topicConfig;
+
+    private AnalyzerRunnerBuilder(
+        GameRelease gameRelease,
+        ILinkCache linkCache,
+        ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder)
+    {
+        _gameRelease = gameRelease;
+        _linkCache = linkCache;
+        _loadOrder = loadOrder;
+    }
+
+    public static AnalyzerRunnerBuilder Create(
+        GameRelease gameRelease,
+        ILinkCache linkCache,
+        ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder)
+    {
+        return new AnalyzerRunnerBuilder(gameRelease, linkCache, loadOrder);
+    }
+
+    public static AnalyzerRunnerBuilder Create(
+        IGameEnvironment gameEnvironment)
+    {
+        return new AnalyzerRunnerBuilder(
+            gameEnvironment.GameRelease,
+            gameEnvironment.LinkCache,
+            gameEnvironment.LoadOrder);
+    }
+
+    public AnalyzerRunnerBuilder WithFileSystem(IFileSystem fileSystem) {
+        _fileSystem = fileSystem;
+        return this;
+    }
+
+    public AnalyzerRunnerBuilder WithThreads(int threads) {
+        _numWorkThreadsController = new NumWorkThreadsConstant(threads);
+        return this;
+    }
+
+    public AnalyzerRunnerBuilder WithThreads(IObservable<int> threads)
+    {
+        // TODO: replace with implementation accepting an observable
+        _numWorkThreadsController = new NumWorkThreadsConstant(-1);
+        return this;
+    }
+
+    public AnalyzerRunnerBuilder WithMinimumSeverity(Severity minimumSeverity)
+    {
+        _minimumSeverity = minimumSeverity;
+        return this;
+    }
+
+    public AnalyzerRunnerBuilder WithTopicConfig(TopicConfig? topicConfig)
+    {
+        _topicConfig = topicConfig;
+        return this;
+    }
+
+    public IAnalyzerRunner Build()
+    {
+        return new AnalyzerRunner(
+            _fileSystem ?? new FileSystem(),
+            _gameRelease,
+            _linkCache,
+            _loadOrder,
+            _topicConfig ?? new TopicConfig(),
+            _minimumSeverity,
+            _numWorkThreadsController ?? new NumWorkThreadsConstant(null));
+    }
+}
+
 public static class AnalyzerExtensions
 {
-    public static IAnalyzerRunner Analyzer(this IGameEnvironment gameEnvironment, AnalyzerOptions? options = null)
+    public static AnalyzerRunnerBuilder CreateAnalyzerRunner(this IGameEnvironment gameEnvironment)
     {
-        return new AnalyzerRunner(gameEnvironment, options);
+        return AnalyzerRunnerBuilder.Create(gameEnvironment);
     }
 }
 
@@ -46,23 +129,31 @@ public interface IAnalyzerRunner
 
 public class AnalyzerRunner : IAnalyzerRunner
 {
-    private readonly IGameEnvironment _gameEnvironment;
     private readonly IWorkDropoff _workDropoff;
     private readonly IContainer _container;
+    private readonly ILinkCache _linkCache;
+    private readonly ILoadOrderGetter<IModListingGetter<IModGetter>> _loadOrder;
 
     public IDriverProvider<IContextualDriver> ContextualModDrivers { get; }
     public IDriverProvider<IIsolatedDriver> IsolatedModDrivers { get; }
 
-    public AnalyzerRunner(IGameEnvironment gameEnvironment, AnalyzerOptions? options = null)
+    internal AnalyzerRunner(
+        IFileSystem fileSystem,
+        GameRelease gameRelease,
+        ILinkCache linkCache,
+        ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder,
+        TopicConfig topicConfig,
+        Severity minimumSeverity,
+        INumWorkThreadsController numWorkThreadsController)
     {
-        _gameEnvironment = gameEnvironment;
+        _linkCache = linkCache;
+        _loadOrder = loadOrder;
 
-        options ??= new AnalyzerOptions();
         var builder = new ContainerBuilder();
 
-        builder.RegisterInstance(new FileSystem()).As<IFileSystem>();
+        builder.RegisterInstance(fileSystem).As<IFileSystem>();
 
-        builder.RegisterInstance(new GameReleaseInjection(gameEnvironment.GameRelease))
+        builder.RegisterInstance(new GameReleaseInjection(gameRelease))
             .AsSelf()
             .AsImplementedInterfaces();
 
@@ -70,7 +161,11 @@ public class AnalyzerRunner : IAnalyzerRunner
         builder.RegisterModule<SkyrimAnalyzerModule>();
 
         // Custom topic and analyzer config
-        builder.RegisterInstance(options.TopicConfig)
+        builder.RegisterInstance(topicConfig)
+            .AsSelf()
+            .AsImplementedInterfaces();
+
+        builder.RegisterInstance(new MinimumSeverityConfiguration(minimumSeverity))
             .AsSelf()
             .AsImplementedInterfaces();
 
@@ -78,13 +173,10 @@ public class AnalyzerRunner : IAnalyzerRunner
             .AsSelf()
             .AsImplementedInterfaces();
 
-        builder.RegisterInstance(GameConstants.Get(gameEnvironment.GameRelease))
+        builder.RegisterInstance(GameConstants.Get(gameRelease))
             .As<GameConstants>();
 
-        builder.RegisterInstance(options)
-            .AsImplementedInterfaces();
-
-        builder.RegisterInstance(new NumWorkThreadsConstant(options.NumberOfThreads))
+        builder.RegisterInstance(numWorkThreadsController)
             .AsImplementedInterfaces();
 
         _container = builder.Build();
@@ -116,8 +208,8 @@ public class AnalyzerRunner : IAnalyzerRunner
 
         // Contextual
         var contextualParams = new ContextualDriverParams(
-            _gameEnvironment.LinkCache,
-            _gameEnvironment.LoadOrder,
+            _linkCache,
+            _loadOrder,
             reportDropbox,
             CancellationToken.None);
 
@@ -144,7 +236,7 @@ public class AnalyzerRunner : IAnalyzerRunner
         var isolatedParams = new IsolatedRecordAnalyzerParams<TMajorRecord>(
             record.FormKey.ModKey,
             record,
-            new ReportContextParameters(_gameEnvironment.LinkCache),
+            new ReportContextParameters(_linkCache),
             reportDropbox);
 
         var isolatedAnalyzerProvider = _container.Resolve<IAnalyzerProvider<IIsolatedRecordAnalyzer<TMajorRecord>>>();
@@ -161,8 +253,8 @@ public class AnalyzerRunner : IAnalyzerRunner
 
         // Contextual
         var contextualParams = new ContextualRecordAnalyzerParams<TMajorRecord>(
-            _gameEnvironment.LinkCache,
-            _gameEnvironment.LoadOrder,
+            _linkCache,
+            _loadOrder,
             record.FormKey.ModKey,
             record,
             reportDropbox);
