@@ -49,7 +49,7 @@ public class EditorIdEnricherTests
         };
         payload.Sut.Dropoff(param, topic);
         payload.TestReportDropbox.Dropoffs.Select(x => x.Topics.MetaData)
-            .ShouldEqual(topic.MetaData);
+            .ShouldEqualEnumerable([topic.MetaData]);
     }
 
     [Theory, MutagenModAutoData]

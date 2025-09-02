@@ -40,7 +40,7 @@ public class EngineTests
         await sut.RunOn(modPath, dropoff, CancellationToken.None);
 
         dropoff.Reports.Select(x => x.TopicDefinition.Id)
-            .ShouldEqual(TestIsolatedRecordAnalyzer.HasHeight.Id);
+            .ShouldEqualEnumerable(TestIsolatedRecordAnalyzer.HasHeight.Id);
     }
 
     [Theory, MutagenModAutoData]
@@ -83,7 +83,7 @@ public class EngineTests
         await sut.Run(CancellationToken.None);
 
         dropoff.Reports.Select(x => x.TopicDefinition.Id)
-            .ShouldEqual(TestIsolatedRecordAnalyzer.HasHeight.Id);
+            .ShouldEqualEnumerable(TestIsolatedRecordAnalyzer.HasHeight.Id);
     }
 
     [Theory, MutagenModAutoData]
@@ -126,6 +126,6 @@ public class EngineTests
         await sut.Run(CancellationToken.None);
 
         dropoff.Reports.Select(x => x.TopicDefinition.Id)
-            .ShouldEqual(TestContextualRecordAnalyzer.HasHeight.Id);
+            .ShouldEqualEnumerable(TestContextualRecordAnalyzer.HasHeight.Id);
     }
 }
