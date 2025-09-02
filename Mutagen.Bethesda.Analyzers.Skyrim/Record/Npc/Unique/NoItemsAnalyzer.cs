@@ -17,7 +17,7 @@ public class NoItemsAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (!npc.IsEligibleForTest(param.LinkCache)) return;
+        if (!npc.IsUniqueActorType(param.LinkCache)) return;
 
         // Skip NPCs using templates for inventory
         if (npc.Configuration.TemplateFlags.HasFlag(NpcConfiguration.TemplateFlag.Inventory)) return;

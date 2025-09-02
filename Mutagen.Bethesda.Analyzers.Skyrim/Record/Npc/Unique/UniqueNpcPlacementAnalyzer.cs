@@ -25,7 +25,7 @@ public class UniqueNpcPlacementAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (!npc.IsEligibleForTest(param.LinkCache)) return;
+        if (!npc.IsUniqueActorType(param.LinkCache)) return;
 
         var placements = UsageCacheUtil.GetUsageCache(param.LinkCache)
             .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks

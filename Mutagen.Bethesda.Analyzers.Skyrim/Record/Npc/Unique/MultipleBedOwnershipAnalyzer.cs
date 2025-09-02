@@ -26,7 +26,7 @@ public class MultipleBedOwnershipAnalyzer : IContextualRecordAnalyzer<INpcGetter
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (!npc.IsEligibleForTest(param.LinkCache)) return;
+        if (!npc.IsUniqueActorType(param.LinkCache)) return;
 
         var usageCache = UsageCacheUtil.GetUsageCache(param.LinkCache);
         var ownedBeds = usageCache.GetUsagesOf<IPlacedObjectGetter>(npc).UsageLinks

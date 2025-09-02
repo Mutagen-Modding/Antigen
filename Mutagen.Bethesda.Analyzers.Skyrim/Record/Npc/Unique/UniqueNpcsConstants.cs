@@ -5,7 +5,7 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
 public static class UniqueNpcsConstants
 {
-    public static bool IsEligibleForTest(this INpcGetter npc, ILinkCache linkCache)
+    public static bool IsUniqueActorType(this INpcGetter npc, ILinkCache linkCache)
     {
         return npc.IsUnique() && npc.IsActorTypeNpc(linkCache);
     }

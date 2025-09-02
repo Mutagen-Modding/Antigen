@@ -18,7 +18,7 @@ public class NoShortNameAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (!npc.IsEligibleForTest(param.LinkCache)) return;
+        if (!npc.IsUniqueActorType(param.LinkCache)) return;
 
         if (npc.ShortName is not null) return;
         if (npc.Name is null) return;
