@@ -98,43 +98,43 @@ public class LocRefTypeAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
             {
                 CheckObject(placeableObject => placeableObject is not IFurnitureGetter furniture || !furniture.IsBed(), InvalidHouseBedRefType);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.HouseContainerRefType.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.HouseContainerRefType))
             {
                 CheckObject(placeableObject => placeableObject is not IContainerGetter, InvalidHouseContainerRefType);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.BossContainer.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.BossContainer))
             {
                 CheckObject(placeableObject => placeableObject is not IContainerGetter, InvalidBossContainer);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.MerchantContainerRefType.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.MerchantContainerRefType))
             {
                 CheckObject(placeableObject => placeableObject is not IContainerGetter, InvalidMerchantContainerRefType);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.HouseMainDoorRefType.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.HouseMainDoorRefType))
             {
                 CheckObject(placeableObject => placeableObject is not IDoorGetter, InvalidHouseMainDoorRefType);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.HouseBackDoorRefType.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.HouseBackDoorRefType))
             {
                 CheckObject(placeableObject => placeableObject is not IDoorGetter, InvalidHouseBackDoorRefType);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.WETravel.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.WETravel))
             {
                 CheckObject(placeableObject => placeableObject.FormKey != FormKeys.SkyrimSE.Skyrim.Static.XMarker.FormKey, InvalidWETravel);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.WEScene.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.WEScene))
             {
                 CheckObject(placeableObject => placeableObject.FormKey != FormKeys.SkyrimSE.Skyrim.Static.XMarkerHeading.FormKey, InvalidWEScene);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.WESceneCenter.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.WESceneCenter))
             {
                 CheckObject(placeableObject => placeableObject.FormKey != FormKeys.SkyrimSE.Skyrim.Static.XMarkerHeading.FormKey, InvalidWESceneCenter);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.MapMarkerRefType.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.MapMarkerRefType))
             {
                 CheckObject(placeableObject => placeableObject.FormKey != FormKeys.SkyrimSE.Skyrim.Static.MapMarker.FormKey, InvalidMapMarkerRefType);
             }
-            else if (locationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.Boss.FormKey)
+            else if (locationRefType.Equals(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.Boss))
             {
                 CheckNpc(_ => false, InvalidBoss);
             }
