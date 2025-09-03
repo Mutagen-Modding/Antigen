@@ -95,7 +95,7 @@ public static class RecordExtension
             IMagicEffectGetter magicEffect => magicEffect.Conditions,
             IMessageGetter message => message.MenuButtons.SelectMany(x => x.Conditions),
             IMusicTrackGetter musicTrack => musicTrack.Conditions,
-            IPackageGetter package => package.Conditions,
+            IPackageGetter package => package.Conditions.Concat(package.ProcedureTree.SelectMany(b => b.Conditions)),
             IPerkGetter perk => perk.Conditions,
             IQuestGetter quest => quest.DialogConditions
                 .Concat(quest.EventConditions)
