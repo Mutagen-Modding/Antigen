@@ -10,7 +10,7 @@ public class EncounterZoneAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
     public static readonly TopicDefinition<IFormLinkNullableGetter<IEncounterZoneGetter>> HasEncounterZone = MutagenTopicBuilder.FromDiscussion(
             393,
             "Exterior Cell Has Encounter Zone",
-            Severity.Warning)
+            Severity.Suggestion)
         .WithFormatting<IFormLinkNullableGetter<IEncounterZoneGetter>>("Cell is exterior cell with an encounter zone: {0}");
 
     public IEnumerable<TopicDefinition> Topics => [HasEncounterZone];
