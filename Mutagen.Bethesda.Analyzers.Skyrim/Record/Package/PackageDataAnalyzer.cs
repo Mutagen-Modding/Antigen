@@ -25,12 +25,35 @@ public class PackageDataAnalyzer : IContextualRecordAnalyzer<IPackageGetter>
             Severity.Warning)
         .WithFormatting<string>("Package data '{0}' targets no object");
 
+    public static readonly TopicDefinition<string, string?> PackageDataDoesNotExist = MutagenTopicBuilder.FromDiscussion(
+            497,
+            "Referenced Package Data Index Missing",
+            Severity.Error)
+        .WithFormatting<string, string?>("Package data '{0}' referenced by {1} does not exist");
+
     public IEnumerable<TopicDefinition> Topics { get; } = [PackageWithoutOwningQuestReferencingQuestAlias, PackageReferencingMissingQuestAlias];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPackageGetter> param)
     {
         var package = param.Record;
         if (package.IsDeleted) return;
+
+        if (package.PackageTemplate.IsNull)
+        {
+            var existingIndices = package.Data.Keys.ToHashSet();
+            foreach (var branch in package.ProcedureTree)
+            {
+                foreach (var index in branch.DataInputIndices)
+                {
+                    var sIndex = (sbyte)index;
+                    if (sIndex != -1 && !existingIndices.Contains(sIndex))
+                    {
+                        param.AddTopic(
+                            PackageDataDoesNotExist.Format(package.GetPackageDataName(sIndex, param.LinkCache) ?? sIndex.ToString(), branch.ProcedureType));
+                    }
+                }
+            }
+        }
 
         foreach (var (key, data) in package.Data)
         {
@@ -41,33 +64,23 @@ public class PackageDataAnalyzer : IContextualRecordAnalyzer<IPackageGetter>
                     switch (packageDataLocation.Location.Target)
                     {
                         case ILocationCellGetter locationCell:
-                        {
                             CheckNull(locationCell.Link);
                             break;
-                        }
                         case ILocationFallbackGetter locationFallback:
-                        {
                             if (locationFallback.Type is LocationTargetRadius.LocationType.AliasForReference or LocationTargetRadius.LocationType.AliasForLocation)
                             {
                                 CheckInvalidAlias(locationFallback.Data);
                             }
                             break;
-                        }
                         case ILocationObjectIdGetter locationObjectId:
-                        {
                             CheckNull(locationObjectId.Link);
                             break;
-                        }
                         case ILocationObjectTypeGetter locationObjectType:
-                        {
                             CheckNone(locationObjectType.Type);
                             break;
-                        }
                         case ILocationTargetGetter locationTarget:
-                        {
                             CheckNull(locationTarget.Link);
                             break;
-                        }
                     }
                     break;
                 }
@@ -150,7 +163,7 @@ public class PackageDataAnalyzer : IContextualRecordAnalyzer<IPackageGetter>
             var branches = (template is null ? package.ProcedureTree : template.ProcedureTree);
             var procedureTree = branches.BuildProcedureTree();
 
-            foreach (var procedureUsage in branches.GetDataUsageInProcedure((byte) key))
+            foreach (var procedureUsage in branches.GetDataUsageInProcedure((byte)key))
             {
                 var procedureTreeNode = procedureTree.FindNode(procedureUsage);
                 var currentParent = procedureTreeNode?.Parent;
