@@ -12,6 +12,12 @@ public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IDialogBranchGetter
             Severity.Error)
         .WithoutFormatting("Branch has no quest, it will not be available in game");
 
+    public static readonly TopicDefinition NoStartingTopic = MutagenTopicBuilder.FromDiscussion(
+            498,
+            "No Starting Topic",
+            Severity.Warning)
+        .WithoutFormatting("Branch has no starting topic, nothing will not be available in game");
+
     public IEnumerable<TopicDefinition> Topics { get; } = [NoQuest];
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IDialogBranchGetter> param)
@@ -19,16 +25,22 @@ public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IDialogBranchGetter
         var dialogTopic = param.Record;
         if (dialogTopic.IsDeleted) return;
 
-
         if (dialogTopic.Quest.IsNull)
         {
             param.AddTopic(
                 NoQuest.Format());
+        }
+
+        if (dialogTopic.StartingTopic.IsNull)
+        {
+            param.AddTopic(
+                NoStartingTopic.Format());
         }
     }
 
     public IEnumerable<Func<IDialogBranchGetter, object?>> FieldsOfInterest()
     {
         yield return x => x.Quest;
+        yield return x => x.StartingTopic;
     }
 }
