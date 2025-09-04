@@ -33,6 +33,7 @@ public static class RunDiscussionsCreator
         builder.RegisterInstance(new GameReleaseInjection(cmd.GameRelease)).AsImplementedInterfaces();
         builder.RegisterInstance(GameConstants.Get(cmd.GameRelease)).As<GameConstants>();
         builder.RegisterModule<MainModule>();
+        builder.RegisterModule<ConfigModule>();
         builder.RegisterModule<SkyrimAnalyzerModule>();
         builder.RegisterType<GetTopicDefinitions>().AsSelf();
         builder.RegisterType<CreateGitHubDiscussions>().AsSelf();

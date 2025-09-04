@@ -39,6 +39,7 @@ public class AnalyzerCommandModule(RunAnalyzersCommand command) : Module
             var fileSystem = new FileSystem();
             tempBuilder.RegisterInstance(fileSystem).As<IFileSystem>();
             tempBuilder.RegisterModule<MainModule>();
+            tempBuilder.RegisterModule<ConfigModule>();
             tempBuilder.RegisterInstance(new GameReleaseInjection(command.GameRelease))
                 .AsImplementedInterfaces();
 
