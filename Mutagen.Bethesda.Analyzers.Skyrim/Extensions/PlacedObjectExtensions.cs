@@ -141,7 +141,7 @@ public static class PlacedObjectExtensions
 
         if (cell.IsInteriorCell()) return cell;
 
-        if (context.Parent?.Parent?.Record is not IWorldspaceGetter worldspace) return null;
+        if (!context.TryGetParent<IWorldspaceGetter>(out var worldspace)) return null;
 
         var cellCoordinates = placed.GetCellCoordinates();
         if (cellCoordinates is null) return null;
