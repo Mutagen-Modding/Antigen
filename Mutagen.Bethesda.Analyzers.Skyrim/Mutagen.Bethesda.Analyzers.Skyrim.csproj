@@ -1,19 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
-    
+
     <PropertyGroup>
       <RootNamespace>Mutagen.Bethesda.Analyzers.Skyrim</RootNamespace>
     </PropertyGroup>
-    
+
     <ItemGroup>
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Common\Mutagen.Bethesda.Analyzers.Common.csproj" />
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.SDK\Mutagen.Bethesda.Analyzers.SDK.csproj" />
     </ItemGroup>
-    
+
     <ItemGroup>
       <PackageReference Include="Mutagen.Bethesda.FormKeys.SkyrimSE" />
       <PackageReference Include="Mutagen.Bethesda.Skyrim" />
         <PackageReference Include="Autofac" />
         <PackageReference Include="Mutagen.Bethesda.Autofac" />
+        <PackageReference Include="Noggog.CSharpExt" />
     </ItemGroup>
 
 </Project>
