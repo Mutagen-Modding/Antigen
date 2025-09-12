@@ -18,7 +18,6 @@ public class ObjectWindowFilterAnalyzer : IIsolatedRecordAnalyzer<IQuestGetter>
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IQuestGetter> param)
     {
         var quest = param.Record;
-        if (quest.IsDeleted) return;
 
         if (quest.Filter.IsNullOrWhitespace())
         {

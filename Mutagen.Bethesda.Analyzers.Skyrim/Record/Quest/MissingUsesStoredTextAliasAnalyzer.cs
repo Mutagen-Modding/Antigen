@@ -154,7 +154,6 @@ public class MissingTextReplacementReferenceAnalyzer : IContextualRecordAnalyzer
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IQuestGetter> param)
     {
         var quest = param.Record;
-        if (quest.IsDeleted) return;
 
         foreach (var stage in quest.Stages)
         {

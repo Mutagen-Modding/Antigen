@@ -43,7 +43,6 @@ public class MissingTextReplacementReferenceAnalyzer : IContextualRecordAnalyzer
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogTopicGetter> param)
     {
         var dialogTopic = param.Record;
-        if (dialogTopic.IsDeleted) return;
 
         if (dialogTopic.Name is null) return;
 

@@ -18,7 +18,6 @@ public class EncounterZoneAnalyzer : IContextualRecordAnalyzer<ICellGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ICellGetter> param)
     {
         var cell = param.Record;
-        if (cell.IsDeleted) return;
 
         if (cell.EncounterZone is not {} encounterZoneLink) return;
 

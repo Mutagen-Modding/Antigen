@@ -20,7 +20,6 @@ public class InconsistentCellNameAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<ICellGetter> param)
     {
         var cell = param.Record;
-        if (cell.IsDeleted) return;
         var cellName = cell.Name;
         if (cellName is null) return;
 

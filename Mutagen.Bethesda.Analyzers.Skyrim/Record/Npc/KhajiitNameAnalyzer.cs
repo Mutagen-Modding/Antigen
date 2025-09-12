@@ -18,7 +18,6 @@ public class KhajiitNameAnalyzer : IIsolatedRecordAnalyzer<INpcGetter>
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (npc.IsDeleted) return;
 
         if (npc.Race.FormKey != FormKeys.SkyrimSE.Skyrim.Race.KhajiitRace.FormKey
             && npc.Race.FormKey != FormKeys.SkyrimSE.Skyrim.Race.KhajiitRaceVampire.FormKey) return;

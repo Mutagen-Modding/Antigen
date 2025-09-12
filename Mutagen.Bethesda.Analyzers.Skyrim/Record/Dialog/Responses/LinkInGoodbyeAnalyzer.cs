@@ -17,7 +17,6 @@ public class LinkInGoodbyeAnalyzer : IContextualRecordAnalyzer<IDialogResponsesG
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogResponsesGetter> param)
     {
         var dialogResponses = param.Record;
-        if (dialogResponses.IsDeleted) return;
 
         if (dialogResponses.LinkTo.Count == 0) return;
         if (dialogResponses.Flags is null) return;

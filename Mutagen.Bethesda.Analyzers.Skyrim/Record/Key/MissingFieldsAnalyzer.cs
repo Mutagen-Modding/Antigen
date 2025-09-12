@@ -23,7 +23,6 @@ public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IKeyGetter>
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IKeyGetter> param)
     {
         var key = param.Record;
-        if (key.IsDeleted) return;
 
         if (key.PickUpSound.IsNull)
         {

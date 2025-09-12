@@ -19,7 +19,6 @@ public class MissingPromptAnalyzer : IContextualRecordAnalyzer<IDialogTopicGette
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogTopicGetter> param)
     {
         var topic = param.Record;
-        if (topic.IsDeleted) return;
 
         if (topic.Name is not null) return;
         if (topic.Responses.Count == 0) return;

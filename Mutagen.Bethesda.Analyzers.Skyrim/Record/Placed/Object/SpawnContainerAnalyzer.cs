@@ -23,7 +23,6 @@ public class SpawnContainerAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGet
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedObjectGetter> param)
     {
         var placedObject = param.Record;
-        if (placedObject.IsDeleted) return;
 
         if (placedObject.SpawnContainer.IsNull) return;
 

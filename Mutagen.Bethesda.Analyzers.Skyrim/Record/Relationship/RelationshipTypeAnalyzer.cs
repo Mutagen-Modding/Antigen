@@ -23,7 +23,6 @@ public class RelationshipTypeAnalyzer : IContextualRecordAnalyzer<IRelationshipG
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IRelationshipGetter> param)
     {
         var relationship = param.Record;
-        if (relationship.IsDeleted) return;
 
         if (relationship.AssociationType.FormKey == FormKeys.SkyrimSE.Skyrim.AssociationType.Spouse.FormKey
             && relationship.Rank > Bethesda.Skyrim.Relationship.RankType.Ally)

@@ -53,7 +53,6 @@ public sealed class RedundantPackageAnalyzer : IContextualRecordAnalyzer<INpcGet
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (npc.IsDeleted) return;
 
         var timespans = new List<PackageTimeSpan>();
         foreach (var packageLink in npc.Packages)

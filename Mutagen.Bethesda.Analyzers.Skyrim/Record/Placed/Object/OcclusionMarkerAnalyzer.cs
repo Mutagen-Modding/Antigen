@@ -24,8 +24,6 @@ public class OcclusionMarkerAnalyzer : IIsolatedRecordAnalyzer<IPlacedObjectGett
     {
         var placedObject = param.Record;
 
-        if (placedObject.IsDeleted) return;
-
         if (placedObject.Base.FormKey != FormKeys.SkyrimSE.Skyrim.Static.PlaneMarker.FormKey) return;
 
         if (placedObject.Primitive is not {} primitive)

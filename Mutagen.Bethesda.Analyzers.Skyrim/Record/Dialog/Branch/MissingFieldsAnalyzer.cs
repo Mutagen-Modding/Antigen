@@ -23,7 +23,6 @@ public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IDialogBranchGetter
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IDialogBranchGetter> param)
     {
         var dialogTopic = param.Record;
-        if (dialogTopic.IsDeleted) return;
 
         if (dialogTopic.Quest.IsNull)
         {

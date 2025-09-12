@@ -36,7 +36,6 @@ public class PackageDataAnalyzer : IContextualRecordAnalyzer<IPackageGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPackageGetter> param)
     {
         var package = param.Record;
-        if (package.IsDeleted) return;
 
         if (package.PackageTemplate.IsNull)
         {

@@ -17,7 +17,6 @@ public class DisabledCreateObjectAliasAnalyzer : IIsolatedRecordAnalyzer<IQuestG
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IQuestGetter> param)
     {
         var quest = param.Record;
-        if (quest.IsDeleted) return;
 
         foreach (var alias in quest.Aliases)
         {

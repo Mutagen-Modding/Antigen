@@ -37,7 +37,6 @@ public class PackageActionAnalyzer : IContextualRecordAnalyzer<ISceneGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISceneGetter> param)
     {
         var scene = param.Record;
-        if (scene.IsDeleted) return;
 
         foreach (var packageAction in scene.Actions)
         {

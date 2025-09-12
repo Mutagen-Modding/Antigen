@@ -26,7 +26,6 @@ public class StartingTopicAnalyzer(GameConstants gameConstants) : IContextualRec
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogBranchGetter> param)
     {
         var branch = param.Record;
-        if (branch.IsDeleted) return;
 
         var startingTopic = branch.StartingTopic;
         if (startingTopic.IsNull)
