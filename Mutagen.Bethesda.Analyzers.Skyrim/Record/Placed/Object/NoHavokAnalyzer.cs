@@ -26,8 +26,6 @@ public class NoHavokAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
     {
         var placedObject = param.Record;
 
-        if (placedObject.IsDeleted) return;
-
         var baseObject = placedObject.Base.TryResolve(param.LinkCache);
         if (baseObject is null) return;
 

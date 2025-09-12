@@ -23,7 +23,6 @@ public class WeightValueAnalyzer : IIsolatedRecordAnalyzer<IKeyGetter>
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IKeyGetter> param)
     {
         var key = param.Record;
-        if (key.IsDeleted) return;
 
         if (key is not { Weight: 0 })
         {

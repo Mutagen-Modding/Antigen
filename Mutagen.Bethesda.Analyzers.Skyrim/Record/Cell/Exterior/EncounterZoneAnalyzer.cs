@@ -19,8 +19,6 @@ public class EncounterZoneAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
     {
         var cell = param.Record;
 
-        if (cell.IsDeleted) return;
-
         if (!cell.IsExteriorCell()) return;
 
         if (!cell.EncounterZone.IsNull)

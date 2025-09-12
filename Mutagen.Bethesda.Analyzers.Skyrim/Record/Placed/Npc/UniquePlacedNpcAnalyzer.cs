@@ -23,8 +23,6 @@ public class UniquePlacedNpcAnalyzer : IContextualRecordAnalyzer<IPlacedNpcGette
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedNpcGetter> param)
     {
         var placedNpc = param.Record;
-
-        if (placedNpc.IsDeleted) return;
         if (placedNpc.MajorFlags.HasFlag(PlacedNpc.MajorFlag.InitiallyDisabled)) return;
         if (placedNpc.MajorFlags.HasFlag(PlacedNpc.MajorFlag.StartsDead)) return;
 

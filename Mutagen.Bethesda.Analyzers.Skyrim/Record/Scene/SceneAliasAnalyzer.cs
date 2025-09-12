@@ -29,7 +29,6 @@ public class SceneAliasAnalyzer : IContextualRecordAnalyzer<ISceneGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISceneGetter> param)
     {
         var scene = param.Record;
-        if (scene.IsDeleted) return;
 
         var quest = scene.Quest.TryResolve(param.LinkCache);
         if (quest is null) return;

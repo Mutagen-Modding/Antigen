@@ -18,7 +18,6 @@ public class HasHouseKeyAnalyzer : IContextualRecordAnalyzer<IPlacedNpcGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedNpcGetter> param)
     {
         var placedNpc = param.Record;
-        if (placedNpc.IsDeleted) return;
         if (placedNpc.MajorFlags.HasFlag(PlacedNpc.MajorFlag.StartsDead)) return;
 
         var npc = placedNpc.Base.TryResolve(param.LinkCache);

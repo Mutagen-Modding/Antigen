@@ -67,8 +67,6 @@ public class RackAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
     {
         var triggerRef = param.Record;
 
-        if (triggerRef.IsDeleted) return;
-
         var (triggerScript, activatorLinkProperty) = triggerRef.GetScriptPropertyFromSelfOrBase<IScriptObjectPropertyGetter>(param.LinkCache, TriggerScriptName, ActivatorPropertyName);
         if (triggerScript is null) return;
 

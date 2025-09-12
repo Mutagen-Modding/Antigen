@@ -20,8 +20,6 @@ public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedNpcGetter>
     {
         var placedNpc = param.Record;
 
-        if (placedNpc.IsDeleted) return;
-
         var scaleNullable = placedNpc.Scale;
         if (scaleNullable is null) return;
 

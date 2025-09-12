@@ -37,7 +37,6 @@ public class MapMarkerAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
     {
         var placedObject = param.Record;
 
-        if (placedObject.IsDeleted) return;
         if (placedObject.Base.FormKey != FormKeys.SkyrimSE.Skyrim.Static.MapMarker.FormKey) return;
 
         // Not Persistent

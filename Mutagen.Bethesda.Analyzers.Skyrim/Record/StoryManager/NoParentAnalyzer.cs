@@ -17,8 +17,6 @@ public class NoParentAnalyzer : IIsolatedRecordAnalyzer<IAStoryManagerNodeGetter
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IAStoryManagerNodeGetter> param)
     {
         var branchNode = param.Record;
-        if (branchNode.IsDeleted) return;
-
         if (branchNode.Parent.IsNull && branchNode.FormKey != FormKeys.SkyrimSE.Skyrim.AStoryManagerNode.Root.FormKey)
         {
             param.AddTopic(

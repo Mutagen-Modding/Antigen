@@ -22,7 +22,6 @@ public partial class ChanceNoneAnalyzer : IIsolatedRecordAnalyzer<ILeveledItemGe
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<ILeveledItemGetter> param)
     {
         var leveledItem = param.Record;
-        if (leveledItem.IsDeleted) return;
 
         if (leveledItem.ChanceNone == Percent.Zero) return;
         if (leveledItem.EditorID is null) return;

@@ -24,9 +24,6 @@ public class UnlinkedDoorAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGette
     {
         var placedObject = param.Record;
 
-        // Skip deleted objects
-        if (placedObject.IsDeleted) return;
-
         if (placedObject.TeleportDestination is {} destination)
         {
             if (destination.Door.IsNull)

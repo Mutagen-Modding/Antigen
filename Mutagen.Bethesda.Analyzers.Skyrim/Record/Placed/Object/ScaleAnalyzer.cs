@@ -33,8 +33,6 @@ public class ScaleAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
     {
         var placedObject = param.Record;
 
-        if (placedObject.IsDeleted) return;
-
         var scaleNullable = placedObject.Scale;
         if (scaleNullable is null) return;
 

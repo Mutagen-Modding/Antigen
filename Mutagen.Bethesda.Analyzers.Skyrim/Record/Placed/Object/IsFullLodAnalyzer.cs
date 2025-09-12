@@ -17,7 +17,6 @@ public class IsFullLodAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedObjectGetter> param)
     {
         var placedObject = param.Record;
-        if (placedObject.IsDeleted) return;
 
         var flags = (PlacedObject.StaticMajorFlag)placedObject.SkyrimMajorRecordFlags;
         if (!flags.HasFlag(PlacedObject.StaticMajorFlag.IsFullLod)) return;

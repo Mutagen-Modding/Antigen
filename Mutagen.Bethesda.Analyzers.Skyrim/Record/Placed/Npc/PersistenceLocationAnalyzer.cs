@@ -23,7 +23,6 @@ public class PersistenceLocationAnalyzer : IContextualRecordAnalyzer<IPlacedNpcG
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedNpcGetter> param)
     {
         var placedNpc = param.Record;
-        if (placedNpc.IsDeleted) return;
 
         if (placedNpc.PersistentLocation.IsNull) return;
         if (placedNpc.PersistentLocation.FormKey == FormKeys.SkyrimSE.Skyrim.Location.PersistAll.FormKey) return;

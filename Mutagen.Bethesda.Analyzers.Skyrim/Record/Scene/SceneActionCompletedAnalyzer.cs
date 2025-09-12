@@ -33,7 +33,6 @@ public class SceneActionCompletedAnalyzer : IIsolatedRecordAnalyzer<ISceneGetter
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<ISceneGetter> param)
     {
         var scene = param.Record;
-        if (scene.IsDeleted) return;
 
         for (var phaseIndex = 0; phaseIndex < scene.Phases.Count; phaseIndex++)
         {

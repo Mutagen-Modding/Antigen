@@ -79,8 +79,6 @@ public class DummyAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
     {
         var placedObject = param.Record;
 
-        if (placedObject.IsDeleted) return;
-
         var hasLeveledList = placedObject.LeveledItemBaseObject.IsNull == false;
         var isDummyItem = DummyItems.Contains(placedObject.Base.FormKey);
 

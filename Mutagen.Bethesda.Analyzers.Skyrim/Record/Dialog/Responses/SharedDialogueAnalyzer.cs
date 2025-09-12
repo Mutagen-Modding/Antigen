@@ -23,7 +23,6 @@ public class SharedDialogueAnalyzer : IContextualRecordAnalyzer<IDialogResponses
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogResponsesGetter> param)
     {
         var responses = param.Record;
-        if (responses.IsDeleted) return;
 
         var responsesContext = param.LinkCache.ResolveSimpleContext(responses);
         if (responsesContext.Parent?.Record is not IDialogTopicGetter topic) return;

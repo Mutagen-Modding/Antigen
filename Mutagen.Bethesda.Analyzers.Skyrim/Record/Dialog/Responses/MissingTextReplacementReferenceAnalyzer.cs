@@ -43,7 +43,6 @@ public class MissingTextReplacementReferenceAnalyzer : IContextualRecordAnalyzer
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogResponsesGetter> param)
     {
         var dialogResponses = param.Record;
-        if (dialogResponses.IsDeleted) return;
 
         if (dialogResponses.Prompt is null) return;
         if (!param.LinkCache.TryResolveSimpleContext(dialogResponses, out var context)) return;

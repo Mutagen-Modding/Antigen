@@ -27,9 +27,6 @@ public class MineOreAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
     {
         var placedObject = param.Record;
 
-        // Skip deleted objects
-        if (placedObject.IsDeleted) return;
-
         // Skip objects that don't place mine activators
         if (!param.LinkCache.TryResolve<IActivatorGetter>(placedObject.Base.FormKey, out var mine)) return;
         if (mine.EditorID is null || (!mine.EditorID.Contains("MineOre") && !mine.EditorID.Contains("MineGem"))) return;
@@ -47,7 +44,6 @@ public class MineOreAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 
     public IEnumerable<Func<IPlacedObjectGetter, object?>> FieldsOfInterest()
     {
-        yield return x => x.IsDeleted;
         yield return x => x.EditorID;
         yield return x => x.Base;
         yield return x => x.LinkedReferences;

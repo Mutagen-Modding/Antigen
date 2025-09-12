@@ -17,7 +17,6 @@ public class TopLevelBlockingAnalyzer : IContextualRecordAnalyzer<IDialogBranchG
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogBranchGetter> param)
     {
         var branch = param.Record;
-        if (branch.IsDeleted) return;
 
         if (branch.Flags is null) return;
 

@@ -28,7 +28,6 @@ public partial class GiveGoldAnalyzer : IIsolatedRecordAnalyzer<IDialogTopicGett
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IDialogTopicGetter> param)
     {
         var topic = param.Record;
-        if (topic.IsDeleted) return;
 
         if (topic.Name is null) return;
 

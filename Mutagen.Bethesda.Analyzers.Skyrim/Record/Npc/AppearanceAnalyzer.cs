@@ -57,7 +57,6 @@ public class AppearanceAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (npc.IsDeleted) return;
 
         var race = npc.Race.TryResolve(param.LinkCache);
         if (race?.HeadData is null || !race.Flags.HasFlag(Race.Flag.FaceGenHead)) return;

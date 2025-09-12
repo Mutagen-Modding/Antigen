@@ -18,8 +18,6 @@ public class MultiBoundMarkerAnalyzer : IIsolatedRecordAnalyzer<IPlacedObjectGet
     {
         var placedObject = param.Record;
 
-        if (placedObject.IsDeleted) return;
-
         if (placedObject.Base.FormKey == FormKeys.SkyrimSE.Skyrim.Static.MultiBoundMarker.FormKey)
         {
             param.AddTopic(MultiBoundMarker.Format());

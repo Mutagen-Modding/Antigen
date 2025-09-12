@@ -29,23 +29,26 @@ public class ByGenericTypeRecordIsolatedDriver<TMajor> : IIsolatedDriver
         if (_isolatedRecordAnalyzers.Length == 0) return;
         var reportContext = new ReportContextParameters(driverParams.LinkCache);
 
-        await Task.WhenAll(driverParams.TargetMod.EnumerateMajorRecords<TMajor>().SelectMany(rec =>
-        {
-            var isolatedParam = new IsolatedRecordAnalyzerParams<TMajor>(
-                driverParams.TargetMod.ModKey,
-                rec,
-                reportContext,
-                driverParams.ReportDropbox);
-            return _isolatedRecordAnalyzers.Select(analyzer =>
+        await Task.WhenAll(driverParams.TargetMod
+            .EnumerateMajorRecords<TMajor>()
+            .Where(x => !x.IsDeleted)
+            .SelectMany(rec =>
             {
-                return _dropoff.EnqueueAndWait(() =>
+                var isolatedParam = new IsolatedRecordAnalyzerParams<TMajor>(
+                    driverParams.TargetMod.ModKey,
+                    rec,
+                    reportContext,
+                    driverParams.ReportDropbox);
+                return _isolatedRecordAnalyzers.Select(analyzer =>
                 {
-                    analyzer.AnalyzeRecord(isolatedParam with
+                    return _dropoff.EnqueueAndWait(() =>
                     {
-                        AnalyzerType = analyzer.GetType()
-                    });
-                }, driverParams.CancellationToken);
-            });
-        }));
+                        analyzer.AnalyzeRecord(isolatedParam with
+                        {
+                            AnalyzerType = analyzer.GetType()
+                        });
+                    }, driverParams.CancellationToken);
+                });
+            }));
     }
 }

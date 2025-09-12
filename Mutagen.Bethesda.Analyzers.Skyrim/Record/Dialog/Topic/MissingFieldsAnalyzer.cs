@@ -23,7 +23,6 @@ public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IDialogTopicGetter>
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IDialogTopicGetter> param)
     {
         var dialogTopic = param.Record;
-        if (dialogTopic.IsDeleted) return;
 
         if (dialogTopic.Subtype is DialogTopic.SubtypeEnum.Rumors or DialogTopic.SubtypeEnum.ForceGreet or DialogTopic.SubtypeEnum.Custom
             && dialogTopic.Branch.IsNull)

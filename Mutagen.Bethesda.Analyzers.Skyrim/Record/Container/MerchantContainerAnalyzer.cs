@@ -24,7 +24,6 @@ public class MerchantContainerAnalyzer : IContextualRecordAnalyzer<IContainerGet
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IContainerGetter> param)
     {
         var container = param.Record;
-        if (container.IsDeleted) return;
 
         if (container.EditorID is not {} editorID) return;
         if (!editorID.Contains("Merchant")) return;

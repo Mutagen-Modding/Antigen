@@ -18,8 +18,6 @@ public class InvalidPlacementAnalyzer : IContextualRecordAnalyzer<ICellGetter>
     {
         var cell = param.Record;
 
-        if (cell.IsDeleted) return;
-
         if (cell.IsExteriorCell()) return;
 
         foreach (var placed in cell.Temporary.Concat(cell.Persistent))

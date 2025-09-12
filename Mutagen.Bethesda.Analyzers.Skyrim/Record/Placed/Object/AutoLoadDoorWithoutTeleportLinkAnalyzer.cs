@@ -25,7 +25,6 @@ public class AutoLoadDoorWithoutTeleportLinkAnalyzer : IContextualRecordAnalyzer
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedObjectGetter> param)
     {
         var placedObject = param.Record;
-        if (placedObject.IsDeleted) return;
 
         if (AutoLoadDoors.Contains(placedObject.Base.FormKey)
             && (placedObject.TeleportDestination is null || placedObject.TeleportDestination.Door.IsNull))
