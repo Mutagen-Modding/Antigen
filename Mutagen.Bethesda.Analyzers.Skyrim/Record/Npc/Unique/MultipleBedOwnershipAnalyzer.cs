@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
 
@@ -28,7 +29,7 @@ public class MultipleBedOwnershipAnalyzer : IContextualRecordAnalyzer<INpcGetter
         var npc = param.Record;
         if (!npc.IsUniqueActorType(param.LinkCache)) return;
 
-        var usageCache = UsageCacheUtil.GetUsageCache(param.LinkCache);
+        var usageCache = param.ResolveCache<ILinkUsageCache>();
         var ownedBeds = usageCache.GetUsagesOf<IPlacedObjectGetter>(npc).UsageLinks
             .Where(x => IsOwner(x, npc.FormKey))
             .ToList();

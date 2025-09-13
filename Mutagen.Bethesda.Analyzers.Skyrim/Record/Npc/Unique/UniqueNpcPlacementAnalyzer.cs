@@ -1,6 +1,7 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -27,7 +28,7 @@ public class UniqueNpcPlacementAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         var npc = param.Record;
         if (!npc.IsUniqueActorType(param.LinkCache)) return;
 
-        var placements = UsageCacheUtil.GetUsageCache(param.LinkCache)
+        var placements = param.ResolveCache<ILinkUsageCache>()
             .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks
             .ToArray();
 

@@ -1,6 +1,7 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -27,7 +28,7 @@ public class MissingPromptAnalyzer : IContextualRecordAnalyzer<IDialogTopicGette
         var responsesWithoutPrompt = topic.Responses.Where(r => r.Prompt is null).ToArray();
         if (responsesWithoutPrompt.Length == 0) return;
 
-        var usageCache = UsageCacheUtil.GetUsageCache(param.LinkCache);
+        var usageCache = param.ResolveCache<ILinkUsageCache>();
         var linkingBranches = usageCache.GetUsagesOf<IDialogBranchGetter>(topic).UsageLinks
             .Select(b => b.TryResolve(param.LinkCache))
             .WhereNotNull();

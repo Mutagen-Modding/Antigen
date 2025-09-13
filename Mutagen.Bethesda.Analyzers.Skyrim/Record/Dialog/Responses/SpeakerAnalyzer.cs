@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Skyrim.Records.Assets.VoiceType;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
@@ -26,7 +27,7 @@ public class SpeakerAnalyzer : IContextualRecordAnalyzer<IDialogResponsesGetter>
     {
         var dialogResponses = param.Record;
 
-        var voiceTypeAssetLookup = VoiceTypeAssetLookupUtil.GetVoiceTypeAssetLookup(param.LinkCache);
+        var voiceTypeAssetLookup = param.ResolveCache<VoiceTypeAssetLookup>();
         var speakers = voiceTypeAssetLookup.GetSpeakers(dialogResponses).ToHashSet();
         if (speakers.Capacity == 0)
         {
