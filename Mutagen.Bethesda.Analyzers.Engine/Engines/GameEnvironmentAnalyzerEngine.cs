@@ -6,12 +6,12 @@ using Noggog.WorkEngine;
 
 namespace Mutagen.Bethesda.Analyzers.Engines;
 
-public interface IContextualEngine : IEngine
+public interface IGameEnvironmentAnalyzerEngine : IEngine
 {
     Task Run(CancellationToken cancel);
 }
 
-public class ContextualEngine : IContextualEngine
+public class GameEnvironmentAnalyzerEngine : IGameEnvironmentAnalyzerEngine
 {
     private readonly IBlacklistedModsProvider _blacklistedModsProvider;
     private readonly IWorkDropoff _workDropoff;
@@ -23,7 +23,7 @@ public class ContextualEngine : IContextualEngine
     public IEnumerable<IDriver> Drivers => ContextualModDrivers.Drivers
         .Concat<IDriver>(IsolatedModDrivers.Drivers);
 
-    public ContextualEngine(
+    public GameEnvironmentAnalyzerEngine(
         IGameEnvironmentProvider envGetter,
         IDriverProvider<IContextualDriver> contextualDrivers,
         IDriverProvider<IIsolatedDriver> isolatedDrivers,

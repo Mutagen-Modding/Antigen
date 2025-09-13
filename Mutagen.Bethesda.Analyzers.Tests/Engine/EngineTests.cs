@@ -100,7 +100,7 @@ public class EngineTests
         builder.RegisterInstance(new TestGameEnvironmentProvider(env)).AsImplementedInterfaces();
         builder.RegisterInstance(env).AsImplementedInterfaces();
         var container = builder.Build();
-        var sut = container.Resolve<ContextualEngine>();
+        var sut = container.Resolve<GameEnvironmentAnalyzerEngine>();
         var dropoff = container.Resolve<TestDropoff>();
 
         var modPath = Path.Combine(existingDataDir, mod.ModKey.FileName);
@@ -145,7 +145,7 @@ public class EngineTests
         builder.RegisterInstance(new TestGameEnvironmentProvider(env)).AsImplementedInterfaces();
         builder.RegisterInstance(env).AsImplementedInterfaces();
         var container = builder.Build();
-        var sut = container.Resolve<ContextualEngine>();
+        var sut = container.Resolve<GameEnvironmentAnalyzerEngine>();
         var dropoff = container.Resolve<TestDropoff>();
 
         var modPath = Path.Combine(existingDataDir, mod.ModKey.FileName);
@@ -188,7 +188,7 @@ public class EngineTests
         builder.RegisterInstance(new TestGameEnvironmentProvider(env)).AsImplementedInterfaces();
         builder.RegisterInstance(env).AsImplementedInterfaces();
         var container = builder.Build();
-        var sut = container.Resolve<ContextualEngine>();
+        var sut = container.Resolve<GameEnvironmentAnalyzerEngine>();
         var dropoff = container.Resolve<TestDropoff>();
 
         var modPath = Path.Combine(existingDataDir, mod.ModKey.FileName);

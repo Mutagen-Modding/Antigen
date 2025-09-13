@@ -16,7 +16,7 @@ public class MainModule : Module
         builder.RegisterModule<ReflectionDriverModule>();
         builder.RegisterAssemblyTypes(typeof(IsolatedEngine).Assembly)
             .InNamespacesOf(
-                typeof(ContextualEngine))
+                typeof(GameEnvironmentAnalyzerEngine))
             .AsImplementedInterfaces()
             .AsSelf()
             .SingleInstance();

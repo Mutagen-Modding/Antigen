@@ -47,7 +47,7 @@ public class RunConfigApplicationTests
             builder.RegisterInstance(_env).AsImplementedInterfaces();
             containerAdjustment(builder);
             var container = builder.Build();
-            var engine = container.Resolve<ContextualEngine>();
+            var engine = container.Resolve<GameEnvironmentAnalyzerEngine>();
             await engine.Run(CancellationToken.None);
             return container.Resolve<TestDropoff>();
         }
