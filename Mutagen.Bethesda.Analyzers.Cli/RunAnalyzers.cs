@@ -21,7 +21,7 @@ public static class RunAnalyzers
     {
         var container = GetContainer(command);
 
-        var engine = container.Resolve<GameEnvironmentAnalyzerEngine>();
+        var engine = container.Resolve<ContextualAnalyzerEngine>();
         var consumer = container.Resolve<IWorkConsumer>();
 
         PrintTopics(command, engine);
@@ -32,7 +32,7 @@ public static class RunAnalyzers
         return 0;
     }
 
-    private static void PrintTopics(RunAnalyzersCommand command, GameEnvironmentAnalyzerEngine engine)
+    private static void PrintTopics(RunAnalyzersCommand command, ContextualAnalyzerEngine engine)
     {
         if (!command.PrintTopics) return;
 
