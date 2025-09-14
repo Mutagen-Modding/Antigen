@@ -1,4 +1,5 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Drops;
+﻿using System.IO.Abstractions;
+using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Records;
@@ -10,20 +11,29 @@ public class IsolatedDriverParams
     public readonly ILinkCache LinkCache;
     public readonly IReportDropbox ReportDropbox;
     public readonly IModGetter TargetMod;
-    public readonly ModPath? TargetModPath;
+    public readonly IsolatedDriverFileParams? FileParams;
     public readonly CancellationToken CancellationToken;
+
 
     public IsolatedDriverParams(
         ILinkCache linkCache,
         IReportDropbox reportDropbox,
         IModGetter targetMod,
-        ModPath? modPath,
+        IsolatedDriverFileParams? fileParams,
         CancellationToken cancellationToken)
     {
         LinkCache = linkCache;
         ReportDropbox = reportDropbox;
         TargetMod = targetMod;
-        TargetModPath = modPath;
+        FileParams = fileParams;
         CancellationToken = cancellationToken;
     }
+}
+
+public class IsolatedDriverFileParams(
+    IFileSystem fileSystem,
+    ModPath modPath)
+{
+    public IFileSystem FileSystem { get; } = fileSystem;
+    public ModPath ModPath { get; } = modPath;
 }

@@ -1,4 +1,5 @@
-﻿using Mutagen.Bethesda.Analyzers.Config.Run;
+﻿using System.IO.Abstractions;
+using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.SDK.Caches;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
@@ -14,6 +15,7 @@ public interface IContextualAnalyzerEngine : IEngine
 
 public class ContextualAnalyzerEngine : IContextualAnalyzerEngine
 {
+    private readonly IFileSystem _fileSystem;
     private readonly ICacheConstructor[] _cacheConstructors;
     private readonly IBlacklistedModsProvider _blacklistedModsProvider;
     private readonly IWorkDropoff _workDropoff;
@@ -27,6 +29,7 @@ public class ContextualAnalyzerEngine : IContextualAnalyzerEngine
 
     public ContextualAnalyzerEngine(
         IGameEnvironmentProvider envGetter,
+        IFileSystem fileSystem,
         IDriverProvider<IContextualDriver> contextualDrivers,
         IDriverProvider<IIsolatedDriver> isolatedDrivers,
         IReportDropbox reportDropbox,
@@ -34,6 +37,7 @@ public class ContextualAnalyzerEngine : IContextualAnalyzerEngine
         IBlacklistedModsProvider blacklistedModsProvider,
         IWorkDropoff workDropoff)
     {
+        _fileSystem = fileSystem;
         _cacheConstructors = cacheConstructors;
         _blacklistedModsProvider = blacklistedModsProvider;
         _workDropoff = workDropoff;
@@ -67,7 +71,9 @@ public class ContextualAnalyzerEngine : IContextualAnalyzerEngine
                     listing.Mod.ToUntypedImmutableLinkCache(),
                     ReportDropbox,
                     listing.Mod,
-                    modPath,
+                    new IsolatedDriverFileParams(
+                        _fileSystem,
+                        modPath),
                     cancel);
 
                 toDo.Add(Task.WhenAll(IsolatedModDrivers.Drivers.Select(driver =>

@@ -1,7 +1,9 @@
-﻿using Mutagen.Bethesda.Analyzers.Config.Run;
+﻿using System.IO.Abstractions;
+using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Binary.Parameters;
 using Mutagen.Bethesda.Plugins.Records.DI;
 using Noggog.WorkEngine;
 
@@ -14,6 +16,7 @@ public interface IIsolatedEngine : IEngine
 
 public class IsolatedEngine : IIsolatedEngine
 {
+    private readonly IFileSystem _fileSystem;
     private readonly IBlacklistedModsProvider _blacklistedModsProvider;
     private readonly IWorkDropoff _workDropoff;
     public IModImporter ModImporter { get; }
@@ -23,12 +26,14 @@ public class IsolatedEngine : IIsolatedEngine
 
     public IsolatedEngine(
         IModImporter modImporter,
+        IFileSystem fileSystem,
         IDriverProvider<IIsolatedDriver> isolatedDrivers,
         IBlacklistedModsProvider blacklistedModsProvider,
         IWorkDropoff workDropoff)
     {
         ModImporter = modImporter;
         IsolatedDrivers = isolatedDrivers;
+        _fileSystem = fileSystem;
         _blacklistedModsProvider = blacklistedModsProvider;
         _workDropoff = workDropoff;
     }
@@ -41,13 +46,18 @@ public class IsolatedEngine : IIsolatedEngine
         if (cancel.IsCancellationRequested) return;
         if (_blacklistedModsProvider.IsBlacklisted(modPath.ModKey)) return;
 
-        var mod = ModImporter.Import(modPath);
+        var mod = ModImporter.Import(modPath, new BinaryReadParameters()
+        {
+            FileSystem = _fileSystem
+        });
 
         var driverParams = new IsolatedDriverParams(
             mod.ToUntypedImmutableLinkCache(),
             reportDropbox,
             mod,
-            modPath,
+            new IsolatedDriverFileParams(
+                _fileSystem,
+                modPath),
             cancel);
 
         if (cancel.IsCancellationRequested) return;

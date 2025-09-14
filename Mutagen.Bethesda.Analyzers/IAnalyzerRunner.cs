@@ -43,6 +43,7 @@ public class AnalyzerRunner : IAnalyzerRunner
 {
     private readonly IWorkDropoff _workDropoff;
     private readonly IContainer _container;
+    private readonly IFileSystem _fileSystem;
     private readonly ILinkCache _linkCache;
     private readonly ILoadOrderGetter<IModListingGetter<IModGetter>> _loadOrder;
 
@@ -59,6 +60,7 @@ public class AnalyzerRunner : IAnalyzerRunner
         Severity minimumSeverity,
         INumWorkThreadsController numWorkThreadsController)
     {
+        _fileSystem = fileSystem;
         _linkCache = linkCache;
         _loadOrder = loadOrder;
 
@@ -117,7 +119,9 @@ public class AnalyzerRunner : IAnalyzerRunner
             mod.ToUntypedImmutableLinkCache(),
             reportDropbox,
             mod,
-            new ModPath(mod.ModKey, ""),
+            new IsolatedDriverFileParams(
+                _fileSystem,
+                new ModPath(mod.ModKey, "")),
             CancellationToken.None);
 
         var isolated = Task.WhenAll(IsolatedModDrivers.Drivers
