@@ -43,7 +43,8 @@ public class ByGenericTypeRecordContextualDriver<TMajor> : IContextualDriver
                     driverParams.LoadOrder,
                     listing.Mod.ModKey,
                     rec,
-                    driverParams.ReportDropbox);
+                    driverParams.ReportDropbox,
+                    driverParams.ProvideCaches);
                 return _contextualRecordAnalyzers.Select(analyzer =>
                 {
                     return _dropoff.EnqueueAndWait(() =>

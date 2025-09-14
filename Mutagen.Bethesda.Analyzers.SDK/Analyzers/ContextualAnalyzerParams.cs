@@ -1,4 +1,5 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Drops;
+﻿using Mutagen.Bethesda.Analyzers.SDK.Caches;
+using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
@@ -15,6 +16,7 @@ public readonly struct ContextualAnalyzerParams
     public Type? AnalyzerType { get; init; }
     private readonly IReportDropbox _reportDropbox;
     private readonly ReportContextParameters _parameters;
+    private readonly IProvideCaches _provideCaches;
 
     /// <summary>
     /// Link Cache to use during analysis
@@ -30,12 +32,14 @@ public readonly struct ContextualAnalyzerParams
         ILinkCache linkCache,
         ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder,
         IReportDropbox reportDropbox,
+        IProvideCaches provideCaches,
         ReportContextParameters parameters)
     {
         LinkCache = linkCache;
         LoadOrder = loadOrder;
         _reportDropbox = reportDropbox;
         _parameters = parameters;
+        _provideCaches = provideCaches;
     }
 
     /// <summary>
@@ -52,5 +56,10 @@ public readonly struct ContextualAnalyzerParams
             mod,
             record,
             Topic.Create(formattedTopicDefinition, AnalyzerType, metaData));
+    }
+
+    public TAnalyzerCache ResolveCache<TAnalyzerCache>()
+    {
+        return _provideCaches.Resolve<TAnalyzerCache>();
     }
 }

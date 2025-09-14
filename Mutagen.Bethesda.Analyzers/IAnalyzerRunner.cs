@@ -7,6 +7,7 @@ using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.Reporting.Drops;
 using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Caches;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim;
@@ -47,6 +48,7 @@ public class AnalyzerRunner : IAnalyzerRunner
 
     public IDriverProvider<IContextualDriver> ContextualModDrivers { get; }
     public IDriverProvider<IIsolatedDriver> IsolatedModDrivers { get; }
+    public ICacheConstructor[] CacheConstructors { get; }
 
     internal AnalyzerRunner(
         IFileSystem fileSystem,
@@ -95,6 +97,7 @@ public class AnalyzerRunner : IAnalyzerRunner
 
         ContextualModDrivers = _container.Resolve<IDriverProvider<IContextualDriver>>();
         IsolatedModDrivers = _container.Resolve<IDriverProvider<IIsolatedDriver>>();
+        CacheConstructors = _container.Resolve<ICacheConstructor[]>();
     }
 
     public async Task<IEnumerable<AnalyzerResult>> Analyze(IModGetter mod)
@@ -104,6 +107,10 @@ public class AnalyzerRunner : IAnalyzerRunner
         var consumer = _container.Resolve<IWorkConsumer>();
 
         consumer.Start();
+
+        var cacheCache = new ProvideCaches(
+            _linkCache,
+            CacheConstructors);
 
         // Isolated
         var isolatedParams = new IsolatedDriverParams(
@@ -122,6 +129,7 @@ public class AnalyzerRunner : IAnalyzerRunner
             _linkCache,
             _loadOrder,
             reportDropbox,
+            cacheCache,
             CancellationToken.None);
 
         var contextual = Task.WhenAll(ContextualModDrivers.Drivers
@@ -142,6 +150,10 @@ public class AnalyzerRunner : IAnalyzerRunner
         var consumer = _container.Resolve<IWorkConsumer>();
 
         consumer.Start();
+
+        var cacheCache = new ProvideCaches(
+            _linkCache,
+            CacheConstructors);
 
         // Isolated
         var isolatedParams = new IsolatedRecordAnalyzerParams<TMajorRecord>(
@@ -168,7 +180,8 @@ public class AnalyzerRunner : IAnalyzerRunner
             _loadOrder,
             record.FormKey.ModKey,
             record,
-            reportDropbox);
+            reportDropbox,
+            cacheCache);
 
         var contextualAnalyzerProvider = _container.Resolve<IAnalyzerProvider<IContextualRecordAnalyzer<TMajorRecord>>>();
         var contextual = Task.WhenAll(contextualAnalyzerProvider.GetAnalyzers().Select(analyzer =>

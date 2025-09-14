@@ -1,5 +1,6 @@
 ﻿using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.Drivers;
+using Mutagen.Bethesda.Analyzers.SDK.Caches;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Environments.DI;
 using Noggog.WorkEngine;
@@ -13,6 +14,7 @@ public interface IGameEnvironmentAnalyzerEngine : IEngine
 
 public class GameEnvironmentAnalyzerEngine : IGameEnvironmentAnalyzerEngine
 {
+    private readonly ICacheConstructor[] _cacheConstructors;
     private readonly IBlacklistedModsProvider _blacklistedModsProvider;
     private readonly IWorkDropoff _workDropoff;
     public IReportDropbox ReportDropbox { get; }
@@ -28,9 +30,11 @@ public class GameEnvironmentAnalyzerEngine : IGameEnvironmentAnalyzerEngine
         IDriverProvider<IContextualDriver> contextualDrivers,
         IDriverProvider<IIsolatedDriver> isolatedDrivers,
         IReportDropbox reportDropbox,
+        ICacheConstructor[] cacheConstructors,
         IBlacklistedModsProvider blacklistedModsProvider,
         IWorkDropoff workDropoff)
     {
+        _cacheConstructors = cacheConstructors;
         _blacklistedModsProvider = blacklistedModsProvider;
         _workDropoff = workDropoff;
         ReportDropbox = reportDropbox;
@@ -43,6 +47,7 @@ public class GameEnvironmentAnalyzerEngine : IGameEnvironmentAnalyzerEngine
     {
         if (cancel.IsCancellationRequested) return;
         using var env = EnvGetter.Construct();
+        var cacheCache = new ProvideCaches(env.LinkCache, _cacheConstructors);
 
         List<Task> toDo = new();
 
@@ -79,6 +84,7 @@ public class GameEnvironmentAnalyzerEngine : IGameEnvironmentAnalyzerEngine
             env.LinkCache,
             env.LoadOrder,
             ReportDropbox,
+            cacheCache,
             cancel);
 
         toDo.Add(Task.WhenAll(ContextualModDrivers.Drivers.Select(driver =>

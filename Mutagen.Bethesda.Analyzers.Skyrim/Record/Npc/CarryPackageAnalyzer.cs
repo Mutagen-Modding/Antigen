@@ -2,6 +2,7 @@ using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -96,7 +97,7 @@ public class CarryPackageAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             }
         }
 
-        var placedNpcs = UsageCacheUtil.GetUsageCache(param.LinkCache)
+        var placedNpcs = param.ResolveCache<ILinkUsageCache>()
             .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks
             .Select(x => x.TryResolve(param.LinkCache))
             .WhereNotNull();

@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Skyrim.Records.Assets.VoiceType;
 using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
@@ -20,7 +21,7 @@ public class LinksToDifferentSpeakerAnalyzer : IContextualRecordAnalyzer<IDialog
     {
         var dialogTopic = param.Record;
 
-        var voiceTypeAssetLookup = VoiceTypeAssetLookupUtil.GetVoiceTypeAssetLookup(param.LinkCache);
+        var voiceTypeAssetLookup = param.ResolveCache<VoiceTypeAssetLookup>();
 
         var topicsPerLink = dialogTopic.Responses
             .SelectMany(responses => responses.LinkTo.Select(link => (link, responses)))

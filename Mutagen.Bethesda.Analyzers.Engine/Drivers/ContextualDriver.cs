@@ -28,6 +28,7 @@ public class ContextualDriver : IContextualDriver
             driverParams.LinkCache,
             driverParams.LoadOrder,
             driverParams.ReportDropbox,
+            driverParams.ProvideCaches,
             reportContext);
         if (driverParams.CancellationToken.IsCancellationRequested) return;
         await Task.WhenAll(_contextualAnalyzers.Select(contextualAnalyzer =>
