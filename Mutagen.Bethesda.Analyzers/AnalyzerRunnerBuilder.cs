@@ -2,12 +2,67 @@
 using Mutagen.Bethesda.Analyzers.Config.Topic;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog.WorkEngine;
 
 namespace Mutagen.Bethesda.Analyzers;
+
+public record AnalyzerRunnerBuilderNeedsTarget
+{
+    private readonly GameRelease _gameRelease;
+
+    public AnalyzerRunnerBuilderNeedsTarget(GameRelease gameRelease)
+    {
+        _gameRelease = gameRelease;
+    }
+
+    public AnalyzerRunnerBuilder WithLinkCache(ILinkCache linkCache)
+    {
+        return new AnalyzerRunnerBuilder(
+            _gameRelease,
+            linkCache);
+    }
+
+    public AnalyzerRunnerBuilder WithLoadOrder(ILoadOrder<IModListingGetter<IModGetter>> loadOrder)
+    {
+        return new AnalyzerRunnerBuilder(
+            _gameRelease,
+            loadOrder);
+    }
+
+    public AnalyzerRunnerBuilderTargetMod WithTargetMod(ModKey modKey)
+    {
+        return new AnalyzerRunnerBuilderTargetMod(
+            _gameRelease,
+            modKey);
+    }
+}
+
+public record AnalyzerRunnerBuilderTargetMod
+{
+    private readonly GameRelease _gameRelease;
+    private readonly ModKey _modKey;
+
+    public AnalyzerRunnerBuilderTargetMod(
+        GameRelease gameRelease,
+        ModKey modKey)
+    {
+        _gameRelease = gameRelease;
+        _modKey = modKey;
+    }
+
+    public AnalyzerRunnerBuilder WithLoadOrder(ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder)
+    {
+        return new AnalyzerRunnerBuilder(
+            _gameRelease,
+            loadOrder.TrimAt(_modKey));
+        // ToDo
+        // Add any applicable filters
+    }
+}
 
 public record AnalyzerRunnerBuilder
 {
@@ -20,31 +75,31 @@ public record AnalyzerRunnerBuilder
     private Severity _minimumSeverity { get; init; } = Severity.Suggestion;
     private TopicConfig? _topicConfig { get; init; }
 
-    private AnalyzerRunnerBuilder(
+    internal AnalyzerRunnerBuilder(
         GameRelease gameRelease,
-        ILinkCache linkCache,
-        ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder)
+        ILinkCache linkCache)
     {
         _gameRelease = gameRelease;
         _linkCache = linkCache;
+        _loadOrder = new LoadOrder<IModListingGetter<IModGetter>>(
+            linkCache
+                .ListedOrder
+                .Select(x => new ModListing<IModGetter>(x.ModKey, x, enabled: true)));
+    }
+
+    internal AnalyzerRunnerBuilder(
+        GameRelease gameRelease,
+        ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder)
+    {
+        _gameRelease = gameRelease;
+        _linkCache = loadOrder.ToUntypedImmutableLinkCache();
         _loadOrder = loadOrder;
     }
 
-    public static AnalyzerRunnerBuilder Create(
-        GameRelease gameRelease,
-        ILinkCache linkCache,
-        ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder)
+    public static AnalyzerRunnerBuilderNeedsTarget Create(
+        GameRelease gameRelease)
     {
-        return new AnalyzerRunnerBuilder(gameRelease, linkCache, loadOrder);
-    }
-
-    public static AnalyzerRunnerBuilder Create(
-        IGameEnvironment gameEnvironment)
-    {
-        return new AnalyzerRunnerBuilder(
-            gameEnvironment.GameRelease,
-            gameEnvironment.LinkCache,
-            gameEnvironment.LoadOrder);
+        return new AnalyzerRunnerBuilderNeedsTarget(gameRelease);
     }
 
     public AnalyzerRunnerBuilder WithFileSystem(IFileSystem fileSystem)
