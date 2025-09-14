@@ -18,8 +18,6 @@ public class RunAnalyzerModule : Module
         builder.RegisterDecorator<DisallowedParametersChecker, IReportDropbox>();
         builder.RegisterDecorator<FilterBlacklistedReports, IReportDropbox>();
 
-        builder.RegisterType<ConsoleReportHandler>().AsImplementedInterfaces();
-
         builder.RegisterModule<MainModule>();
         builder.RegisterModule<ConfigModule>();
     }

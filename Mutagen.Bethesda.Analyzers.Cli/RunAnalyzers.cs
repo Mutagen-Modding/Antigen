@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.Cli.Args;
 using Mutagen.Bethesda.Analyzers.Cli.Modules;
 using Mutagen.Bethesda.Analyzers.Engines;
+using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim;
 using Noggog;
@@ -64,6 +65,7 @@ public static class RunAnalyzers
         builder.RegisterInstance(new FileSystem()).As<IFileSystem>();
 
         builder.RegisterModule<RunAnalyzerModule>();
+        builder.RegisterType<ConsoleReportHandler>().AsImplementedInterfaces();
         builder.RegisterModule(new AnalyzerCommandModule(command));
 
         builder.RegisterModule<SkyrimAnalyzerModule>();
