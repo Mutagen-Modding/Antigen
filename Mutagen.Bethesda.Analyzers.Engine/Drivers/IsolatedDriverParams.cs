@@ -10,14 +10,14 @@ public class IsolatedDriverParams
     public readonly ILinkCache LinkCache;
     public readonly IReportDropbox ReportDropbox;
     public readonly IModGetter TargetMod;
-    public readonly ModPath TargetModPath;
+    public readonly ModPath? TargetModPath;
     public readonly CancellationToken CancellationToken;
 
     public IsolatedDriverParams(
         ILinkCache linkCache,
         IReportDropbox reportDropbox,
         IModGetter targetMod,
-        ModPath modPath,
+        ModPath? modPath,
         CancellationToken cancellationToken)
     {
         LinkCache = linkCache;

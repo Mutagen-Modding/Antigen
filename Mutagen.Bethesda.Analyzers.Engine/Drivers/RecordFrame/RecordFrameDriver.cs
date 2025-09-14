@@ -167,7 +167,12 @@ public class RecordFrameDriver : IIsolatedDriver, IContextualDriver
     public async Task Drive(IsolatedDriverParams driverParams)
     {
         if (driverParams.CancellationToken.IsCancellationRequested) return;
-        var parsingMeta = ParsingMeta.Factory(new BinaryReadParameters(), _gameReleaseContext.Release, driverParams.TargetModPath);
+        if (driverParams.TargetModPath == null) return;
+
+        var parsingMeta = ParsingMeta.Factory(
+            new BinaryReadParameters(),
+            _gameReleaseContext.Release,
+            driverParams.TargetModPath);
         using var stream = new MutagenBinaryReadStream(driverParams.TargetModPath, parsingMeta);
         var locs = RecordLocator.GetLocations(stream);
 
