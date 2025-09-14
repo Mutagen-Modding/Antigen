@@ -9,16 +9,16 @@ using Noggog.WorkEngine;
 
 namespace Mutagen.Bethesda.Analyzers;
 
-public class AnalyzerRunnerBuilder
+public record AnalyzerRunnerBuilder
 {
     private readonly GameRelease _gameRelease;
     private readonly ILinkCache _linkCache;
     private readonly ILoadOrderGetter<IModListingGetter<IModGetter>> _loadOrder;
 
-    private IFileSystem? _fileSystem;
-    private INumWorkThreadsController? _numWorkThreadsController;
-    private Severity _minimumSeverity = Severity.Suggestion;
-    private TopicConfig? _topicConfig;
+    private IFileSystem? _fileSystem { get; init; }
+    private INumWorkThreadsController? _numWorkThreadsController { get; init; }
+    private Severity _minimumSeverity { get; init; } = Severity.Suggestion;
+    private TopicConfig? _topicConfig { get; init; }
 
     private AnalyzerRunnerBuilder(
         GameRelease gameRelease,
@@ -47,33 +47,49 @@ public class AnalyzerRunnerBuilder
             gameEnvironment.LoadOrder);
     }
 
-    public AnalyzerRunnerBuilder WithFileSystem(IFileSystem fileSystem) {
-        _fileSystem = fileSystem;
-        return this;
-    }
-
-    public AnalyzerRunnerBuilder WithThreads(int threads) {
-        _numWorkThreadsController = new NumWorkThreadsConstant(threads);
-        return this;
-    }
-
-    public AnalyzerRunnerBuilder WithThreads(IObservable<int> threads)
+    public AnalyzerRunnerBuilder WithFileSystem(IFileSystem fileSystem)
     {
-        // TODO: replace with implementation accepting an observable
-        _numWorkThreadsController = new NumWorkThreadsConstant(-1);
-        return this;
+        return this with
+        {
+            _fileSystem = fileSystem
+        };
+    }
+
+    public AnalyzerRunnerBuilder WithThreads(int threads)
+    {
+        return this with
+        {
+            _numWorkThreadsController = new NumWorkThreadsConstant(threads)
+        };
+    }
+
+    public AnalyzerRunnerBuilder WithThreads(IObservable<int?> threads)
+    {
+        return this with
+        {
+            _numWorkThreadsController = new NumWorkThreadsByObservable(threads)
+        };
+    }
+
+    private class NumWorkThreadsByObservable(IObservable<int?> numThreads) : INumWorkThreadsController
+    {
+        public IObservable<int?> NumDesiredThreads { get; } = numThreads;
     }
 
     public AnalyzerRunnerBuilder WithMinimumSeverity(Severity minimumSeverity)
     {
-        _minimumSeverity = minimumSeverity;
-        return this;
+        return this with
+        {
+            _minimumSeverity = minimumSeverity
+        };
     }
 
     public AnalyzerRunnerBuilder WithTopicConfig(TopicConfig? topicConfig)
     {
-        _topicConfig = topicConfig;
-        return this;
+        return this with
+        {
+            _topicConfig = topicConfig
+        };
     }
 
     public IAnalyzerRunner Build()
