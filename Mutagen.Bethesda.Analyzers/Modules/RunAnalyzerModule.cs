@@ -1,10 +1,9 @@
 ﻿using Autofac;
 using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.Reporting.Drops;
-using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 
-namespace Mutagen.Bethesda.Analyzers.Cli.Modules;
+namespace Mutagen.Bethesda.Analyzers.Modules;
 
 public class RunAnalyzerModule : Module
 {

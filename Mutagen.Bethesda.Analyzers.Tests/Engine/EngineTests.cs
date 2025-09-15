@@ -2,6 +2,7 @@
 using Autofac;
 using Mutagen.Bethesda.Analyzers.Engines;
 using Mutagen.Bethesda.Analyzers.Testing;
+using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
@@ -85,20 +86,17 @@ public class EngineTests
         var builder = new ContainerBuilder();
         builder.RegisterModule(new TestModule(fileSystem));
         builder.RegisterType<TestIsolatedRecordAnalyzer>().AsImplementedInterfaces();
-        var env = new TestGameEnvironment()
-        {
-            GameRelease = GameRelease.SkyrimSE,
-            LinkCache = mod.ToImmutableLinkCache(),
-            DataFolderPath = existingDataDir,
-            CreationClubListingsFilePath = null,
-            LoadOrderFilePath = "",
-            LoadOrder = new LoadOrder<IModListingGetter<IModGetter>>([
+        builder
+            .RegisterInstance(new LoadOrder<IModListingGetter<IModGetter>>([
                 new ModListing<IModGetter>(mod)
-            ]),
-            AssetProvider = null!,
-        };
-        builder.RegisterInstance(new TestGameEnvironmentProvider(env)).AsImplementedInterfaces();
-        builder.RegisterInstance(env).AsImplementedInterfaces();
+            ]))
+            .AsImplementedInterfaces();
+        builder
+            .RegisterInstance(new DataDirectoryInjection(existingDataDir))
+            .AsImplementedInterfaces();
+        builder
+            .RegisterInstance(mod.ToImmutableLinkCache())
+            .AsImplementedInterfaces();
         var container = builder.Build();
         var sut = container.Resolve<ContextualAnalyzerEngine>();
         var dropoff = container.Resolve<TestDropoff>();
@@ -130,20 +128,17 @@ public class EngineTests
         var builder = new ContainerBuilder();
         builder.RegisterModule(new TestModule(fileSystem));
         builder.RegisterType<TestIsolatedRecordAnalyzer>().AsImplementedInterfaces();
-        var env = new TestGameEnvironment()
-        {
-            GameRelease = GameRelease.SkyrimSE,
-            LinkCache = mod.ToImmutableLinkCache(),
-            DataFolderPath = existingDataDir,
-            CreationClubListingsFilePath = null,
-            LoadOrderFilePath = "",
-            LoadOrder = new LoadOrder<IModListingGetter<IModGetter>>([
+        builder
+            .RegisterInstance(new LoadOrder<IModListingGetter<IModGetter>>([
                 new ModListing<IModGetter>(mod)
-            ]),
-            AssetProvider = null!,
-        };
-        builder.RegisterInstance(new TestGameEnvironmentProvider(env)).AsImplementedInterfaces();
-        builder.RegisterInstance(env).AsImplementedInterfaces();
+            ]))
+            .AsImplementedInterfaces();
+        builder
+            .RegisterInstance(new DataDirectoryInjection(existingDataDir))
+            .AsImplementedInterfaces();
+        builder
+            .RegisterInstance(mod.ToImmutableLinkCache())
+            .AsImplementedInterfaces();
         var container = builder.Build();
         var sut = container.Resolve<ContextualAnalyzerEngine>();
         var dropoff = container.Resolve<TestDropoff>();
@@ -173,20 +168,17 @@ public class EngineTests
         var builder = new ContainerBuilder();
         builder.RegisterModule(new TestModule(fileSystem));
         builder.RegisterType<TestContextualRecordAnalyzer>().AsImplementedInterfaces();
-        var env = new TestGameEnvironment()
-        {
-            GameRelease = GameRelease.SkyrimSE,
-            LinkCache = mod.ToImmutableLinkCache(),
-            DataFolderPath = existingDataDir,
-            CreationClubListingsFilePath = null,
-            LoadOrderFilePath = "",
-            LoadOrder = new LoadOrder<IModListingGetter<IModGetter>>([
+        builder
+            .RegisterInstance(new LoadOrder<IModListingGetter<IModGetter>>([
                 new ModListing<IModGetter>(mod)
-            ]),
-            AssetProvider = null!,
-        };
-        builder.RegisterInstance(new TestGameEnvironmentProvider(env)).AsImplementedInterfaces();
-        builder.RegisterInstance(env).AsImplementedInterfaces();
+            ]))
+            .AsImplementedInterfaces();
+        builder
+            .RegisterInstance(new DataDirectoryInjection(existingDataDir))
+            .AsImplementedInterfaces();
+        builder
+            .RegisterInstance(mod.ToImmutableLinkCache())
+            .AsImplementedInterfaces();
         var container = builder.Build();
         var sut = container.Resolve<ContextualAnalyzerEngine>();
         var dropoff = container.Resolve<TestDropoff>();

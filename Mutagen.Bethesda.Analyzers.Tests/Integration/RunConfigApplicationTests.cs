@@ -43,7 +43,12 @@ public class RunConfigApplicationTests
         {
             var builder = new ContainerBuilder();
             builder.RegisterModule<TestModule>();
-            builder.RegisterInstance(new TestGameEnvironmentProvider(_env)).AsImplementedInterfaces();
+            builder.RegisterInstance(
+                    _env.LinkCache)
+                .AsImplementedInterfaces();
+            builder.RegisterInstance(
+                    _env.LoadOrder)
+                .AsImplementedInterfaces();
             builder.RegisterInstance(_env).AsImplementedInterfaces();
             containerAdjustment(builder);
             var container = builder.Build();

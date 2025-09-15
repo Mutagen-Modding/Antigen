@@ -1,11 +1,16 @@
 ﻿using System.IO.Abstractions;
+using Autofac;
+using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim;
 using Mutagen.Bethesda.Environments;
+using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
+using Noggog;
 using Noggog.WorkEngine;
 
 namespace Mutagen.Bethesda.Analyzers;
@@ -74,6 +79,7 @@ public record AnalyzerRunnerBuilder
     private INumWorkThreadsController? _numWorkThreadsController { get; init; }
     private Severity _minimumSeverity { get; init; } = Severity.Suggestion;
     private TopicConfig? _topicConfig { get; init; }
+    private DirectoryPath? _dataDirectory { get; init; }
 
     internal AnalyzerRunnerBuilder(
         GameRelease gameRelease,
@@ -147,15 +153,58 @@ public record AnalyzerRunnerBuilder
         };
     }
 
+    public AnalyzerRunnerBuilder WithDataDirectory(DirectoryPath dataDirectory)
+    {
+        return this with
+        {
+            _dataDirectory = _dataDirectory
+        };
+    }
+
     public IAnalyzerRunner Build()
     {
-        return new AnalyzerRunner(
-            _fileSystem ?? new FileSystem(),
-            _gameRelease,
-            _linkCache,
-            _loadOrder,
-            _topicConfig ?? new TopicConfig(),
-            _minimumSeverity,
-            _numWorkThreadsController ?? new NumWorkThreadsConstant(null));
+        var builder = new ContainerBuilder();
+
+        builder.RegisterModule<MainModule>();
+        builder.RegisterModule<SkyrimAnalyzerModule>();
+
+        builder
+            .RegisterInstance(_fileSystem ?? new FileSystem())
+            .As<IFileSystem>();
+
+        builder
+            .RegisterInstance(new GameReleaseInjection(_gameRelease))
+            .AsImplementedInterfaces();
+
+        builder
+            .RegisterInstance(_loadOrder)
+            .AsImplementedInterfaces();
+
+        builder
+            .RegisterInstance(_linkCache)
+            .AsImplementedInterfaces();
+
+        builder
+            .RegisterInstance(_topicConfig ?? new TopicConfig())
+            .AsSelf()
+            .AsImplementedInterfaces();
+
+        builder.RegisterInstance(new MinimumSeverityConfiguration(_minimumSeverity))
+            .AsImplementedInterfaces();
+
+        builder
+            .RegisterInstance(_numWorkThreadsController ?? new NumWorkThreadsConstant(null))
+            .AsImplementedInterfaces();
+
+        if (_dataDirectory != null)
+        {
+            builder
+                .RegisterInstance(new DataDirectoryInjection(_dataDirectory.Value))
+                .AsImplementedInterfaces();
+        }
+
+        var cont = builder.Build();
+
+        return cont.Resolve<AnalyzerRunner>();
     }
 }

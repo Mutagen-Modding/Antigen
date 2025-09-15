@@ -1,9 +1,13 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.SDK.Caches;
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Environments.DI;
+using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache;
+using Mutagen.Bethesda.Plugins.Order;
+using Mutagen.Bethesda.Plugins.Records;
 using Noggog.WorkEngine;
 
 namespace Mutagen.Bethesda.Analyzers.Engines;
@@ -16,11 +20,13 @@ public interface IContextualAnalyzerEngine : IEngine
 public class ContextualAnalyzerEngine : IContextualAnalyzerEngine
 {
     private readonly IFileSystem _fileSystem;
+    private readonly IDataDirectoryProvider? _dataDirectoryProvider;
+    private readonly ILoadOrderGetter<IModListingGetter<IModGetter>> _loadOrder;
+    private readonly ILinkCache _linkCache;
     private readonly ICacheConstructor[] _cacheConstructors;
     private readonly IBlacklistedModsProvider _blacklistedModsProvider;
     private readonly IWorkDropoff _workDropoff;
     public IReportDropbox ReportDropbox { get; }
-    public IGameEnvironmentProvider EnvGetter { get; }
     public IDriverProvider<IContextualDriver> ContextualModDrivers { get; }
     public IDriverProvider<IIsolatedDriver> IsolatedModDrivers { get; }
 
@@ -28,8 +34,10 @@ public class ContextualAnalyzerEngine : IContextualAnalyzerEngine
         .Concat<IDriver>(IsolatedModDrivers.Drivers);
 
     public ContextualAnalyzerEngine(
-        IGameEnvironmentProvider envGetter,
         IFileSystem fileSystem,
+        IDataDirectoryProvider? dataDirectoryProvider,
+        ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder,
+        ILinkCache linkCache,
         IDriverProvider<IContextualDriver> contextualDrivers,
         IDriverProvider<IIsolatedDriver> isolatedDrivers,
         IReportDropbox reportDropbox,
@@ -38,11 +46,13 @@ public class ContextualAnalyzerEngine : IContextualAnalyzerEngine
         IWorkDropoff workDropoff)
     {
         _fileSystem = fileSystem;
+        _dataDirectoryProvider = dataDirectoryProvider;
+        _loadOrder = loadOrder;
+        _linkCache = linkCache;
         _cacheConstructors = cacheConstructors;
         _blacklistedModsProvider = blacklistedModsProvider;
         _workDropoff = workDropoff;
         ReportDropbox = reportDropbox;
-        EnvGetter = envGetter;
         ContextualModDrivers = contextualDrivers;
         IsolatedModDrivers = isolatedDrivers;
     }
@@ -50,30 +60,33 @@ public class ContextualAnalyzerEngine : IContextualAnalyzerEngine
     public async Task Run(CancellationToken cancel)
     {
         if (cancel.IsCancellationRequested) return;
-        using var env = EnvGetter.Construct();
-        var cacheCache = new ProvideCaches(env.LinkCache, _cacheConstructors);
+        var cacheCache = new ProvideCaches(_linkCache, _cacheConstructors);
 
         List<Task> toDo = new();
 
         var isolatedDrivers = IsolatedModDrivers.Drivers;
         if (isolatedDrivers.Count > 0)
         {
-            foreach (var listing in env.LoadOrder.ListedOrder)
+            foreach (var listing in _loadOrder.ListedOrder)
             {
                 if (cancel.IsCancellationRequested) return;
 
                 if (listing.Mod is null) continue;
                 if (_blacklistedModsProvider.IsBlacklisted(listing.ModKey)) continue;
 
-                var modPath = Path.Combine(env.DataFolderPath.Path, listing.ModKey.FileName);
+                ModPath? modPath = _dataDirectoryProvider == null
+                    ? null
+                    : new ModPath(Path.Combine(_dataDirectoryProvider.Path, listing.ModKey.FileName));
 
                 var isolatedParam = new IsolatedDriverParams(
                     listing.Mod.ToUntypedImmutableLinkCache(),
                     ReportDropbox,
                     listing.Mod,
-                    new IsolatedDriverFileParams(
-                        _fileSystem,
-                        modPath),
+                    modPath == null
+                        ? null
+                        : new IsolatedDriverFileParams(
+                            _fileSystem,
+                            modPath),
                     cancel);
 
                 toDo.Add(Task.WhenAll(IsolatedModDrivers.Drivers.Select(driver =>
@@ -87,8 +100,8 @@ public class ContextualAnalyzerEngine : IContextualAnalyzerEngine
         }
 
         var contextualParam = new ContextualDriverParams(
-            env.LinkCache,
-            env.LoadOrder,
+            _linkCache,
+            _loadOrder,
             ReportDropbox,
             cacheCache,
             cancel);

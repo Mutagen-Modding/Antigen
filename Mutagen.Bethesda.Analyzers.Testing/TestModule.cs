@@ -4,8 +4,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Mutagen.Bethesda.Analyzers.Cli.Modules;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
+using Mutagen.Bethesda.Analyzers.Modules;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;
+using Mutagen.Bethesda.Plugins.Cache;
+using Mutagen.Bethesda.Plugins.Order;
+using Mutagen.Bethesda.Plugins.Records;
+using Mutagen.Bethesda.Skyrim;
 using Noggog;
 using Noggog.WorkEngine;
 using NSubstitute;
@@ -42,5 +47,10 @@ public class TestModule : Module
         minSev.MinimumSeverity.Returns(Severity.Suggestion);
         builder.RegisterInstance(minSev).As<IMinimumSeverityConfiguration>();
         builder.RegisterType<InlineWorkDropoff>().As<IWorkDropoff>();
+        var lo = new LoadOrder<ModListing<SkyrimMod>>();
+        builder.RegisterInstance(lo)
+            .As<ILoadOrderGetter<IModListingGetter<IModGetter>>>();
+        builder.RegisterInstance(lo.ToImmutableLinkCache())
+            .As<ILinkCache>();
     }
 }
