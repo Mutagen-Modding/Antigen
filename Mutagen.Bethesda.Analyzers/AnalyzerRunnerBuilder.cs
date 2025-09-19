@@ -2,6 +2,7 @@
 using Autofac;
 using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Services;
 using Mutagen.Bethesda.Environments;
@@ -92,6 +93,8 @@ public record AnalyzerRunnerBuilder
     private Severity _minimumSeverity { get; init; } = Severity.Suggestion;
     private TopicConfig? _topicConfig { get; init; }
     private DirectoryPath? _dataDirectory { get; init; }
+    private bool _addTypicalAnalyzers { get; init; }
+    private IReadOnlyCollection<IAnalyzer> _customAnalyzers { get; init; } = Array.Empty<IAnalyzer>();
 
     internal AnalyzerRunnerBuilder(
         GameRelease gameRelease,
@@ -173,6 +176,29 @@ public record AnalyzerRunnerBuilder
         };
     }
 
+    public AnalyzerRunnerBuilder WithTypicalAnalyzers()
+    {
+        return this with
+        {
+            _addTypicalAnalyzers = true
+        };
+    }
+
+    public AnalyzerRunnerBuilder WithAnalyzers(params IAnalyzer[] analyzers)
+    {
+        return WithAnalyzers((IEnumerable<IAnalyzer>)analyzers);
+    }
+
+    public AnalyzerRunnerBuilder WithAnalyzers(IEnumerable<IAnalyzer> analyzers)
+    {
+        var combined = _customAnalyzers.Concat(analyzers).ToArray();
+
+        return this with
+        {
+            _customAnalyzers = combined
+        };
+    }
+
     public IAnalyzerRunner Build()
     {
         var builder = new ContainerBuilder();
@@ -180,7 +206,10 @@ public record AnalyzerRunnerBuilder
         builder.RegisterModule<MainModule>();
 
         // Dynamically load the appropriate analyzer module based on game release
-        DynamicAnalyzerModuleLoader.LoadAnalyzerModule(builder, _gameRelease);
+        if (_addTypicalAnalyzers)
+        {
+            DynamicAnalyzerModuleLoader.LoadAnalyzerModule(builder, _gameRelease);
+        }
 
         builder
             .RegisterInstance(_fileSystem ?? new FileSystem())
@@ -215,6 +244,16 @@ public record AnalyzerRunnerBuilder
             builder
                 .RegisterInstance(new DataDirectoryInjection(_dataDirectory.Value))
                 .AsImplementedInterfaces();
+        }
+
+        // Register custom analyzers with distinctness by type
+        var distinctAnalyzers = _customAnalyzers
+            .GroupBy(a => a.GetType())
+            .Select(g => g.First());
+
+        foreach (var analyzer in distinctAnalyzers)
+        {
+            builder.RegisterInstance(analyzer).AsImplementedInterfaces();
         }
 
         var cont = builder.Build();
