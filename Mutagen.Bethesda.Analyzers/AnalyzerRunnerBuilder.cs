@@ -32,11 +32,17 @@ public record AnalyzerRunnerBuilderNeedsTarget
             linkCache);
     }
 
-    public AnalyzerRunnerBuilder WithLoadOrder(ILoadOrder<IModListingGetter<IModGetter>> loadOrder)
+    public AnalyzerRunnerBuilder WithLoadOrder(ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder)
     {
         return new AnalyzerRunnerBuilder(
             _gameRelease,
             loadOrder);
+    }
+
+    public AnalyzerRunnerBuilder WithLoadOrder(ILoadOrderGetter<IModGetter> loadOrder)
+    {
+        return WithLoadOrder(loadOrder
+            .Transform(x => new ModListing<IModGetter>(x, enabled: true)));
     }
 
     public AnalyzerRunnerBuilderTargetMod WithTargetMod(ModKey modKey)
@@ -67,6 +73,12 @@ public record AnalyzerRunnerBuilderTargetMod
             loadOrder.TrimAt(_modKey));
         // ToDo
         // Add any applicable filters
+    }
+
+    public AnalyzerRunnerBuilder WithLoadOrder(ILoadOrderGetter<IModGetter> loadOrder)
+    {
+        return WithLoadOrder(loadOrder
+            .Transform(x => new ModListing<IModGetter>(x, enabled: true)));
     }
 }
 
