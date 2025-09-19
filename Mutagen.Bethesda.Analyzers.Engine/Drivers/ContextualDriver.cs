@@ -26,7 +26,6 @@ public class ContextualDriver : IContextualDriver
         var reportContext = new ReportContextParameters(driverParams.LinkCache);
         var analyzerParams = new ContextualAnalyzerParams(
             driverParams.LinkCache,
-            driverParams.LoadOrder,
             driverParams.ReportDropbox,
             driverParams.ProvideCaches,
             reportContext);
