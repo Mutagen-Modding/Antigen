@@ -48,6 +48,11 @@ public record AnalyzerRunnerBuilderNeedsTarget
             .Transform(x => new ModListing<IModGetter>(x, enabled: true)));
     }
 
+    public AnalyzerRunnerBuilder WithGameEnvironment(IGameEnvironment gameEnvironment)
+    {
+        return WithLinkCache(gameEnvironment.LinkCache);
+    }
+
     public AnalyzerRunnerBuilderTargetMod WithTargetMod(ModKey modKey)
     {
         return new AnalyzerRunnerBuilderTargetMod(
@@ -82,6 +87,11 @@ public record AnalyzerRunnerBuilderTargetMod
     {
         return WithLoadOrder(loadOrder
             .Transform(x => new ModListing<IModGetter>(x, enabled: true)));
+    }
+
+    public AnalyzerRunnerBuilder WithGameEnvironment(IGameEnvironment gameEnvironment)
+    {
+        return WithLoadOrder(gameEnvironment.LoadOrder);
     }
 }
 
