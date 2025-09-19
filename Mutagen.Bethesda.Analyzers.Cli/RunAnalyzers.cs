@@ -6,7 +6,6 @@ using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.Cli.Args;
 using Mutagen.Bethesda.Analyzers.Cli.Modules;
 using Mutagen.Bethesda.Analyzers.Engines;
-using Mutagen.Bethesda.Analyzers.Modules;
 using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim;
