@@ -4,7 +4,6 @@ using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Services;
-using Mutagen.Bethesda.Analyzers.Skyrim;
 using Mutagen.Bethesda.Environments;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
@@ -179,7 +178,9 @@ public record AnalyzerRunnerBuilder
         var builder = new ContainerBuilder();
 
         builder.RegisterModule<MainModule>();
-        builder.RegisterModule<SkyrimAnalyzerModule>();
+
+        // Dynamically load the appropriate analyzer module based on game release
+        DynamicAnalyzerModuleLoader.LoadAnalyzerModule(builder, _gameRelease);
 
         builder
             .RegisterInstance(_fileSystem ?? new FileSystem())

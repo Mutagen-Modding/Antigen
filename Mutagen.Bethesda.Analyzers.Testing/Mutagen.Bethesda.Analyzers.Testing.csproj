@@ -14,6 +14,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Cli\Mutagen.Bethesda.Analyzers.Cli.csproj" />
+      <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Common\Mutagen.Bethesda.Analyzers.Common.csproj" />
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Engine\Mutagen.Bethesda.Analyzers.Engine.csproj" />
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.SDK\Mutagen.Bethesda.Analyzers.SDK.csproj" />
     </ItemGroup>

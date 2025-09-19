@@ -3,6 +3,7 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.Cli.Args;
 using Mutagen.Bethesda.Analyzers.Cli.Modules;
 using Mutagen.Bethesda.Analyzers.Engines;
@@ -68,7 +69,7 @@ public static class RunAnalyzers
         builder.RegisterType<ConsoleReportHandler>().AsImplementedInterfaces();
         builder.RegisterModule(new AnalyzerCommandModule(command));
 
-        builder.RegisterModule<SkyrimAnalyzerModule>();
+        DynamicAnalyzerModuleLoader.LoadAnalyzerModule(builder, command.GameRelease);
 
         return builder.Build();
     }
