@@ -18,6 +18,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Mutagen.Bethesda.Analyzers\Mutagen.Bethesda.Analyzers.csproj" />
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Engine\Mutagen.Bethesda.Analyzers.Engine.csproj" />
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Skyrim\Mutagen.Bethesda.Analyzers.Skyrim.csproj" />
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Testing\Mutagen.Bethesda.Analyzers.Testing.csproj" />

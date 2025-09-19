@@ -1,7 +1,10 @@
 ﻿using System.IO.Abstractions;
+using System.Reactive.Linq;
 using Autofac;
 using Mutagen.Bethesda.Analyzers.Autofac;
+using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
+using Mutagen.Bethesda.Analyzers.Modules;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Services;
@@ -89,12 +92,14 @@ public record AnalyzerRunnerBuilder
     private readonly ILoadOrderGetter<IModListingGetter<IModGetter>> _loadOrder;
 
     private IFileSystem? _fileSystem { get; init; }
-    private INumWorkThreadsController? _numWorkThreadsController { get; init; }
+    private IObservable<int?>? _numWorkThreads { get; init; }
+    private IWorkDropoff? _workDropoff { get; init; }
     private Severity _minimumSeverity { get; init; } = Severity.Suggestion;
     private TopicConfig? _topicConfig { get; init; }
     private DirectoryPath? _dataDirectory { get; init; }
     private bool _addTypicalAnalyzers { get; init; }
     private IReadOnlyCollection<IAnalyzer> _customAnalyzers { get; init; } = Array.Empty<IAnalyzer>();
+    private IReadOnlyCollection<ModKey> _blacklistedMods { get; init; } = Array.Empty<ModKey>();
 
     internal AnalyzerRunnerBuilder(
         GameRelease gameRelease,
@@ -133,23 +138,41 @@ public record AnalyzerRunnerBuilder
 
     public AnalyzerRunnerBuilder WithThreads(int threads)
     {
+        if (_workDropoff != null)
+        {
+            throw new InvalidOperationException("Cannot configure threads when a work dropoff has already been registered. Use either WithThreads or WithWorkDropoff, not both.");
+        }
+
         return this with
         {
-            _numWorkThreadsController = new NumWorkThreadsConstant(threads)
+            _numWorkThreads = Observable.Return<int?>(threads)
         };
     }
 
     public AnalyzerRunnerBuilder WithThreads(IObservable<int?> threads)
     {
+        if (_workDropoff != null)
+        {
+            throw new InvalidOperationException("Cannot configure threads when a work dropoff has already been registered. Use either WithThreads or WithWorkDropoff, not both.");
+        }
+
         return this with
         {
-            _numWorkThreadsController = new NumWorkThreadsByObservable(threads)
+            _numWorkThreads = threads
         };
     }
 
-    private class NumWorkThreadsByObservable(IObservable<int?> numThreads) : INumWorkThreadsController
+    public AnalyzerRunnerBuilder WithWorkDropoff(IWorkDropoff workDropoff)
     {
-        public IObservable<int?> NumDesiredThreads { get; } = numThreads;
+        if (_numWorkThreads != null)
+        {
+            throw new InvalidOperationException("Cannot register a work dropoff when threads have already been configured. Use either WithThreads or WithWorkDropoff, not both.");
+        }
+
+        return this with
+        {
+            _workDropoff = workDropoff
+        };
     }
 
     public AnalyzerRunnerBuilder WithMinimumSeverity(Severity minimumSeverity)
@@ -199,11 +222,26 @@ public record AnalyzerRunnerBuilder
         };
     }
 
+    public AnalyzerRunnerBuilder WithBlacklistedMods(params ModKey[] modKeys)
+    {
+        return WithBlacklistedMods((IEnumerable<ModKey>)modKeys);
+    }
+
+    public AnalyzerRunnerBuilder WithBlacklistedMods(IEnumerable<ModKey> modKeys)
+    {
+        var combined = _blacklistedMods.Concat(modKeys).ToArray();
+
+        return this with
+        {
+            _blacklistedMods = combined
+        };
+    }
+
     public IAnalyzerRunner Build()
     {
         var builder = new ContainerBuilder();
 
-        builder.RegisterModule<MainModule>();
+        builder.RegisterModule<AnalyzersModule>();
 
         // Dynamically load the appropriate analyzer module based on game release
         if (_addTypicalAnalyzers)
@@ -221,7 +259,7 @@ public record AnalyzerRunnerBuilder
 
         builder
             .RegisterInstance(_loadOrder)
-            .AsImplementedInterfaces();
+            .As<ILoadOrderGetter<IModListingGetter<IModGetter>>>();
 
         builder
             .RegisterInstance(_linkCache)
@@ -233,10 +271,6 @@ public record AnalyzerRunnerBuilder
             .AsImplementedInterfaces();
 
         builder.RegisterInstance(new MinimumSeverityConfiguration(_minimumSeverity))
-            .AsImplementedInterfaces();
-
-        builder
-            .RegisterInstance(_numWorkThreadsController ?? new NumWorkThreadsConstant(null))
             .AsImplementedInterfaces();
 
         if (_dataDirectory != null)
@@ -256,8 +290,33 @@ public record AnalyzerRunnerBuilder
             builder.RegisterInstance(analyzer).AsImplementedInterfaces();
         }
 
+        // Register blacklisted mods provider
+        builder.RegisterInstance(new BuilderBlacklistedModsProvider(_blacklistedMods))
+            .As<IBlacklistedModsProvider>()
+            .SingleInstance();
+
         var cont = builder.Build();
 
-        return cont.Resolve<IAnalyzerRunner>();
+        var factory = cont.Resolve<AnalyzerRunner.Factory>();
+
+        return factory(_workDropoff, _numWorkThreads);
+    }
+
+    /// <summary>
+    /// Private implementation of IBlacklistedModsProvider for the builder
+    /// </summary>
+    private class BuilderBlacklistedModsProvider : IBlacklistedModsProvider
+    {
+        private readonly HashSet<ModKey> _blacklistedMods;
+
+        public BuilderBlacklistedModsProvider(IEnumerable<ModKey> blacklistedMods)
+        {
+            _blacklistedMods = blacklistedMods.ToHashSet();
+        }
+
+        public bool IsBlacklisted(ModKey modKey)
+        {
+            return _blacklistedMods.Contains(modKey);
+        }
     }
 }
