@@ -157,7 +157,7 @@ public record AnalyzerRunnerBuilder
     {
         return this with
         {
-            _dataDirectory = _dataDirectory
+            _dataDirectory = dataDirectory
         };
     }
 
