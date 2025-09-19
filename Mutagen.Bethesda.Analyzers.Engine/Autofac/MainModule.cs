@@ -14,6 +14,7 @@ public class MainModule : Module
         builder.RegisterModule<NoggogModule>();
         builder.RegisterModule<MutagenModule>();
         builder.RegisterModule<ReflectionDriverModule>();
+        builder.RegisterModule<HandlerModule>();
         builder.RegisterAssemblyTypes(typeof(IsolatedEngine).Assembly)
             .InNamespacesOf(
                 typeof(ContextualAnalyzerEngine))
