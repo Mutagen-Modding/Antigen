@@ -3,6 +3,7 @@ using Autofac;
 using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Services;
 using Mutagen.Bethesda.Analyzers.Skyrim;
 using Mutagen.Bethesda.Environments;
 using Mutagen.Bethesda.Environments.DI;
@@ -205,6 +206,6 @@ public record AnalyzerRunnerBuilder
 
         var cont = builder.Build();
 
-        return cont.Resolve<AnalyzerRunner>();
+        return cont.Resolve<IAnalyzerRunner>();
     }
 }
