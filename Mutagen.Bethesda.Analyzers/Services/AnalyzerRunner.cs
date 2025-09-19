@@ -14,7 +14,7 @@ public class AnalyzerRunner : IAnalyzerRunner
 {
     private readonly ILifetimeScope _lifetimeScope;
 
-    internal AnalyzerRunner(
+    public AnalyzerRunner(
         ILifetimeScope lifetimeScope)
     {
         _lifetimeScope = lifetimeScope;
