@@ -389,3 +389,7 @@ FodyWeavers.xsd
 
 # User specific launch settings when starting from the IDE
 /Mutagen.Bethesda.Analyzers.Cli/Properties/launchSettings.json
+
+# Claude Code files
+CLAUDE.md
+.claude
