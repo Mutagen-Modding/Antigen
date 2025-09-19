@@ -290,12 +290,8 @@ public record AnalyzerRunnerBuilder
                 .AsImplementedInterfaces();
         }
 
-        // Register custom analyzers with distinctness by type
-        var distinctAnalyzers = _customAnalyzers
-            .GroupBy(a => a.GetType())
-            .Select(g => g.First());
-
-        foreach (var analyzer in distinctAnalyzers)
+        foreach (var analyzer in _customAnalyzers
+                     .DistinctBy(x => x.GetType()))
         {
             builder.RegisterInstance(analyzer).AsImplementedInterfaces();
         }
