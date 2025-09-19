@@ -3,9 +3,11 @@ using Autofac;
 using Autofac.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.Cli.Args;
 using Mutagen.Bethesda.Analyzers.Cli.Modules;
 using Mutagen.Bethesda.Analyzers.Engines;
+using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim;
 using Noggog;
@@ -20,7 +22,7 @@ public static class RunAnalyzers
     {
         var container = GetContainer(command);
 
-        var engine = container.Resolve<GameEnvironmentAnalyzerEngine>();
+        var engine = container.Resolve<ContextualAnalyzerEngine>();
         var consumer = container.Resolve<IWorkConsumer>();
 
         PrintTopics(command, engine);
@@ -31,7 +33,7 @@ public static class RunAnalyzers
         return 0;
     }
 
-    private static void PrintTopics(RunAnalyzersCommand command, GameEnvironmentAnalyzerEngine engine)
+    private static void PrintTopics(RunAnalyzersCommand command, ContextualAnalyzerEngine engine)
     {
         if (!command.PrintTopics) return;
 
@@ -64,9 +66,10 @@ public static class RunAnalyzers
         builder.RegisterInstance(new FileSystem()).As<IFileSystem>();
 
         builder.RegisterModule<RunAnalyzerModule>();
+        builder.RegisterType<ConsoleReportHandler>().AsImplementedInterfaces();
         builder.RegisterModule(new AnalyzerCommandModule(command));
 
-        builder.RegisterModule<SkyrimAnalyzerModule>();
+        DynamicAnalyzerModuleLoader.LoadAnalyzerModule(builder, command.GameRelease);
 
         return builder.Build();
     }

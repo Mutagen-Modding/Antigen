@@ -1,4 +1,5 @@
 using System.Buffers;
+using System.IO.Abstractions;
 using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Environments.DI;
@@ -18,6 +19,7 @@ public class RecordFrameDriver : IIsolatedDriver, IContextualDriver
     private readonly IWorkDropoff _dropoff;
     private readonly GameConstants _constants;
     private readonly IGameReleaseContext _gameReleaseContext;
+    private readonly IFileSystem _fileSystem;
     private readonly IDataDirectoryProvider _dataDataDirectoryProvider;
     private readonly IBlacklistedModsProvider _blacklistedModsProvider;
 
@@ -38,6 +40,7 @@ public class RecordFrameDriver : IIsolatedDriver, IContextualDriver
 
     public RecordFrameDriver(
         IGameReleaseContext gameReleaseContext,
+        IFileSystem fileSystem,
         IDataDirectoryProvider dataDataDirectoryProvider,
         IIsolatedRecordFrameAnalyzerDriver[] isolatedDrivers,
         IContextualRecordFrameAnalyzerDriver[] contextualDrivers,
@@ -45,6 +48,7 @@ public class RecordFrameDriver : IIsolatedDriver, IContextualDriver
         IWorkDropoff dropoff)
     {
         _gameReleaseContext = gameReleaseContext;
+        _fileSystem = fileSystem;
         _dataDataDirectoryProvider = dataDataDirectoryProvider;
         _blacklistedModsProvider = blacklistedModsProvider;
         _dropoff = dropoff;
@@ -116,7 +120,9 @@ public class RecordFrameDriver : IIsolatedDriver, IContextualDriver
                                 mod.ToUntypedImmutableLinkCache(),
                                 driverParams.ReportDropbox,
                                 mod,
-                                modPath,
+                                new IsolatedDriverFileParams(
+                                    _fileSystem,
+                                    modPath),
                                 driverParams.CancellationToken);
 
                             toDo.Add(Task.WhenAll(analyzerBundles.Isolated.Select(analyzer =>
@@ -167,8 +173,14 @@ public class RecordFrameDriver : IIsolatedDriver, IContextualDriver
     public async Task Drive(IsolatedDriverParams driverParams)
     {
         if (driverParams.CancellationToken.IsCancellationRequested) return;
-        var parsingMeta = ParsingMeta.Factory(new BinaryReadParameters(), _gameReleaseContext.Release, driverParams.TargetModPath);
-        using var stream = new MutagenBinaryReadStream(driverParams.TargetModPath, parsingMeta);
+        if (driverParams.FileParams == null) return;
+
+        var parsingMeta = ParsingMeta.Factory(
+            new BinaryReadParameters(),
+            _gameReleaseContext.Release,
+            driverParams.FileParams.ModPath);
+        parsingMeta.FileSystem = driverParams.FileParams.FileSystem;
+        using var stream = new MutagenBinaryReadStream(driverParams.FileParams.ModPath, parsingMeta);
         var locs = RecordLocator.GetLocations(stream);
 
         var amount = locs.ListedRecords.Count;

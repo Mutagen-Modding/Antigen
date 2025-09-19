@@ -11,22 +11,24 @@ public class MainModule : Module
 {
     protected override void Load(ContainerBuilder builder)
     {
-        builder.RegisterModule<NoggogModule>();
+        builder.RegisterModule<CSharpExtModule>();
         builder.RegisterModule<MutagenModule>();
         builder.RegisterModule<ReflectionDriverModule>();
+        builder.RegisterModule<HandlerModule>();
         builder.RegisterAssemblyTypes(typeof(IsolatedEngine).Assembly)
             .InNamespacesOf(
-                typeof(GameEnvironmentAnalyzerEngine))
+                typeof(ContextualAnalyzerEngine))
             .AsImplementedInterfaces()
             .AsSelf()
-            .SingleInstance();
+            .InstancePerLifetimeScope();
         builder.RegisterType<ContextualDriver>()
             .AsImplementedInterfaces()
-            .SingleInstance();
+            .InstancePerLifetimeScope();
         builder.RegisterGeneric(typeof(InjectionDriverProvider<>))
             .As(typeof(IDriverProvider<>))
-            .SingleInstance();
+            .InstancePerLifetimeScope();
         builder.RegisterGeneric(typeof(FilteredAnalyzerProvider<>))
-            .As(typeof(IAnalyzerProvider<>));
+            .As(typeof(IAnalyzerProvider<>))
+            .InstancePerLifetimeScope();
     }
 }

@@ -34,7 +34,6 @@ public class ByGenericTypeRecordFrameContextualDriver<TMajor> : IContextualRecor
         var reportContext = new ReportContextParameters(driverParams.LinkCache);
         var param = new ContextualRecordFrameAnalyzerParams<TMajor>(
             driverParams.LinkCache,
-            driverParams.LoadOrder,
             frame);
 
         await Task.WhenAll(_contextualRecordFrameAnalyzers.Select(analyzer =>

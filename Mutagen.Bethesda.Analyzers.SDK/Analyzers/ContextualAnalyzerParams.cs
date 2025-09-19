@@ -3,7 +3,6 @@ using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
-using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 
 namespace Mutagen.Bethesda.Analyzers.SDK.Analyzers;
@@ -23,20 +22,13 @@ public readonly struct ContextualAnalyzerParams
     /// </summary>
     public readonly ILinkCache LinkCache;
 
-    /// <summary>
-    /// Load Order to use during analysis
-    /// </summary>
-    public readonly ILoadOrderGetter<IModListingGetter<IModGetter>> LoadOrder;
-
     public ContextualAnalyzerParams(
         ILinkCache linkCache,
-        ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder,
         IReportDropbox reportDropbox,
         IProvideCaches provideCaches,
         ReportContextParameters parameters)
     {
         LinkCache = linkCache;
-        LoadOrder = loadOrder;
         _reportDropbox = reportDropbox;
         _parameters = parameters;
         _provideCaches = provideCaches;

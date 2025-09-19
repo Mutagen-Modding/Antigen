@@ -23,6 +23,6 @@ public class ContainerTests
         builder.RegisterModule<TestModule>();
         var container = builder.Build();
 
-        container.Resolve<GameEnvironmentAnalyzerEngine>();
+        container.Resolve<ContextualAnalyzerEngine>();
     }
 }
