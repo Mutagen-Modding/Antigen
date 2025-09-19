@@ -72,7 +72,8 @@ public class AnalyzerRunnerBuilderTests
     [Theory, MutagenAutoData(GameRelease.SkyrimSE)]
     public async Task WithAnalyzers_CustomAnalyzer_DetectsIssues(
         TestNpcAnalyzer testAnalyzer,
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        DirectoryPath dataDirectory)
     {
         // Arrange
         var mod = new SkyrimMod(ModKey.FromNameAndExtension("Test.esp"), SkyrimRelease.SkyrimSE);
@@ -88,6 +89,7 @@ public class AnalyzerRunnerBuilderTests
         var runner = AnalyzerRunnerBuilder.Create(GameRelease.SkyrimSE)
             .WithLoadOrder(loadOrder)
             .WithFileSystem(fileSystem)
+            .WithDataDirectory(dataDirectory)
             .WithAnalyzers(testAnalyzer)
             .Build();
 
@@ -109,7 +111,8 @@ public class AnalyzerRunnerBuilderTests
     public async Task WithAnalyzers_MultipleAnalyzers_BothDetectIssues(
         TestNpcAnalyzer npcAnalyzer,
         HighDamageWeaponAnalyzer weaponAnalyzer,
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        DirectoryPath dataDirectory)
     {
         // Arrange
         var mod = new SkyrimMod(ModKey.FromNameAndExtension("Test.esp"), SkyrimRelease.SkyrimSE);
@@ -128,6 +131,7 @@ public class AnalyzerRunnerBuilderTests
         var runner = AnalyzerRunnerBuilder.Create(GameRelease.SkyrimSE)
             .WithLoadOrder(loadOrder)
             .WithFileSystem(fileSystem)
+            .WithDataDirectory(dataDirectory)
             .WithAnalyzers(npcAnalyzer, weaponAnalyzer)
             .Build();
 
@@ -153,7 +157,8 @@ public class AnalyzerRunnerBuilderTests
     public async Task WithAnalyzers_AdditiveCalls_DetectsBothAnalyzerTypes(
         TestNpcAnalyzer npcAnalyzer,
         HighDamageWeaponAnalyzer weaponAnalyzer,
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        DirectoryPath dataDirectory)
     {
         // Arrange
         var mod = new SkyrimMod(ModKey.FromNameAndExtension("Test.esp"), SkyrimRelease.SkyrimSE);
@@ -172,6 +177,7 @@ public class AnalyzerRunnerBuilderTests
         var runner = AnalyzerRunnerBuilder.Create(GameRelease.SkyrimSE)
             .WithLoadOrder(loadOrder)
             .WithFileSystem(fileSystem)
+            .WithDataDirectory(dataDirectory)
             .WithAnalyzers(npcAnalyzer)           // First call
             .WithAnalyzers(weaponAnalyzer)        // Second call - should be additive
             .Build();
@@ -196,7 +202,8 @@ public class AnalyzerRunnerBuilderTests
 
     [Theory, MutagenAutoData(GameRelease.SkyrimSE)]
     public async Task WithAnalyzers_DuplicateAnalyzerTypes_UsesFirstInstanceOnly(
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        DirectoryPath dataDirectory)
     {
         // Arrange
         var mod = new SkyrimMod(ModKey.FromNameAndExtension("Test.esp"), SkyrimRelease.SkyrimSE);
@@ -215,6 +222,7 @@ public class AnalyzerRunnerBuilderTests
         var runner = AnalyzerRunnerBuilder.Create(GameRelease.SkyrimSE)
             .WithLoadOrder(loadOrder)
             .WithFileSystem(fileSystem)
+            .WithDataDirectory(dataDirectory)
             .WithAnalyzers(analyzer1)
             .WithAnalyzers(analyzer2)    // Duplicate type - should use first instance
             .Build();
@@ -233,7 +241,8 @@ public class AnalyzerRunnerBuilderTests
 
     [Theory, MutagenAutoData(GameRelease.SkyrimSE)]
     public async Task WithoutCustomAnalyzers_NoCustomResults(
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        DirectoryPath dataDirectory)
     {
         // Arrange
         var mod = new SkyrimMod(ModKey.FromNameAndExtension("Test.esp"), SkyrimRelease.SkyrimSE);
@@ -252,6 +261,7 @@ public class AnalyzerRunnerBuilderTests
         var runner = AnalyzerRunnerBuilder.Create(GameRelease.SkyrimSE)
             .WithLoadOrder(loadOrder)
             .WithFileSystem(fileSystem)
+            .WithDataDirectory(dataDirectory)
             // No custom analyzers added, no typical analyzers either
             .Build();
 
@@ -269,7 +279,8 @@ public class AnalyzerRunnerBuilderTests
     [Theory, MutagenAutoData(GameRelease.SkyrimSE)]
     public async Task WithTypicalAnalyzers_DetectsCustomAnalyzerResults(
         TestNpcAnalyzer testAnalyzer,
-        IFileSystem fileSystem)
+        IFileSystem fileSystem,
+        DirectoryPath dataDirectory)
     {
         // Arrange
         var mod = new SkyrimMod(ModKey.FromNameAndExtension("Test.esp"), SkyrimRelease.SkyrimSE);
@@ -285,6 +296,7 @@ public class AnalyzerRunnerBuilderTests
         var runner = AnalyzerRunnerBuilder.Create(GameRelease.SkyrimSE)
             .WithLoadOrder(loadOrder)
             .WithFileSystem(fileSystem)
+            .WithDataDirectory(dataDirectory)
             .WithAnalyzers(testAnalyzer) // Custom analyzer
             .Build();
 
