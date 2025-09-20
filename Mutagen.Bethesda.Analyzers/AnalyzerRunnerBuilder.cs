@@ -108,8 +108,8 @@ public record AnalyzerRunnerBuilder
     private TopicConfig? _topicConfig { get; init; }
     private DirectoryPath? _dataDirectory { get; init; }
     private bool _addTypicalAnalyzers { get; init; }
-    private IReadOnlyCollection<IAnalyzer> _customAnalyzers { get; init; } = Array.Empty<IAnalyzer>();
-    private IReadOnlyCollection<ModKey> _blacklistedMods { get; init; } = Array.Empty<ModKey>();
+    private IReadOnlyCollection<IAnalyzer> _customAnalyzers { get; init; } = [];
+    private IReadOnlyCollection<ModKey> _blacklistedMods { get; init; } = [];
 
     internal AnalyzerRunnerBuilder(
         GameRelease gameRelease,
@@ -217,12 +217,7 @@ public record AnalyzerRunnerBuilder
         };
     }
 
-    public AnalyzerRunnerBuilder WithAnalyzers(params IAnalyzer[] analyzers)
-    {
-        return WithAnalyzers((IEnumerable<IAnalyzer>)analyzers);
-    }
-
-    public AnalyzerRunnerBuilder WithAnalyzers(IEnumerable<IAnalyzer> analyzers)
+    public AnalyzerRunnerBuilder WithAnalyzers(params IEnumerable<IAnalyzer> analyzers)
     {
         var combined = _customAnalyzers.Concat(analyzers).ToArray();
 
@@ -232,12 +227,7 @@ public record AnalyzerRunnerBuilder
         };
     }
 
-    public AnalyzerRunnerBuilder WithBlacklistedMods(params ModKey[] modKeys)
-    {
-        return WithBlacklistedMods((IEnumerable<ModKey>)modKeys);
-    }
-
-    public AnalyzerRunnerBuilder WithBlacklistedMods(IEnumerable<ModKey> modKeys)
+    public AnalyzerRunnerBuilder WithBlacklistedMods(params IEnumerable<ModKey> modKeys)
     {
         var combined = _blacklistedMods.Concat(modKeys).ToArray();
 
