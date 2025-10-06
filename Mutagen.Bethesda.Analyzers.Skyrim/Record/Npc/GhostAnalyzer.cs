@@ -24,7 +24,7 @@ public class GhostKeywordAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Suggestion)
         .WithoutFormatting("Npc has ghost flag but no ghost keyword");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [GhostScriptMissingKeyword, GhostFlagMissingKeyword];
+    public IEnumerable<TopicDefinition> Topics { get; } = [GhostScriptMissingKeyword, GhostScriptMissingDoesntBleedFlag, GhostFlagMissingKeyword];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
