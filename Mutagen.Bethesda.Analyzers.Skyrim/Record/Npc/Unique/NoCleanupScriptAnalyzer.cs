@@ -1,6 +1,8 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc.Unique;
 
@@ -39,6 +41,15 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         var script = npc.GetScript(CleanupScriptName);
         if (script is null)
         {
+            // Ignore if all placements of this NPC start dead anyway
+            if (param.ResolveCache<ILinkUsageCache>()
+                .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks
+                .Select(link => link.TryResolve(param.LinkCache))
+                .WhereNotNull()
+                .All(placedNpc => placedNpc.MajorFlags.HasFlag(PlacedNpc.MajorFlag.StartsDead))) {
+                return;
+            }
+
             param.AddTopic(
                 NoCleanupScript.Format());
             return;
