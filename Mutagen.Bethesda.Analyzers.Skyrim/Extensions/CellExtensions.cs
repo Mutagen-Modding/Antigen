@@ -1,7 +1,6 @@
 ﻿using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
-using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
@@ -134,20 +133,5 @@ public static class CellExtensions
                 }
             }
         }
-    }
-
-    public static P2Int? GetCellCoordinates(this IPlacedGetter placed)
-    {
-        const int cellLength = 4096;
-        if (placed.Placement is null) return null;
-
-        var position = placed.Placement.Position;
-
-        var cellX = position.X / cellLength;
-        var cellY = position.Y / cellLength;
-
-        return new P2Int(
-            cellX < 0 ? (int)Math.Floor(cellX) : (int)cellX,
-            cellY < 0 ? (int)Math.Floor(cellY) : (int)cellY);
     }
 }
