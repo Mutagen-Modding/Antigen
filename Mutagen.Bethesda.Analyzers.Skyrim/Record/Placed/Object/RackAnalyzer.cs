@@ -64,9 +64,11 @@ public class RackAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
         RackTriggerMissingKeywordProperty,
         RackActivatorMissing,
         RackActivatorInvalid,
+        RackActivatorMissingKeywordProperty,
         RackActivatorNoTrigger,
         RackActivatorLinksToDifferentTrigger,
         RackActivatorDisplayItemInvalidType,
+        RackActivatorHasEnableParent,
     ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedObjectGetter> param)
