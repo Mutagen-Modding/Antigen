@@ -147,7 +147,7 @@ public static class PlacedObjectExtensions
         var cellCoordinates = placed.GetCellCoordinates();
         if (cellCoordinates is null) return null;
 
-        return worldspace.GetCell(cellCoordinates.Value);
+        return worldspace.GetCell(cellCoordinates.Value, linkCache);
     }
 
     public static P2Int? GetCellCoordinates(this IPlacedGetter placed)
