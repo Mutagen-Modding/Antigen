@@ -152,13 +152,12 @@ public static class PlacedObjectExtensions
 
     public static P2Int? GetCellCoordinates(this IPlacedGetter placed)
     {
-        const int cellLength = 4096;
         if (placed.Placement is null) return null;
 
         var position = placed.Placement.Position;
 
-        var cellX = position.X / cellLength;
-        var cellY = position.Y / cellLength;
+        var cellX = position.X / CellExtensions.CellLength;
+        var cellY = position.Y / CellExtensions.CellLength;
 
         return new P2Int(
             cellX < 0 ? (int)Math.Floor(cellX) : (int)cellX,

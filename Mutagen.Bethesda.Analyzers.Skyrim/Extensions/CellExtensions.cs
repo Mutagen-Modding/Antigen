@@ -6,6 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
 public static class CellExtensions
 {
+    public const int CellLength = 4096;
+
     public static IEnumerable<ILocationGetter> GetAllLocations(this ICellGetter cell, ILinkCache linkCache)
     {
         // Add all parent location form keys
