@@ -1,9 +1,6 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
-using Mutagen.Bethesda.Fonts;
-using Mutagen.Bethesda.Fonts.DI;
-using Mutagen.Bethesda.Plugins.Meta;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Strings;
 
