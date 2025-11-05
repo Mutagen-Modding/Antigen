@@ -35,6 +35,22 @@ public static class CellExtensions
         return cellLocations;
     }
 
+    /// <summary>
+    /// Estimates if a cell is just a testing cell that can be ignored.
+    /// A testing cell is always an interior cell, and has no special setup.
+    /// </summary>
+    /// <param name="cell">Cell to check</param>
+    /// <returns>True if the cell is likely a testing cell</returns>
+    public static bool IsTestingCell(this ICellGetter cell)
+    {
+        if (cell.IsExteriorCell()) return false;
+        if (!cell.LockList.IsNull) return false;
+        if (!cell.Location.IsNull) return false;
+        if (!cell.Owner.IsNull) return false;
+
+        return true;
+    }
+
     public static bool IsSettlementCell(this ICellGetter cell, ILinkCache linkCache)
     {
         if (!cell.IsInteriorCell()) return false;
