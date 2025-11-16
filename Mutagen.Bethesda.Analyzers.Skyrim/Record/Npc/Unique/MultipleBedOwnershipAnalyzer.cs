@@ -36,7 +36,7 @@ public class MultipleBedOwnershipAnalyzer : IContextualRecordAnalyzer<INpcGetter
         if (ownedBeds.Count == 0)
         {
             var factionOwnedBeds = npc.Factions.SelectMany(rank => usageCache.GetUsagesOf<IPlacedObjectGetter>(rank.Faction).UsageLinks
-                    .Where(x => IsOwner(x, npc.FormKey)))
+                    .Where(x => IsOwner(x, rank.Faction.FormKey)))
                 .ToList();
 
             if (factionOwnedBeds.Count == 0)
