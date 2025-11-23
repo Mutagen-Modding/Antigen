@@ -7,11 +7,11 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class NpcVoiceTypeAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition<MaleFemaleGender, MaleFemaleGender> NpcVoiceTypeMaleFemaleMismatch = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<MaleFemaleGender, IVoiceTypeGetter, MaleFemaleGender> NpcVoiceTypeMaleFemaleMismatch = MutagenTopicBuilder.FromDiscussion(
             511,
         "Npc and assigned Voice Type have mismatching gender",
             Severity.Warning)
-        .WithFormatting<MaleFemaleGender, MaleFemaleGender>("Npc is {0} but assigned Voice Type is {1}");
+        .WithFormatting<MaleFemaleGender, IVoiceTypeGetter, MaleFemaleGender>("Npc is {0} but assigned Voice Type is {1}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NpcVoiceTypeMaleFemaleMismatch];
 
@@ -29,7 +29,7 @@ public class NpcVoiceTypeAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         if (voiceTypeMaleFemale != npcMaleFemale)
         {
             param.AddTopic(
-                NpcVoiceTypeMaleFemaleMismatch.Format(npcMaleFemale, voiceTypeMaleFemale));
+                NpcVoiceTypeMaleFemaleMismatch.Format(npcMaleFemale, voiceType, voiceTypeMaleFemale));
         }
     }
 
