@@ -50,6 +50,13 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         // Skip NPCs using templates for scripts
         if (npc.Configuration.TemplateFlags.HasFlag(NpcConfiguration.TemplateFlag.Script)) return;
 
+        // Essential NPCs can't die and don't need cleanup scripts
+        if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.Essential)) return;
+
+        // Children can't die and don't need cleanup scripts
+        var race = npc.Race.TryResolve(param.LinkCache);
+        if (race is not null && race.Flags.HasFlag(Race.Flag.Child)) return;
+
         var script = npc.GetScript(CleanupScriptName);
         if (script is null)
         {
