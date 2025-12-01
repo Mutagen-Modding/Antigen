@@ -10,7 +10,7 @@ public class NoSleepPackageAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition NoSleepPackage = MutagenTopicBuilder.FromDiscussion(
             283,
             "No Sleep Package",
-            Severity.Warning)
+            Severity.Suggestion)
         .WithoutFormatting("Npc has no sleep package");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoSleepPackage];
