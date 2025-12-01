@@ -22,6 +22,18 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Warning)
         .WithoutFormatting("Death container property is not filled in cleanup script");
 
+    public static readonly TopicDefinition DeathContainerPropertyNotFilledWithContainer = MutagenTopicBuilder.FromDiscussion(
+            523,
+            "Death Container Not Filled With Container",
+            Severity.Warning)
+        .WithoutFormatting("Death container property is not assigned to a container");
+
+    public static readonly TopicDefinition DeathContainerPropertyCanRespawn = MutagenTopicBuilder.FromDiscussion(
+            524,
+            "Death Container Can Respawn",
+            Severity.Warning)
+        .WithoutFormatting("Death container is assigned to a furniture that can respawn");
+
     public static readonly TopicDefinition WIPropertyNotFilled = MutagenTopicBuilder.FromDiscussion(
             344,
             "WI quest Property Not Found",
@@ -46,7 +58,8 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
                 .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks
                 .Select(link => link.TryResolve(param.LinkCache))
                 .WhereNotNull()
-                .All(placedNpc => placedNpc.MajorFlags.HasFlag(PlacedNpc.MajorFlag.StartsDead))) {
+                .All(placedNpc => placedNpc.MajorFlags.HasFlag(PlacedNpc.MajorFlag.StartsDead)))
+            {
                 return;
             }
 
@@ -56,10 +69,35 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         }
 
         var deathContainer = script.GetProperty<IScriptObjectPropertyGetter>("DeathContainer");
-        if (deathContainer is null)
+        if (deathContainer is null || deathContainer.Object.IsNull)
         {
             param.AddTopic(
                 DeathContainerPropertyNotFilled.Format());
+        }
+        else
+        {
+            if (param.LinkCache.TryResolve<IPlacedObjectGetter>(deathContainer.Object.FormKey, out var placedObject))
+            {
+                var baseObject = placedObject.Base.TryResolve(param.LinkCache);
+                if (baseObject is IContainerGetter container)
+                {
+                    if (container.Flags.HasFlag(Bethesda.Skyrim.Container.Flag.Respawns))
+                    {
+                        param.AddTopic(
+                            DeathContainerPropertyCanRespawn.Format());
+                    }
+                }
+                else
+                {
+                    param.AddTopic(
+                        DeathContainerPropertyNotFilledWithContainer.Format());
+                }
+            }
+            else
+            {
+                param.AddTopic(
+                    DeathContainerPropertyNotFilledWithContainer.Format());
+            }
         }
 
         var wiQuest = script.GetProperty<IScriptObjectPropertyGetter>("WI");
