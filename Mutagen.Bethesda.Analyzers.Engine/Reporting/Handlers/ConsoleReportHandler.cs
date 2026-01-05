@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog.WorkEngine;
 
@@ -21,7 +22,7 @@ public class ConsoleReportHandler : IReportHandler
     public void Dropoff(
         ReportContextParameters parameters,
         ModKey sourceMod,
-        IMajorRecordIdentifierGetter majorRecord,
+        IFormLinkIdentifier majorRecord,
         Topic topic)
     {
         _workDropoff.Enqueue(() =>

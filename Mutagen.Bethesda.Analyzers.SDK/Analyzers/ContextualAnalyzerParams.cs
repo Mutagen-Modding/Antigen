@@ -39,7 +39,7 @@ public readonly struct ContextualAnalyzerParams
     /// </summary>
     public void AddTopic(
         ModKey mod,
-        IMajorRecordIdentifierGetter record,
+        IFormLinkIdentifier record,
         IFormattedTopicDefinition formattedTopicDefinition,
         params (string Name, object Value)[] metaData)
     {

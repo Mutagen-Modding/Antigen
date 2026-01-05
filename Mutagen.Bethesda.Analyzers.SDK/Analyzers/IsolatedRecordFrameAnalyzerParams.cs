@@ -1,5 +1,6 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Binary.Headers;
 using Mutagen.Bethesda.Plugins.Records;
 
@@ -14,14 +15,14 @@ public readonly struct IsolatedRecordFrameAnalyzerParams<TMajor>
     public Type? AnalyzerType { get; init; }
     private readonly IReportDropbox _reportDropbox;
     private readonly IModGetter _mod;
-    private readonly IMajorRecordIdentifierGetter _record;
+    private readonly IFormLinkIdentifier _record;
     private readonly ReportContextParameters _parameters;
 
     public readonly MajorRecordFrame Frame;
 
     public IsolatedRecordFrameAnalyzerParams(IReportDropbox reportDropbox,
         IModGetter mod,
-        IMajorRecordIdentifierGetter record,
+        IFormLinkIdentifier record,
         ReportContextParameters parameters,
         MajorRecordFrame frame)
     {
@@ -54,7 +55,7 @@ public readonly struct IsolatedRecordFrameAnalyzerParams
 {
     private readonly IReportDropbox _reportDropbox;
     private readonly IModGetter _mod;
-    private readonly IMajorRecordIdentifierGetter _record;
+    private readonly IFormLinkIdentifier _record;
     private readonly ReportContextParameters _parameters;
     public readonly Type AnalyzerType;
 
@@ -62,7 +63,7 @@ public readonly struct IsolatedRecordFrameAnalyzerParams
 
     internal IsolatedRecordFrameAnalyzerParams(
         IModGetter mod,
-        IMajorRecordIdentifierGetter record,
+        IFormLinkIdentifier record,
         IReportDropbox reportDropbox,
         ReportContextParameters parameters,
         MajorRecordFrame frame,

@@ -25,7 +25,7 @@ public class CsvReportHandler : IReportHandler
     public void Dropoff(
         ReportContextParameters parameters,
         ModKey sourceMod,
-        IMajorRecordIdentifierGetter majorRecord,
+        IFormLinkIdentifier majorRecord,
         Topic topic)
     {
         _workDropoff.Enqueue(() =>

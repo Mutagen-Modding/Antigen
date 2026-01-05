@@ -88,7 +88,7 @@ internal class AnalyzerRunner : IAnalyzerRunner
         public void Dropoff(
             ReportContextParameters parameters,
             ModKey sourceMod,
-            IMajorRecordIdentifierGetter majorRecord,
+            IFormLinkIdentifier majorRecord,
             Topic topic)
         {
             Results.OnNext(new AnalyzerResult()
