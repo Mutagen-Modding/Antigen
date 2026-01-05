@@ -20,7 +20,7 @@ public class TestAnalyzer : IContextualAnalyzer
         {
             param.AddTopic(
                 ModKey.Null,
-                new MajorRecordIdentifier { FormKey = FormKey.Null },
+                new FormLinkInformation(FormKey.Null, typeof(IMajorRecordGetter)),
                 topic.Format());
         }
     }
