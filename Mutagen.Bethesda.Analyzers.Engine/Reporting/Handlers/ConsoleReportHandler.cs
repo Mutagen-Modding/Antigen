@@ -11,11 +11,16 @@ namespace Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 public class ConsoleReportHandler : IReportHandler
 {
     private readonly IWorkDropoff _workDropoff;
+    private readonly ILinkCache _linkCache;
     private readonly IRunConfigLookup _runConfig;
 
-    public ConsoleReportHandler(IWorkDropoff workDropoff, IRunConfigLookup runConfig)
+    public ConsoleReportHandler(
+        IWorkDropoff workDropoff,
+        ILinkCache linkCache,
+        IRunConfigLookup runConfig)
     {
         _workDropoff = workDropoff;
+        _linkCache = linkCache;
         _runConfig = runConfig;
     }
 
@@ -27,6 +32,24 @@ public class ConsoleReportHandler : IReportHandler
     {
         _workDropoff.Enqueue(() =>
         {
+            IMajorRecordGetter? parent = null;
+            _linkCache.TryResolveIdentifier(majorRecord, out var editorId);
+            if (_linkCache.TryResolveSimpleContext(majorRecord, out var parentContext) && parentContext?.Parent?.Record is IMajorRecordGetter parentRecord)
+            {
+                parent = parentRecord;
+            }
+
+            string parentText;
+            if (parent is null)
+            {
+                parentText = string.Empty;
+            }
+            else
+            {
+                _linkCache.TryResolveIdentifier(majorRecord, out var parentEditorId);
+                parentText = $" (Parent: {parent.FormKey.ToString()} {parentEditorId})";
+            }
+
             Console.WriteLine($"""
                 {topic.TopicDefinition}
                    {sourceMod.ToString()} -> {majorRecord.FormKey.ToString()} {majorRecord.EditorID}
