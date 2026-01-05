@@ -9,7 +9,7 @@ public class TestReportDropbox : IReportDropbox
 {
     public List<(ReportContextParameters Parameters, Topic Topics)> Dropoffs = new();
 
-    public void Dropoff(ReportContextParameters parameters, ModKey mod, IMajorRecordIdentifierGetter record, Topic topic)
+    public void Dropoff(ReportContextParameters parameters, ModKey mod, IFormLinkIdentifier record, Topic topic)
     {
         Dropoffs.Add((parameters, topic));
     }

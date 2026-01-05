@@ -22,7 +22,7 @@ public class SeverityAdjuster : IReportDropbox
     public void Dropoff(
         ReportContextParameters parameters,
         ModKey mod,
-        IMajorRecordIdentifierGetter record,
+        IFormLinkIdentifier record,
         Topic topic)
     {
         _dropbox.Dropoff(parameters, mod, record,

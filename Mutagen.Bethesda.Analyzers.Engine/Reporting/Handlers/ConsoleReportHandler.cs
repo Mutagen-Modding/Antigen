@@ -52,7 +52,7 @@ public class ConsoleReportHandler : IReportHandler
 
             Console.WriteLine($"""
                 {topic.TopicDefinition}
-                   {sourceMod.ToString()} -> {majorRecord.FormKey.ToString()} {majorRecord.EditorID}
+                   {sourceMod.ToString()} -> {majorRecord.FormKey.ToString()} {editorId}{parentText}
                    {topic.FormattedTopic.FormattedMessage}
                 """);
 
