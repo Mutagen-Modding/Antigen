@@ -12,9 +12,8 @@
     <ItemGroup>
       <PackageReference Include="Mutagen.Bethesda.FormKeys.SkyrimSE" />
       <PackageReference Include="Mutagen.Bethesda.Skyrim" />
-        <PackageReference Include="Autofac" />
-        <PackageReference Include="Mutagen.Bethesda.Autofac" />
-        <PackageReference Include="Noggog.CSharpExt" />
+      <PackageReference Include="Autofac" />
+      <PackageReference Include="Mutagen.Bethesda.Autofac" />
     </ItemGroup>
 
 </Project>
