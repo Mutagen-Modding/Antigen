@@ -27,11 +27,9 @@ public static class RunAnalyzers
         var container = GetContainer(command);
 
         var engine = container.Resolve<ContextualAnalyzerEngine>();
-        var consumer = container.Resolve<IWorkConsumer>();
 
         PrintTopics(command, engine);
 
-        consumer.Start();
         await engine.Run(CancellationToken.None);
 
         return 0;
@@ -93,13 +91,9 @@ public static class RunAnalyzers
             .RegisterInstance(gameEnvironment.LinkCache)
             .AsImplementedInterfaces();
 
-        var workDropoff = new WorkDropoff();
+        var workDropoff = new InlineWorkDropoff();
         builder
             .RegisterInstance(workDropoff)
-            .AsImplementedInterfaces();
-
-        builder
-            .RegisterInstance(new WorkConsumer(0, workDropoff, workDropoff))
             .AsImplementedInterfaces();
 
         builder.RegisterInstance(new NumWorkThreadsUnopinionated())
