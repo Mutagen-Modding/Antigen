@@ -102,6 +102,9 @@ public static class RunAnalyzers
             .RegisterInstance(new WorkConsumer(0, workDropoff, workDropoff))
             .AsImplementedInterfaces();
 
+        builder.RegisterInstance(new NumWorkThreadsUnopinionated())
+            .AsImplementedInterfaces();
+
         builder.RegisterModule<RunAnalyzerModule>();
         builder.RegisterModule(new AnalyzerCommandModule(command));
 
