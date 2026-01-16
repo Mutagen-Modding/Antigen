@@ -43,7 +43,8 @@ public class ShowSkyAnalyzer : IContextualRecordAnalyzer<ICellGetter>
             if (!exteriorCell.Regions.Contains(cellSkyAndWeatherFromRegion))
             {
                 param.AddTopic(
-                    WrongRegion.Format(cellSkyAndWeatherFromRegion, exteriorCell, exteriorDoor));
+                    WrongRegion.Format(cellSkyAndWeatherFromRegion, exteriorCell, exteriorDoor),
+                    ("Exterior Cell Regions", exteriorCell.Regions));
             }
         }
     }
