@@ -22,6 +22,8 @@ namespace Mutagen.Bethesda.Analyzers.Cli;
 
 public static class RunAnalyzers
 {
+    public static string RunText = "Running analyzers...";
+
     private record Bootstrap(ContextualAnalyzerEngine Engine, IWorkConsumer WorkConsumer);
 
     public static async Task<int> Run(RunAnalyzersCommand command)
@@ -34,6 +36,8 @@ public static class RunAnalyzers
 
         PrintTopics(command, bootstrap.Engine);
 
+        Console.WriteLine(IntroConstants.TextSplash);
+        Console.WriteLine(RunText);
         await bootstrap.Engine.Run(CancellationToken.None);
 
         return 0;
@@ -69,7 +73,7 @@ public static class RunAnalyzers
 
         var builder = new ContainerBuilder();
         builder.Populate(services);
-        builder.RegisterInstance(new FileSystem()).As<IFileSystem>();
+        builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();
 
         IGameEnvironment gameEnvironment;
         if (command.LoadOrder is null)
@@ -99,6 +103,8 @@ public static class RunAnalyzers
         builder.RegisterModule(new AnalyzerCommandModule(command));
 
         DynamicAnalyzerModuleLoader.LoadAnalyzerModule(builder, command.GameRelease);
+
+        builder.RegisterType<Bootstrap>().AsSelf().SingleInstance();
 
         return builder.Build();
     }
