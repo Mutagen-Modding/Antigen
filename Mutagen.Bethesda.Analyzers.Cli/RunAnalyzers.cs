@@ -22,15 +22,19 @@ namespace Mutagen.Bethesda.Analyzers.Cli;
 
 public static class RunAnalyzers
 {
+    private record Bootstrap(ContextualAnalyzerEngine Engine, IWorkConsumer WorkConsumer);
+
     public static async Task<int> Run(RunAnalyzersCommand command)
     {
         var container = GetContainer(command);
 
-        var engine = container.Resolve<ContextualAnalyzerEngine>();
+        var bootstrap = container.Resolve<Bootstrap>();
 
-        PrintTopics(command, engine);
+        bootstrap.WorkConsumer.Start();
 
-        await engine.Run(CancellationToken.None);
+        PrintTopics(command, bootstrap.Engine);
+
+        await bootstrap.Engine.Run(CancellationToken.None);
 
         return 0;
     }
@@ -89,14 +93,6 @@ public static class RunAnalyzers
 
         builder
             .RegisterInstance(gameEnvironment.LinkCache)
-            .AsImplementedInterfaces();
-
-        var workDropoff = new InlineWorkDropoff();
-        builder
-            .RegisterInstance(workDropoff)
-            .AsImplementedInterfaces();
-
-        builder.RegisterInstance(new NumWorkThreadsUnopinionated())
             .AsImplementedInterfaces();
 
         builder.RegisterModule<RunAnalyzerModule>();

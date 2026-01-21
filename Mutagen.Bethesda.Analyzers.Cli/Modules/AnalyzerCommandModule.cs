@@ -25,6 +25,10 @@ public class AnalyzerCommandModule(RunAnalyzersCommand command) : Module
     {
         builder.RegisterInstance(command).AsImplementedInterfaces();
         builder.RegisterInstance(new GameReleaseInjection(command.GameRelease)).AsImplementedInterfaces();
+        builder.RegisterType<WorkDropoff>().AsImplementedInterfaces()
+            .SingleInstance();
+        builder.RegisterType<WorkConsumer>().AsImplementedInterfaces().AsSelf()
+            .SingleInstance();
         builder.RegisterInstance(new NumWorkThreadsConstant(command.NumThreads)).AsImplementedInterfaces();
         builder.RegisterInstance(GameConstants.Get(command.GameRelease)).As<GameConstants>();
 
