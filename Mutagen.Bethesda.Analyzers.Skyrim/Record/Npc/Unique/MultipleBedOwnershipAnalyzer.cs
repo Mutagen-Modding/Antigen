@@ -1,6 +1,5 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
-using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Records;
@@ -37,7 +36,7 @@ public class MultipleBedOwnershipAnalyzer : IContextualRecordAnalyzer<INpcGetter
         if (ownedBeds.Count == 0)
         {
             var factionOwnedBeds = npc.Factions.SelectMany(rank => usageCache.GetUsagesOf<IPlacedObjectGetter>(rank.Faction).UsageLinks
-                    .Where(x => IsOwner(x, npc.FormKey)))
+                    .Where(x => IsOwner(x, rank.Faction.FormKey)))
                 .ToList();
 
             if (factionOwnedBeds.Count == 0)

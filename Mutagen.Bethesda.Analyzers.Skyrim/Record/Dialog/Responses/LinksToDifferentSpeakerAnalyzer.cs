@@ -1,6 +1,5 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
-using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Skyrim.Records.Assets.VoiceType;
 using Noggog;
@@ -20,7 +19,6 @@ public class LinksToDifferentSpeakerAnalyzer : IContextualRecordAnalyzer<IDialog
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogTopicGetter> param)
     {
         var dialogTopic = param.Record;
-
         var voiceTypeAssetLookup = param.ResolveCache<VoiceTypeAssetLookup>();
 
         var topicsPerLink = dialogTopic.Responses
@@ -33,7 +31,8 @@ public class LinksToDifferentSpeakerAnalyzer : IContextualRecordAnalyzer<IDialog
                 responses => responses,
                 responses => voiceTypeAssetLookup.GetSpeakers(responses).ToHashSet());
 
-        foreach (var (linkTopicLink, responses) in topicsPerLink) {
+        foreach (var (linkTopicLink, responses) in topicsPerLink)
+        {
             var linkTopic = linkTopicLink.TryResolve(param.LinkCache);
             if (linkTopic?.Responses is null) continue;
 
@@ -46,7 +45,8 @@ public class LinksToDifferentSpeakerAnalyzer : IContextualRecordAnalyzer<IDialog
                         .Select(r => speakersPerResponse.FirstOrDefault(s => s.Key.FormKey == r.FormKey).Value)
                         .WhereNotNull()
                         .All(speakers => !speakers.Intersect(linkedSpeakers).Any());
-                })) {
+                }))
+            {
                 param.AddTopic(
                     LinksToDifferentSpeaker.Format(linkTopic),
                     ("Responses the link comes from", responses));

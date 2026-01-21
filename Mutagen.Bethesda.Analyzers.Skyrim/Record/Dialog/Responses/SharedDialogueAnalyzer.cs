@@ -24,7 +24,7 @@ public class SharedDialogueAnalyzer : IContextualRecordAnalyzer<IDialogResponses
     {
         var responses = param.Record;
 
-        var responsesContext = param.LinkCache.ResolveSimpleContext(responses);
+        if (!param.LinkCache.TryResolveSimpleContext(responses, out var responsesContext)) return;
         if (responsesContext.Parent?.Record is not IDialogTopicGetter topic) return;
         if (topic.SubtypeName != "IDAT") return;
 

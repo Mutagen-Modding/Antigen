@@ -24,6 +24,7 @@ public class NorthMarkerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
     {
         var cell = param.Record;
         if (cell.IsExteriorCell()) return;
+        if (cell.IsTestingCell()) return;
 
         var northMarkers = cell.GetAllPlaced(param.LinkCache)
             .OfType<IPlacedObjectGetter>()

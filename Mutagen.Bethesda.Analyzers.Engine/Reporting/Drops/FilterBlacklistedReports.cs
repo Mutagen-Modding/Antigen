@@ -8,7 +8,7 @@ namespace Mutagen.Bethesda.Analyzers.Reporting.Drops;
 
 public class FilterBlacklistedReports(IReportDropbox dropbox, IBlacklistedModsProvider blacklistedModsProvider) : IReportDropbox
 {
-    public void Dropoff(ReportContextParameters parameters, ModKey mod, IMajorRecordIdentifierGetter record, Topic topic)
+    public void Dropoff(ReportContextParameters parameters, ModKey mod, IFormLinkIdentifier record, Topic topic)
     {
         if (blacklistedModsProvider.IsBlacklisted(mod))
         {

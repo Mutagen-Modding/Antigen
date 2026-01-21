@@ -8,37 +8,44 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Npc;
 
 public class AppearanceAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition<IHeadPartGetter, IRaceGetter> InvalidHeadPart = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IHeadPartGetter, IRaceGetter> InvalidHeadPart = MutagenTopicBuilder.FromDiscussion(
+            476,
             "Npc uses invalid Head Part",
             Severity.Warning)
         .WithFormatting<IHeadPartGetter, IRaceGetter>("Npc uses head part {0} which cannot be used for the npc's race {1}");
 
-    public static readonly TopicDefinition<IFormLinkNullableGetter<IColorRecordGetter>, IRaceGetter> InvalidHairColor = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IFormLinkNullableGetter<IColorRecordGetter>, IRaceGetter> InvalidHairColor = MutagenTopicBuilder.FromDiscussion(
+            477,
             "Npc uses invalid Hair Color",
             Severity.Warning)
         .WithFormatting<IFormLinkNullableGetter<IColorRecordGetter>, IRaceGetter>("Npc uses hair color {0} which is not available for the npc's race {1}");
 
-    public static readonly TopicDefinition<uint, IRaceGetter> InvalidNose = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<uint, IRaceGetter> InvalidNose = MutagenTopicBuilder.FromDiscussion(
+            478,
             "Npc uses invalid Nose",
             Severity.Warning)
         .WithFormatting<uint, IRaceGetter>("Npc uses a nose {0} which is not available for the npc's race {1}");
 
-    public static readonly TopicDefinition<uint, IRaceGetter> InvalidEye = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<uint, IRaceGetter> InvalidEye = MutagenTopicBuilder.FromDiscussion(
+            479,
             "Npc uses invalid Eye",
             Severity.Warning)
         .WithFormatting<uint, IRaceGetter>("Npc uses eyes {0} which is not available for the npc's race {1}");
 
-    public static readonly TopicDefinition<uint, IRaceGetter> InvalidLip = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<uint, IRaceGetter> InvalidLip = MutagenTopicBuilder.FromDiscussion(
+            480,
             "Npc uses invalid Lip",
             Severity.Warning)
         .WithFormatting<uint, IRaceGetter>("Npc uses lips {0} which is not available for the npc's lip {1}");
 
-    public static readonly TopicDefinition<ushort?, IRaceGetter> MissingTintLayer = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<ushort?, IRaceGetter> MissingTintLayer = MutagenTopicBuilder.FromDiscussion(
+            481,
             "Npc uses invalid Tint Layer",
             Severity.Error)
         .WithFormatting<ushort?, IRaceGetter>("Npc uses a tint layer {0} which is not available for the npc's race {1}");
 
-    public static readonly TopicDefinition<IFormLinkNullableGetter<ITextureSetGetter>, IRaceGetter> InvalidHeadTexture = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IFormLinkNullableGetter<ITextureSetGetter>, IRaceGetter> InvalidHeadTexture = MutagenTopicBuilder.FromDiscussion(
+            483,
             "Npc uses invalid Head Texture",
             Severity.Error)
         .WithFormatting<IFormLinkNullableGetter<ITextureSetGetter>, IRaceGetter>("Npc uses head texture {0} which is not available for the npc's race {1}");

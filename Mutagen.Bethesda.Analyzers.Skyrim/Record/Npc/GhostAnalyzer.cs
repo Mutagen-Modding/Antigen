@@ -18,19 +18,13 @@ public class GhostKeywordAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Warning)
         .WithoutFormatting("Npc has ghost script but no DoesNotBleed flag");
 
-    public static readonly TopicDefinition GhostScriptMissingBleedoutOverrideFlag = MutagenTopicBuilder.FromDiscussion(
-            320,
-            "Ghost With Script Missing BleedoutOverride Flag",
-            Severity.Suggestion)
-        .WithoutFormatting("Npc has ghost script but no BleedoutOverride flag");
-
     public static readonly TopicDefinition GhostFlagMissingKeyword = MutagenTopicBuilder.FromDiscussion(
             321,
             "Ghost With Flag Missing Keyword",
             Severity.Suggestion)
         .WithoutFormatting("Npc has ghost flag but no ghost keyword");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [GhostScriptMissingKeyword, GhostFlagMissingKeyword];
+    public IEnumerable<TopicDefinition> Topics { get; } = [GhostScriptMissingKeyword, GhostScriptMissingDoesntBleedFlag, GhostFlagMissingKeyword];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
@@ -52,12 +46,6 @@ public class GhostKeywordAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             {
                 param.AddTopic(
                     GhostScriptMissingDoesntBleedFlag.Format());
-            }
-
-            if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.BleedoutOverride) == false)
-            {
-                param.AddTopic(
-                    GhostScriptMissingBleedoutOverrideFlag.Format());
             }
         }
 

@@ -1,6 +1,7 @@
 using Autofac;
 using Mutagen.Bethesda.Analyzers.SDK;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Noggog.Autofac;
@@ -17,6 +18,12 @@ public class SkyrimAnalyzerModule : Module, IAnalyzerModule
             .SingleInstance();
         builder.RegisterAssemblyTypes(typeof(MissingAssetsAnalyzerUtil).Assembly)
             .InNamespacesOf(typeof(MissingAssetsAnalyzerUtil))
+            .AsSelf()
+            .AsImplementedInterfaces()
+            .SingleInstance();
+
+        builder.RegisterAssemblyTypes(typeof(VoiceTypeAssetLookupProvider).Assembly)
+            .InNamespacesOf(typeof(VoiceTypeAssetLookupProvider))
             .AsSelf()
             .AsImplementedInterfaces()
             .SingleInstance();

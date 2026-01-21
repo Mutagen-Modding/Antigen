@@ -2,6 +2,7 @@
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
@@ -146,6 +147,85 @@ public static class PlacedObjectExtensions
         var cellCoordinates = placed.GetCellCoordinates();
         if (cellCoordinates is null) return null;
 
-        return worldspace.GetCell(cellCoordinates.Value);
+        return worldspace.GetCell(cellCoordinates.Value, linkCache);
+    }
+
+    public static IWorldspaceGetter? GetWorldspace(this IPlacedGetter placed, ILinkCache linkCache)
+    {
+        if (!placed.ToLink().TryResolveSimpleContext(linkCache, out var context)) return null;
+        if (!context.TryGetParent<IWorldspaceGetter>(out var worldspace)) return null;
+
+        return worldspace;
+    }
+
+    public static P2Int? GetCellCoordinates(this IPlacedGetter placed)
+    {
+        if (placed.Placement is null) return null;
+
+        var position = placed.Placement.Position;
+
+        var cellX = position.X / CellExtensions.CellLength;
+        var cellY = position.Y / CellExtensions.CellLength;
+
+        return new P2Int(
+            cellX < 0 ? (int)Math.Floor(cellX) : (int)cellX,
+            cellY < 0 ? (int)Math.Floor(cellY) : (int)cellY);
+    }
+
+    public static IEnumerable<IPlacedObjectGetter> GetNearbyObjects(this IPlacedGetter placed, Func<IFormLinkGetter<IPlaceableObjectGetter>, bool> filterObject, float maxDistance, ILinkCache linkCache)
+    {
+        if (placed.Placement is not { Position: var position }) yield break;
+
+        var cell = placed.GetCell(linkCache);
+        if (cell is null) yield break;
+
+        var worldspace = placed.GetWorldspace(linkCache);
+        if (worldspace is null)
+        {
+            foreach (var placedObject in ProcessCell(cell))
+            {
+                yield return placedObject;
+            }
+
+            yield break;
+        }
+
+        if (cell.Grid is not { Point: { X: var cellX, Y: var cellY } })
+        {
+            yield break;
+        }
+
+        var cellDistance = ((int)maxDistance / CellExtensions.CellLength) + 1;
+        for (var x = -cellDistance; x <= cellDistance; x++)
+        {
+            for (var y = -cellDistance; y <= cellDistance; y++)
+            {
+                var c = worldspace.GetCell(new P2Int(cellX + x, cellY + y), linkCache);
+                if (c is null) yield break;
+
+                foreach (var placedObject in ProcessCell(c))
+                {
+                    yield return placedObject;
+                }
+            }
+        }
+
+        IEnumerable<IPlacedObjectGetter> ProcessCell(ICellGetter c)
+        {
+            var placedObjectsInCell = c.GetAllPlaced(linkCache)
+                .OfType<IPlacedObjectGetter>()
+                .Where(p => filterObject(p.Base));
+
+            foreach (var p in placedObjectsInCell)
+            {
+                if (p.Placement is not { Position: var otherPosition }) continue;
+
+                var distance = position.Distance(otherPosition);
+                if (distance <= maxDistance)
+                {
+                    yield return p;
+                }
+            }
+        }
     }
 }

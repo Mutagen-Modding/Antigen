@@ -10,7 +10,7 @@ public interface IReportHandler
     void Dropoff(
         ReportContextParameters parameters,
         ModKey sourceMod,
-        IMajorRecordIdentifierGetter majorRecord,
+        IFormLinkIdentifier majorRecord,
         Topic topic);
 
     void Dropoff(

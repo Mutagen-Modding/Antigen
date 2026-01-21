@@ -36,26 +36,28 @@ public class ByGenericTypeRecordContextualDriver<TMajor> : IContextualDriver
             if (listing.Mod is null) continue;
             if (_blacklistedModsProvider.IsBlacklisted(listing.ModKey)) continue;
 
-            await Task.WhenAll(listing.Mod.EnumerateMajorRecords<TMajor>().SelectMany(rec =>
-            {
-                var param = new ContextualRecordAnalyzerParams<TMajor>(
-                    driverParams.LinkCache,
-                    driverParams.LoadOrder,
-                    listing.Mod.ModKey,
-                    rec,
-                    driverParams.ReportDropbox,
-                    driverParams.ProvideCaches);
-                return _contextualRecordAnalyzers.Select(analyzer =>
+            await Task.WhenAll(listing.Mod.EnumerateMajorRecords<TMajor>()
+                .Where(x => !x.IsDeleted)
+                .SelectMany(rec =>
                 {
-                    return _dropoff.EnqueueAndWait(() =>
+                    var param = new ContextualRecordAnalyzerParams<TMajor>(
+                        driverParams.LinkCache,
+                        driverParams.LoadOrder,
+                        listing.Mod.ModKey,
+                        rec,
+                        driverParams.ReportDropbox,
+                        driverParams.ProvideCaches);
+                    return _contextualRecordAnalyzers.Select(analyzer =>
                     {
-                        analyzer.AnalyzeRecord(param with
+                        return _dropoff.EnqueueAndWait(() =>
                         {
-                            AnalyzerType = analyzer.GetType()
-                        });
-                    }, driverParams.CancellationToken);
-                });
-            }));
+                            analyzer.AnalyzeRecord(param with
+                            {
+                                AnalyzerType = analyzer.GetType()
+                            });
+                        }, driverParams.CancellationToken);
+                    });
+                }));
         }
     }
 }

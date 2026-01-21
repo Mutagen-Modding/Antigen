@@ -45,11 +45,7 @@ public class ByGenericTypeRecordFrameIsolatedDriver<TMajor> : IIsolatedRecordFra
         var param = new IsolatedRecordFrameAnalyzerParams<TMajor>(
             driverParams.ReportDropbox,
             driverParams.TargetMod,
-            new MajorRecordIdentifier
-            {
-                FormKey = formKey,
-                EditorID = editorId,
-            },
+            new FormLinkInformation(formKey, typeof(TMajor)),
             reportContext,
             frame);
 

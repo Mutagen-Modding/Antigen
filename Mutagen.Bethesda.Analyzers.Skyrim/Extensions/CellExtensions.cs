@@ -1,12 +1,13 @@
 ﻿using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
-using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
 public static class CellExtensions
 {
+    public const int CellLength = 4096;
+
     public static IEnumerable<ILocationGetter> GetAllLocations(this ICellGetter cell, ILinkCache linkCache)
     {
         // Add all parent location form keys
@@ -32,6 +33,22 @@ public static class CellExtensions
         }
 
         return cellLocations;
+    }
+
+    /// <summary>
+    /// Estimates if a cell is just a testing cell that can be ignored.
+    /// A testing cell is always an interior cell, and has no special setup.
+    /// </summary>
+    /// <param name="cell">Cell to check</param>
+    /// <returns>True if the cell is likely a testing cell</returns>
+    public static bool IsTestingCell(this ICellGetter cell)
+    {
+        if (cell.IsExteriorCell()) return false;
+        if (!cell.LockList.IsNull) return false;
+        if (!cell.Location.IsNull) return false;
+        if (!cell.Owner.IsNull) return false;
+
+        return true;
     }
 
     public static bool IsSettlementCell(this ICellGetter cell, ILinkCache linkCache)
@@ -134,20 +151,5 @@ public static class CellExtensions
                 }
             }
         }
-    }
-
-    public static P2Int? GetCellCoordinates(this IPlacedGetter placed)
-    {
-        const int cellLength = 4096;
-        if (placed.Placement is null) return null;
-
-        var position = placed.Placement.Position;
-
-        var cellX = position.X / cellLength;
-        var cellY = position.Y / cellLength;
-
-        return new P2Int(
-            cellX < 0 ? (int)Math.Floor(cellX) : (int)cellX,
-            cellY < 0 ? (int)Math.Floor(cellY) : (int)cellY);
     }
 }

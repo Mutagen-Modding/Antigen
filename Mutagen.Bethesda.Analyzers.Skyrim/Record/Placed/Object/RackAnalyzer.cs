@@ -53,14 +53,22 @@ public class RackAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
             Severity.Error)
         .WithFormatting<IPlacedObjectGetter, IPlacedObjectGetter, IPlaceableObjectGetter?>($"Placed Object has a {TriggerScriptName} but the linked ref activator {{0}} has a linked ref without keyword {{1}} that places {{2}} and not a weapon or armor");
 
+    public static readonly TopicDefinition<IPlacedObjectGetter> RackActivatorHasEnableParent = MutagenTopicBuilder.FromDiscussion(
+            522,
+            "Rack Activator Has Enable Parent",
+            Severity.Error)
+        .WithFormatting<IPlacedObjectGetter>($"Placed Object has a {TriggerScriptName} but the linked ref activator {{0}} has an enable parent which breaks the rack functionality");
+
     public IEnumerable<TopicDefinition> Topics { get; } =
     [
         RackTriggerMissingKeywordProperty,
         RackActivatorMissing,
         RackActivatorInvalid,
+        RackActivatorMissingKeywordProperty,
         RackActivatorNoTrigger,
         RackActivatorLinksToDifferentTrigger,
         RackActivatorDisplayItemInvalidType,
+        RackActivatorHasEnableParent,
     ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedObjectGetter> param)
@@ -84,6 +92,12 @@ public class RackAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
             param.AddTopic(
                 RackActivatorMissing.Format(activatorLinkKeyword));
             return;
+        }
+
+        if (activatorRef.EnableParent is not null)
+        {
+            param.AddTopic(
+                RackActivatorHasEnableParent.Format(activatorRef));
         }
 
         var (activatorScript, triggerLinkProperty) = activatorRef.GetScriptPropertyFromSelfOrBase<IScriptObjectPropertyGetter>(param.LinkCache, ActivatorScriptName, TriggerPropertyName);

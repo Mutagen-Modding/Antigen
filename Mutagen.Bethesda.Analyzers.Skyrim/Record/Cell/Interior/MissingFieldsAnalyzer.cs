@@ -36,6 +36,7 @@ public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<ICellGetter>
     {
         var cell = param.Record;
         if (cell.IsExteriorCell()) return;
+        if (cell.IsTestingCell()) return;
 
         if (cell.Music.IsNull)
         {

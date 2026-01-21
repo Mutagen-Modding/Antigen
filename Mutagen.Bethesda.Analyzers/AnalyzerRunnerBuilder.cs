@@ -12,6 +12,7 @@ using Mutagen.Bethesda.Environments;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
+using Mutagen.Bethesda.Plugins.Meta;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog;
@@ -255,6 +256,11 @@ public record AnalyzerRunnerBuilder
 
         builder
             .RegisterInstance(new GameReleaseInjection(_gameRelease))
+            .AsImplementedInterfaces();
+
+        builder
+            .RegisterInstance(GameConstants.Get(_gameRelease))
+            .AsSelf()
             .AsImplementedInterfaces();
 
         builder
