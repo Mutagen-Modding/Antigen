@@ -1,0 +1,17 @@
+<Project>
+    <!-- Clear local NuGet cache after build to prevent stale packages during development -->
+    <Target Name="ClearLocalNuGetPackages" AfterTargets="Build" Condition="'$(GeneratePackageOnBuild)' == 'true'">
+        <PropertyGroup>
+            <NuGetPackageRoot>$(USERPROFILE)\.nuget\packages\$(PackageId.ToLower())</NuGetPackageRoot>
+            <NuGetPackageRootUnix>$(HOME)/.nuget/packages/$(PackageId.ToLower())</NuGetPackageRootUnix>
+        </PropertyGroup>
+
+        <!-- Windows -->
+        <RemoveDir Directories="$(NuGetPackageRoot)" Condition="Exists('$(NuGetPackageRoot)') AND '$(OS)' == 'Windows_NT'" />
+
+        <!-- Unix/Mac -->
+        <RemoveDir Directories="$(NuGetPackageRootUnix)" Condition="Exists('$(NuGetPackageRootUnix)') AND '$(OS)' != 'Windows_NT'" />
+
+        <Message Text="Cleared local NuGet cache for $(PackageId)" Importance="high" Condition="Exists('$(NuGetPackageRoot)') OR Exists('$(NuGetPackageRootUnix)')" />
+    </Target>
+</Project>

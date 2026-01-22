@@ -8,6 +8,23 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <ImplicitUsings>true</ImplicitUsings>
         <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
+
+        <!-- NuGet Package Configuration -->
+        <IsPackable>false</IsPackable>
+        <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
+        <PackageProjectUrl>https://github.com/Mutagen-Modding/Mutagen.Bethesda.Analyzers</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Mutagen-Modding/Mutagen.Bethesda.Analyzers</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageOutputPath>..\nupkg</PackageOutputPath>
+
+        <!-- Symbol Package Configuration -->
+        <DebugType>portable</DebugType>
+        <DebugSymbols>true</DebugSymbols>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
 </Project>

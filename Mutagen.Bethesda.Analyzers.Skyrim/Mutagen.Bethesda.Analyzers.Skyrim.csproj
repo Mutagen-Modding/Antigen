@@ -1,6 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+      <IsPackable>true</IsPackable>
+      <PackageId>Mutagen.Bethesda.Analyzers.Skyrim</PackageId>
+      <Description>Skyrim-specific analyzers and contextual analysis for Bethesda mod analysis.</Description>
       <RootNamespace>Mutagen.Bethesda.Analyzers.Skyrim</RootNamespace>
     </PropertyGroup>
 
@@ -14,6 +17,8 @@
       <PackageReference Include="Mutagen.Bethesda.Skyrim" />
       <PackageReference Include="Autofac" />
       <PackageReference Include="Mutagen.Bethesda.Autofac" />
+      <PackageReference Include="GitVersion.MsBuild" />
+      <PackageReference Include="Microsoft.SourceLink.GitHub" />
     </ItemGroup>
 
 </Project>

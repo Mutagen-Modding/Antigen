@@ -1,11 +1,18 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+        <IsPackable>true</IsPackable>
         <PackageId>Mutagen.Bethesda.Analyzers</PackageId>
+        <Description>Main analyzer runner and orchestration for analyzing Bethesda game mods and load orders. Built on the Mutagen library.</Description>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Engine\Mutagen.Bethesda.Analyzers.Engine.csproj"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="GitVersion.MsBuild" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" />
     </ItemGroup>
 
 </Project>
