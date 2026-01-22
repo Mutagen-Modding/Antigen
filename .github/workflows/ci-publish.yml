@@ -63,11 +63,11 @@ jobs:
     - name: Install dependencies
       run: |
         dotnet clean -c Release && dotnet nuget locals all --clear
-        dotnet restore ${{ matrix.project }}/${{ matrix.project }}.csproj
+        dotnet restore ${{ matrix.sln }}
     - name: Build
-      run: dotnet build ${{ matrix.project }}/${{ matrix.project }}.csproj -c Release --no-restore
+      run: dotnet build ${{ matrix.sln }} -c Release --no-restore
     - name: Test
-      run: dotnet test ${{ matrix.project }}/${{ matrix.project }}.csproj -c Release --no-build
+      run: dotnet test ${{ matrix.sln }} -c Release --no-build
 
   build-test-push:
     needs: [build-test, activity-short-circuit]
