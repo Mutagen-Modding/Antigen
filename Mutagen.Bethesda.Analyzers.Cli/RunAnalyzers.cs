@@ -7,6 +7,7 @@ using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.Cli.Args;
 using Mutagen.Bethesda.Analyzers.Cli.Modules;
 using Mutagen.Bethesda.Analyzers.Engines;
+using Mutagen.Bethesda.Analyzers.SDK;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments;
 using Mutagen.Bethesda.Plugins;
@@ -102,7 +103,8 @@ public static class RunAnalyzers
         builder.RegisterModule<RunAnalyzerModule>();
         builder.RegisterModule(new AnalyzerCommandModule(command));
 
-        DynamicAnalyzerModuleLoader.LoadAnalyzerModule(builder, command.GameRelease);
+        DynamicModuleLoader.LoadGameModule<IAnalyzerModule>(builder, command.GameRelease);
+        DynamicModuleLoader.LoadGameModule<ICacheModule>(builder, command.GameRelease);
 
         return builder.Build();
     }
