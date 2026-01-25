@@ -36,7 +36,7 @@ public static class RunAnalyzers
 
         PrintTopics(command, bootstrap.Engine);
 
-        Console.WriteLine(IntroConstants.TextSplash);
+        IntroConstants.PrintTextSplash();
         Console.WriteLine(RunText);
         await bootstrap.Engine.Run(CancellationToken.None);
 
