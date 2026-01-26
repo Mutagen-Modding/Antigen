@@ -2,6 +2,7 @@
 using Autofac;
 using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.GitHub.Args;
+using Mutagen.Bethesda.Analyzers.SDK;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins.Meta;
 
@@ -33,7 +34,8 @@ public static class RunDiscussionsCreator
         builder.RegisterInstance(GameConstants.Get(cmd.GameRelease)).As<GameConstants>();
         builder.RegisterModule<MainModule>();
         builder.RegisterModule<ConfigModule>();
-        DynamicAnalyzerModuleLoader.LoadAnalyzerModule(builder, cmd.GameRelease);
+        DynamicModuleLoader.LoadGameModule<IAnalyzerModule>(builder, cmd.GameRelease);
+        DynamicModuleLoader.LoadGameModule<ICacheModule>(builder, cmd.GameRelease);
         builder.RegisterType<GetTopicDefinitions>().AsSelf();
         builder.RegisterType<CreateGitHubDiscussions>().AsSelf();
         builder.RegisterInstance(cmd).As<CreateDiscussionsCommand>();

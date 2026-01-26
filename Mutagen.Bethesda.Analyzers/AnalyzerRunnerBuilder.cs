@@ -5,6 +5,7 @@ using Mutagen.Bethesda.Analyzers.Autofac;
 using Mutagen.Bethesda.Analyzers.Config.Run;
 using Mutagen.Bethesda.Analyzers.Config.Topic;
 using Mutagen.Bethesda.Analyzers.Modules;
+using Mutagen.Bethesda.Analyzers.SDK;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Services;
@@ -247,8 +248,10 @@ public record AnalyzerRunnerBuilder
         // Dynamically load the appropriate analyzer module based on game release
         if (_addTypicalAnalyzers)
         {
-            DynamicAnalyzerModuleLoader.LoadAnalyzerModule(builder, _gameRelease);
+            DynamicModuleLoader.LoadGameModule<IAnalyzerModule>(builder, _gameRelease);
         }
+
+        DynamicModuleLoader.LoadGameModule<ICacheModule>(builder, _gameRelease);
 
         builder
             .RegisterInstance(_fileSystem ?? new FileSystem())
