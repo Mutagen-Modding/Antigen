@@ -86,9 +86,15 @@ public static class RunAnalyzers
                 .Select(x => x.Trim())
                 .Select(x => ModKey.FromFileName(x));
 
-            gameEnvironment = GameEnvironmentBuilder.Create(GameRelease.SkyrimSE)
-                .WithLoadOrder(loadOrder.ToArray())
-                .Build();
+            var envBuilder = GameEnvironmentBuilder.Create(command.GameRelease)
+                .WithLoadOrder(loadOrder.ToArray());
+
+            if (command.DataFolder is not null)
+            {
+                envBuilder = envBuilder.WithTargetDataFolder(new DirectoryPath(command.DataFolder));
+            }
+
+            gameEnvironment = envBuilder.Build();
         }
 
         builder

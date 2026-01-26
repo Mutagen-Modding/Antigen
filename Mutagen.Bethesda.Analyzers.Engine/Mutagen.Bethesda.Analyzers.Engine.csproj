@@ -1,6 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
+      <IsPackable>true</IsPackable>
+      <PackageId>Mutagen.Bethesda.Analyzers.Engine</PackageId>
+      <Description>Core analysis engine with drivers and reporting for Bethesda mod analyzers.</Description>
       <RootNamespace>Mutagen.Bethesda.Analyzers</RootNamespace>
     </PropertyGroup>
 
@@ -11,6 +14,8 @@
     <ItemGroup>
       <PackageReference Include="Autofac" />
       <PackageReference Include="Mutagen.Bethesda.Autofac" />
+      <PackageReference Include="GitVersion.MsBuild" />
+      <PackageReference Include="Microsoft.SourceLink.GitHub" />
     </ItemGroup>
 
 </Project>

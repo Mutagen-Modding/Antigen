@@ -1,9 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageId>Mutagen.Bethesda.Analyzers.SDK</PackageId>
+        <Description>Base classes and interfaces for creating custom Bethesda mod analyzers using the Mutagen.Bethesda.Analyzers framework.</Description>
+    </PropertyGroup>
+
     <ItemGroup>
         <PackageReference Include="Autofac" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="Mutagen.Bethesda.Core" />
+        <PackageReference Include="GitVersion.MsBuild" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" />
     </ItemGroup>
 
 </Project>
