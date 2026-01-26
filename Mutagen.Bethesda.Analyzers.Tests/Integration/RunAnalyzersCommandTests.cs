@@ -37,11 +37,11 @@ public class RunAnalyzersCommandTests
         var modPath = Path.Combine(dataDirectory.Path, mod.ModKey.FileName);
         fileSystem.Directory.CreateDirectory(dataDirectory.Path);
 
-        mod.BeginWrite
+        await mod.BeginWrite
             .ToPath(modPath)
             .WithNoLoadOrder()
             .WithFileSystem(fileSystem)
-            .Write();
+            .WriteAsync();
 
         // Create command pointing to our in-memory data folder
         var command = new RunAnalyzersCommand
