@@ -23,15 +23,23 @@ namespace Mutagen.Bethesda.Analyzers.Cli;
 
 public static class RunAnalyzers
 {
+    public static string RunText = "Running analyzers...";
+
+    private record Bootstrap(ContextualAnalyzerEngine Engine, IWorkConsumer WorkConsumer);
+
     public static async Task<int> Run(RunAnalyzersCommand command)
     {
         var container = GetContainer(command);
 
-        var engine = container.Resolve<ContextualAnalyzerEngine>();
+        var bootstrap = container.Resolve<Bootstrap>();
 
-        PrintTopics(command, engine);
+        bootstrap.WorkConsumer.Start();
 
-        await engine.Run(CancellationToken.None);
+        PrintTopics(command, bootstrap.Engine);
+
+        IntroConstants.PrintTextSplash();
+        Console.WriteLine(RunText);
+        await bootstrap.Engine.Run(CancellationToken.None);
 
         return 0;
     }
@@ -66,7 +74,7 @@ public static class RunAnalyzers
 
         var builder = new ContainerBuilder();
         builder.Populate(services);
-        builder.RegisterInstance(new FileSystem()).As<IFileSystem>();
+        builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();
 
         IGameEnvironment gameEnvironment;
         if (command.LoadOrder is null)
@@ -98,19 +106,13 @@ public static class RunAnalyzers
             .RegisterInstance(gameEnvironment.LinkCache)
             .AsImplementedInterfaces();
 
-        var workDropoff = new InlineWorkDropoff();
-        builder
-            .RegisterInstance(workDropoff)
-            .AsImplementedInterfaces();
-
-        builder.RegisterInstance(new NumWorkThreadsUnopinionated())
-            .AsImplementedInterfaces();
-
         builder.RegisterModule<RunAnalyzerModule>();
         builder.RegisterModule(new AnalyzerCommandModule(command));
 
         DynamicModuleLoader.LoadGameModule<IAnalyzerModule>(builder, command.GameRelease);
         DynamicModuleLoader.LoadGameModule<ICacheModule>(builder, command.GameRelease);
+
+        builder.RegisterType<Bootstrap>().AsSelf().SingleInstance();
 
         return builder.Build();
     }
