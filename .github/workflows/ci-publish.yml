@@ -50,7 +50,7 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         sln:
-          - Mutagen.Bethesda.Analyzers.sln
+          - Mutagen.Bethesda.Analyzers.slnx
           
     steps:
     - uses: actions/checkout@v4
@@ -83,14 +83,14 @@ jobs:
         dotnet-version: 10.0.*
     - name: Install dependencies
       run: |
-        dotnet clean Mutagen.Bethesda.Analyzers.sln -c Release && dotnet nuget locals all --clear
-        dotnet restore Mutagen.Bethesda.Analyzers.sln
+        dotnet clean Mutagen.Bethesda.Analyzers.slnx -c Release && dotnet nuget locals all --clear
+        dotnet restore Mutagen.Bethesda.Analyzers.slnx
     - name: Build
-      run: dotnet build Mutagen.Bethesda.Analyzers.sln -c Release --no-restore /p:GeneratePackageOnBuild=false
+      run: dotnet build Mutagen.Bethesda.Analyzers.slnx -c Release --no-restore /p:GeneratePackageOnBuild=false
     - name: Pack
       if: ${{ success() }}
       run: |
-        dotnet pack Mutagen.Bethesda.Analyzers.sln -c Release --no-restore -o out --include-symbols -p:SymbolPackageFormat=snupkg
+        dotnet pack Mutagen.Bethesda.Analyzers.slnx -c Release --no-restore -o out --include-symbols -p:SymbolPackageFormat=snupkg
     - name: Publish to Github
       uses: svenstaro/upload-release-action@v2
       if: ${{ success() && !github.event.release.prerelease && github.event_name == 'release' }}

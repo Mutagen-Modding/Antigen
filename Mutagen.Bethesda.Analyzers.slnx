@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/.solutionItems/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Analyzers/">
+    <Project Path="Mutagen.Bethesda.Analyzers.Common/Mutagen.Bethesda.Analyzers.Common.csproj" />
+    <Project Path="Mutagen.Bethesda.Analyzers.Skyrim/Mutagen.Bethesda.Analyzers.Skyrim.csproj" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="Mutagen.Bethesda.Analyzers.Engine/Mutagen.Bethesda.Analyzers.Engine.csproj" />
+    <Project Path="Mutagen.Bethesda.Analyzers.SDK/Mutagen.Bethesda.Analyzers.SDK.csproj" />
+    <Project Path="Mutagen.Bethesda.Analyzers/Mutagen.Bethesda.Analyzers.csproj" />
+  </Folder>
+  <Folder Name="/Executables/">
+    <Project Path="Mutagen.Bethesda.Analyzers.Cli/Mutagen.Bethesda.Analyzers.Cli.csproj" />
+    <Project Path="Mutagen.Bethesda.Analyzers.GitHub/Mutagen.Bethesda.Analyzers.GitHub.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Mutagen.Bethesda.Analyzers.Skyrim.Tests/Mutagen.Bethesda.Analyzers.Skyrim.Tests.csproj" />
+    <Project Path="Mutagen.Bethesda.Analyzers.Testing/Mutagen.Bethesda.Analyzers.Testing.csproj" />
+    <Project Path="Mutagen.Bethesda.Analyzers.Tests/Mutagen.Bethesda.Analyzers.Tests.csproj" />
+  </Folder>
+</Solution>
