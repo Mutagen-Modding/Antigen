@@ -14,7 +14,7 @@ on:
 
 jobs:
   activity-short-circuit:
-    if: github.repository == 'Mutagen-Modding/Mutagen.Bethesda.Analyzers' || github.event_name != 'schedule'
+    if: github.repository == 'Mutagen-Modding/Mutagen.Bethesda.Analyzers'
     runs-on: ubuntu-latest
     outputs:
       same_sha: ${{ steps.check.outputs.same_sha }}
