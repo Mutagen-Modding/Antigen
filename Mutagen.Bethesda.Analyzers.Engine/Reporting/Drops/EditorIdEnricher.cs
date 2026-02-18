@@ -61,6 +61,8 @@ public sealed class EditorIdEnricher : IReportDropbox
             case IFormLinkGetter:
             case IEnumerable<IFormLinkGetter>:
                 return true;
+            case IEnumerable enumerable:
+                return enumerable.Cast<object>().Any(IsEnrichTarget);
             default:
                 return false;
         }
@@ -100,6 +102,14 @@ public sealed class EditorIdEnricher : IReportDropbox
                 .Select(e =>
                 {
                     return LinkResolver(parameters, e);
+                })
+                .ToArray(),
+            IEnumerable enumerable => enumerable
+                .Cast<object>()
+                .Select(x => x switch
+                {
+                    IFormLinkGetter link => LinkResolver(parameters, link),
+                    _ => EnrichItem(parameters, item)
                 })
                 .ToArray(),
             _ => item
