@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
@@ -7,13 +7,13 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior;
 
 public class UnownedWorkMarkerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition<IPlacedObjectGetter, ICellGetter> UnownedBed = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<IPlacedObjectGetter, ICellGetter> UnownedWorkMorker = MutagenTopicBuilder.FromDiscussion(
             210,
             "Unowned Work Marker in Owned Cell",
             Severity.Suggestion)
         .WithFormatting<IPlacedObjectGetter, ICellGetter>("Unowned work marker {0} in owned cell {1}");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [UnownedBed];
+    public IEnumerable<TopicDefinition> Topics { get; } = [UnownedWorkMorker];
 
     private static readonly HashSet<FormKey> WorkMarkers =
     [
@@ -32,10 +32,13 @@ public class UnownedWorkMarkerAnalyzer : IContextualRecordAnalyzer<ICellGetter>
         {
             if (placedObject.IsDeleted) continue;
 
+            // Owned work markers are not a problem
+            if (!placedObject.Owner.IsNull) continue;
+
             if (WorkMarkers.Contains(placedObject.Base.FormKey))
             {
                 param.AddTopic(
-                    UnownedBed.Format(placedObject, cell));
+                    UnownedWorkMorker.Format(placedObject, cell));
             }
         }
 
