@@ -14,11 +14,11 @@ public class PackageOwnerQuestMismatchAnalyzer : IContextualRecordAnalyzer<IPack
             Severity.Warning)
         .WithFormatting<IFormLinkGetter<INpcGetter>>("Package has owner quest {0} but is used directly in an Npc");
 
-    public static readonly TopicDefinition<IFormLinkGetter<IQuestGetter>, IFormLinkNullableGetter<IQuestGetter>> PackageWithOwnerQuestUsedInWrongQuest = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<IFormLinkGetter<IQuestGetter>, IQuestAliasGetter, IFormLinkGetter<IQuestGetter>> PackageWithOwnerQuestUsedInWrongQuest = MutagenTopicBuilder.FromDiscussion(
             536,
             "Package with Owner Quest used in wrong Quest Alias",
             Severity.Warning)
-        .WithFormatting<IFormLinkGetter<IQuestGetter>, IFormLinkNullableGetter<IQuestGetter>>("Package has owner quest {0} but is used in quest alias of different quest {1}");
+        .WithFormatting<IFormLinkGetter<IQuestGetter>, IQuestAliasGetter, IFormLinkGetter<IQuestGetter>>("Package has owner quest {0} but is used in quest alias {1} of quest {2}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [PackageWithOwnerQuestUsedInNpc, PackageWithOwnerQuestUsedInWrongQuest];
 
@@ -30,12 +30,21 @@ public class PackageOwnerQuestMismatchAnalyzer : IContextualRecordAnalyzer<IPack
         var questFormKey = package.OwnerQuest.FormKey;
 
         var linkUsageCache = param.ResolveCache<ILinkUsageCache>();
-        foreach (var questLink in linkUsageCache.GetUsagesOf<IQuestGetter>(package).UsageLinks)
+        foreach (var otherQuest in linkUsageCache.GetUsagesOf<IQuestGetter>(package).UsageLinks)
         {
-            if (questFormKey == questLink.FormKey) continue;
+            if (questFormKey == otherQuest.FormKey) continue;
 
-            param.AddTopic(
-                PackageWithOwnerQuestUsedInWrongQuest.Format(questLink, package.OwnerQuest));
+            var quest = otherQuest.TryResolve(param.LinkCache);
+            if (quest is null) continue;
+
+            foreach (var alias in quest.Aliases)
+            {
+                var aliasPackage = alias.PackageData.FirstOrDefault(p => p.FormKey == package.FormKey);
+                if (aliasPackage is null) continue;
+
+                param.AddTopic(
+                    PackageWithOwnerQuestUsedInWrongQuest.Format(package.OwnerQuest, alias, otherQuest));
+            }
         }
 
         foreach (var npcLink in linkUsageCache.GetUsagesOf<INpcGetter>(package).UsageLinks)
