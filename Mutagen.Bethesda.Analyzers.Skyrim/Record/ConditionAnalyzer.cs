@@ -36,7 +36,21 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
             Severity.Error)
         .WithoutFormatting("GetCurrentTime conditions with AND operator on day break can never be true");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [InvalidConditionReference, InvalidStageCondition, GetDeadCondition, GetCurrentTimeConditionWithOrOnDayBreak, GetCurrentTimeConditionWithAndOnDayBreak];
+    private static readonly TopicDefinition GetCrimeGoldRunOnPlayer = MutagenTopicBuilder.FromDiscussion(
+            545,
+            "CrimeGold conditions running on Player with Null Faction Reference",
+            Severity.Error)
+        .WithoutFormatting("CrimeGold conditions running on player with null faction reference will not work correctly as this would check if the player has committed a crime against themselves");
+
+    public IEnumerable<TopicDefinition> Topics { get; } =
+    [
+        InvalidConditionReference,
+        InvalidStageCondition,
+        GetDeadCondition,
+        GetCurrentTimeConditionWithOrOnDayBreak,
+        GetCurrentTimeConditionWithAndOnDayBreak,
+        GetCrimeGoldRunOnPlayer,
+    ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
     {
@@ -125,6 +139,24 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
 
                     break;
                 }
+                case IGetCrimeGoldConditionDataGetter getCrimeGold:
+                    if (condition.Data.RunsOnPlayer() && getCrimeGold.Faction.UsesLink() && getCrimeGold.Faction.Link.IsNull) {
+                        Console.WriteLine("");
+                    }
+
+                    break;
+                case IGetCrimeGoldNonviolentConditionDataGetter getCrimeGoldNonViolent:
+                    if (condition.Data.RunsOnPlayer() && getCrimeGoldNonViolent.Faction.UsesLink() && getCrimeGoldNonViolent.Faction.Link.IsNull) {
+                        Console.WriteLine("");
+                    }
+
+                    break;
+                case IGetCrimeGoldViolentConditionDataGetter getCrimeGoldViolent:
+                    if (condition.Data.RunsOnPlayer() && getCrimeGoldViolent.Faction.UsesLink() && getCrimeGoldViolent.Faction.Link.IsNull) {
+                        Console.WriteLine("");
+                    }
+
+                    break;
             }
         }
     }
