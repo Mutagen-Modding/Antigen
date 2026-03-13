@@ -141,19 +141,19 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                 }
                 case IGetCrimeGoldConditionDataGetter getCrimeGold:
                     if (condition.Data.RunsOnPlayer() && getCrimeGold.Faction.UsesLink() && getCrimeGold.Faction.Link.IsNull) {
-                        Console.WriteLine("");
+                        param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
                     }
 
                     break;
                 case IGetCrimeGoldNonviolentConditionDataGetter getCrimeGoldNonViolent:
                     if (condition.Data.RunsOnPlayer() && getCrimeGoldNonViolent.Faction.UsesLink() && getCrimeGoldNonViolent.Faction.Link.IsNull) {
-                        Console.WriteLine("");
+                        param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
                     }
 
                     break;
                 case IGetCrimeGoldViolentConditionDataGetter getCrimeGoldViolent:
                     if (condition.Data.RunsOnPlayer() && getCrimeGoldViolent.Faction.UsesLink() && getCrimeGoldViolent.Faction.Link.IsNull) {
-                        Console.WriteLine("");
+                        param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
                     }
 
                     break;
