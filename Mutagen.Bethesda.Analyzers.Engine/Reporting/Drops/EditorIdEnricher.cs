@@ -61,6 +61,8 @@ public sealed class EditorIdEnricher : IReportDropbox
             case IFormLinkGetter:
             case IEnumerable<IFormLinkGetter>:
                 return true;
+            case IEnumerable enumerable:
+                return enumerable.Cast<object>().Any(IsEnrichTarget);
             default:
                 return false;
         }
@@ -76,34 +78,47 @@ public sealed class EditorIdEnricher : IReportDropbox
         ReportContextParameters parameters,
         object item)
     {
-        return item switch
+        switch (item)
         {
-            IFormLinkGetter link => LinkResolver(parameters, link),
-            IDictionary dictionary => dictionary.Keys.Cast<object>()
-                .ToDictionary(key =>
-                {
-                    if (key is IFormLinkGetter keyLink)
+            case IFormLinkGetter link:
+                return LinkResolver(parameters, link);
+            case IDictionary dictionary:
+                return dictionary.Keys
+                    .Cast<object>()
+                    .ToDictionary(key =>
                     {
-                        return LinkResolver(parameters, keyLink);
-                    }
-                    return EnrichItem(parameters, key) ?? key;
-                }, key =>
-                {
-                    var val = dictionary[key];
-                    if (val is IFormLinkGetter valueLink)
+                        if (key is IFormLinkGetter keyLink)
+                        {
+                            return LinkResolver(parameters, keyLink);
+                        }
+                        return EnrichItem(parameters, key) ?? key;
+                    }, key =>
                     {
-                        return LinkResolver(parameters, valueLink);
-                    }
-                    return EnrichItem(parameters, dictionary[key]!);
-                }),
-            IEnumerable<IFormLinkGetter> enumerable => enumerable
-                .Select(e =>
-                {
-                    return LinkResolver(parameters, e);
-                })
-                .ToArray(),
-            _ => item
-        };
+                        var val = dictionary[key];
+                        if (val is IFormLinkGetter valueLink)
+                        {
+                            return LinkResolver(parameters, valueLink);
+                        }
+                        return EnrichItem(parameters, dictionary[key]!);
+                    });
+            case IEnumerable<IFormLinkGetter> enumerable:
+                return enumerable
+                    .Select(e => LinkResolver(parameters, e))
+                    .ToArray();
+            case IEnumerable enumerable:
+                var array = enumerable as object[] ?? enumerable.Cast<object>().ToArray();
+                return array.Any(IsEnrichTarget)
+                    ? array
+                        .Select(x => x switch
+                        {
+                            IFormLinkGetter link => LinkResolver(parameters, link),
+                            _ => EnrichItem(parameters, x)
+                        })
+                        .ToArray()
+                    : item;
+            default:
+                return item;
+        }
     }
 
     private (string Name, object Value)[] Enrich(

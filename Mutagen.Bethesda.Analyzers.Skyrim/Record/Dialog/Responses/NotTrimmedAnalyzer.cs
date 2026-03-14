@@ -44,6 +44,9 @@ public class NotTrimmedAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter
             {
                 if (NotTrimmed(text))
                 {
+                    // Special case: a single space is often used for silent responses
+                    if (text == " ") continue;
+
                     param.AddTopic(
                         ResponseNotTrimmed.Format(text, language));
                 }

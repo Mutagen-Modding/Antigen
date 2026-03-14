@@ -1,5 +1,9 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -31,7 +35,13 @@ public class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Warning)
         .WithoutFormatting("Npc with ambush script is not using ambush packages");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive];
+    public static readonly TopicDefinition<IPlacedNpcGetter> AmbushParentActivator = MutagenTopicBuilder.FromDiscussion(
+            540,
+            "Ambush npc without parent activator",
+            Severity.Warning)
+        .WithFormatting<IPlacedNpcGetter>("Placed npc {0} with ambush script doesn't have a parent activator to trigger the ambush");
+
+    public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive, AmbushParentActivator];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
@@ -73,6 +83,25 @@ public class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         if (!hasAmbushPackages || hasTemplatePackages)
         {
             param.AddTopic(AmbushPackages.Format());
+        }
+
+        var linkUsageCache = param.ResolveCache<ILinkUsageCache>();
+        foreach (var placedNpcLink in linkUsageCache.GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks)
+        {
+            if (!param.LinkCache.TryResolve(placedNpcLink, out var placedNpc)) continue;
+
+            // If they have activate parents, they're set up properly
+            if (placedNpc.ActivateParents is not null && placedNpc.ActivateParents.Parents.Count != 0) continue;
+
+            // If they are dead from the start, it doesn't matter if they are activated
+            if (placedNpc.MajorFlags.HasFlag(PlacedNpc.MajorFlag.StartsDead)) continue;
+
+            // Also check if there is any other placed referencing the ambush npc - then it might be triggered in another way
+            if (!linkUsageCache.GetUsagesOf<IPlacedGetter>(placedNpc).UsageLinks.Any())
+            {
+
+                param.AddTopic(AmbushParentActivator.Format(placedNpc));
+            }
         }
     }
 
