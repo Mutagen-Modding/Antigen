@@ -33,8 +33,8 @@ public class DescriptionAnalyzer : IIsolatedRecordAnalyzer<IMagicEffectGetter>
                         param.AddTopic(MagicEffectDescriptionList.Format());
                         break;
                     }
-                    i += 2;
                 }
+                i += 2;
             }
         }
     }
