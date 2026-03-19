@@ -22,27 +22,19 @@ public class DescriptionAnalyzer : IIsolatedRecordAnalyzer<IMagicEffectGetter>
         foreach (Language languages in Enum.GetValues(typeof(Language)))
         {
             string? desc = mgef.Description.Lookup(languages);
-            if ((desc is null)) break;
+            if ((desc is null)) continue;
             int i = 0;
             while (i < desc.Length)
             {
                 if (desc[i] == '%')
                 {
-                    if (desc[i + 1] != '%')
+                    if (i+1 >= desc.Length || desc[i + 1] != '%')
                     {
+                        param.AddTopic(MagicEffectDescriptionList.Format());
                         break;
                     }
-                    else
-                    {
-                        i++;
-                    }
+                    i += 2;
                 }
-                i++;
-            }
-            //leaves while loop either on last pos of string or on single %
-            if (desc[i] == '%')
-            {
-                param.AddTopic(MagicEffectDescriptionList.Format());
             }
         }
     }
