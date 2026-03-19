@@ -1,15 +1,15 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Strings;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.MagicEffect;
 
 public class DescriptionAnalyzer : IIsolatedRecordAnalyzer<IMagicEffectGetter>
 {
-    //TBD
      public static readonly TopicDefinition MagicEffectDescriptionList = MutagenTopicBuilder.FromDiscussion(
              547,
-             "MagicEffectDescription",
+             "Single '%' in Magic Effect Description",
              Severity.Suggestion)
          .WithoutFormatting("% in Magic Effect description should be followed by a second %");
 
@@ -18,30 +18,33 @@ public class DescriptionAnalyzer : IIsolatedRecordAnalyzer<IMagicEffectGetter>
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IMagicEffectGetter> param)
     {
         var mgef = param.Record;
-        if (mgef.Description != null)
+        if (mgef.Description is null) return;
+        foreach (Language languages in Enum.GetValues(typeof(Language)))
         {
-            string? desc = mgef.Description.String;
+            string? desc = mgef.Description.Lookup(languages);
+            if ((desc is null)) break;
             int i = 0;
-            if (desc != null)
+            while (i < desc.Length)
             {
-                while (i < desc.Length)
+                if (desc[i] == '%')
                 {
-                    if (desc[i] == '%')
+                    if (desc[i + 1] != '%')
                     {
-                        if (desc[i + 1] != '%')
-                        {
-                            param.AddTopic(MagicEffectDescriptionList.Format());
-                        }
-                        else
-                        {
-                            i++;
-                        }
+                        break;
                     }
-                    i++;
+                    else
+                    {
+                        i++;
+                    }
                 }
+                i++;
+            }
+            //leaves while loop either on last pos of string or on single %
+            if (desc[i] == '%')
+            {
+                param.AddTopic(MagicEffectDescriptionList.Format());
             }
         }
-
     }
     public IEnumerable<Func<IMagicEffectGetter, object?>> FieldsOfInterest()
     {
