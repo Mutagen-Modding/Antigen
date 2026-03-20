@@ -7,11 +7,11 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.MagicEffect;
 
 public class DescriptionAnalyzer : IIsolatedRecordAnalyzer<IMagicEffectGetter>
 {
-     public static readonly TopicDefinition MagicEffectDescriptionList = MutagenTopicBuilder.FromDiscussion(
+     public static readonly TopicDefinition<Language> MagicEffectDescriptionList = MutagenTopicBuilder.FromDiscussion(
              547,
-             "Single '%' in Magic Effect Description",
+             "Incorrect usage of '%' in Magic Effect Description",
              Severity.Suggestion)
-         .WithoutFormatting("% in Magic Effect description should be followed by a second %");
+         .WithFormatting<Language>("MagicEffect Description in {0} contains incorrect % usage. Always use exactly 2 consecutive %");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [MagicEffectDescriptionList];
 
@@ -19,22 +19,23 @@ public class DescriptionAnalyzer : IIsolatedRecordAnalyzer<IMagicEffectGetter>
     {
         var mgef = param.Record;
         if (mgef.Description is null) return;
-        foreach (Language languages in Enum.GetValues(typeof(Language)))
+
+        foreach (var(language, desc) in mgef.Description)
         {
-            string? desc = mgef.Description.Lookup(languages);
-            if ((desc is null)) continue;
             int i = 0;
             while (i < desc.Length)
             {
                 if (desc[i] == '%')
                 {
-                    if (i+1 >= desc.Length || desc[i + 1] != '%')
+                    bool nextCharIsPercentageOrEmpty = (i + 1 < desc.Length) && (desc[i + 1] == '%');
+                    bool prevCharIsPercentageOrEmpty = (i > 0) && (desc[i - 1] == '%');
+                    if (!(nextCharIsPercentageOrEmpty ^ prevCharIsPercentageOrEmpty))
                     {
-                        param.AddTopic(MagicEffectDescriptionList.Format());
+                        param.AddTopic(MagicEffectDescriptionList.Format(language));
                         break;
                     }
                 }
-                i += 2;
+                i++;
             }
         }
     }
