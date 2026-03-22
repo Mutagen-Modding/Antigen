@@ -10,8 +10,10 @@ using Mutagen.Bethesda.Analyzers.Engines;
 using Mutagen.Bethesda.Analyzers.SDK;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments;
+using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Order;
+using Mutagen.Bethesda.Plugins.Order.DI;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
@@ -76,34 +78,19 @@ public static class RunAnalyzers
         builder.Populate(services);
         builder.RegisterType<FileSystem>().As<IFileSystem>().SingleInstance();
 
-        IGameEnvironment gameEnvironment;
-        if (command.LoadOrder is null)
-        {
-            gameEnvironment = GameEnvironment.Typical.Skyrim(SkyrimRelease.SkyrimSE);
-        }
-        else
-        {
-            var loadOrder = command.LoadOrder.Split(',')
-                .Select(x => x.Trim())
-                .Select(x => ModKey.FromFileName(x));
-
-            var envBuilder = GameEnvironmentBuilder.Create(command.GameRelease)
-                .WithLoadOrder(loadOrder.ToArray());
-
-            if (command.DataFolder is not null)
-            {
-                envBuilder = envBuilder.WithTargetDataFolder(new DirectoryPath(command.DataFolder));
-            }
-
-            gameEnvironment = envBuilder.Build();
-        }
+        builder
+            .Register(x => x.Resolve<IGameEnvironmentProvider>().Construct())
+            .SingleInstance()
+            .AsImplementedInterfaces();
 
         builder
-            .RegisterInstance(gameEnvironment.LoadOrder)
-            .As<ILoadOrderGetter<IModListingGetter<IModGetter>>>();
+            .Register(x => x.Resolve<IGameEnvironment>().LoadOrder)
+            .SingleInstance()
+            .AsImplementedInterfaces();
 
         builder
-            .RegisterInstance(gameEnvironment.LinkCache)
+            .Register(x => x.Resolve<IGameEnvironment>().LinkCache)
+            .SingleInstance()
             .AsImplementedInterfaces();
 
         builder.RegisterModule<RunAnalyzerModule>();
