@@ -33,7 +33,9 @@ public class OwnershipAnalyzer : IContextualRecordAnalyzer<ICellGetter>
             if (owner.FormKey != cell.Owner.FormKey) continue;
 
             switch (placed) {
-                case IPlacedNpcGetter or IPlacedTrapGetter:
+                case IPlacedNpcGetter:
+                    break;
+                case IPlacedTrapGetter:
                     param.AddTopic(
                         RedundantOwnership.Format(placed, cell.Owner));
                     break;
