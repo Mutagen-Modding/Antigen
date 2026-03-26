@@ -88,6 +88,7 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                 {
                     if (condition is IConditionFloatGetter floatCondition
                         && getStage.Quest.UsesLink() && getStage.Quest.Link.TryResolve(param.LinkCache, out var quest)
+                        && floatCondition.ComparisonValue != 0
                         && quest.Stages.All(s => s.Index != (int)floatCondition.ComparisonValue))
                     {
                         param.AddTopic(
