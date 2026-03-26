@@ -2,12 +2,19 @@ using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
-using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Faction;
 
 public class FactionNotBuySellAnalyzer : IIsolatedRecordAnalyzer<IFactionGetter>
 {
+    //build FormKey HashSet for VendorBuyLists that should have NotSellBuy set to true
+    private static readonly HashSet<FormKey> VendorBuySellLists =
+    [
+        FormKeys.SkyrimSE.Skyrim.FormList.VendorItemsMisc.FormKey,
+        FormKeys.SkyrimSE.Skyrim.FormList.VendorItemsMiscLucan.FormKey,
+        FormKeys.SkyrimSE.Dragonborn.FormList.DLC2DremoraVendorExclusion.FormKey
+    ];
+
     public static readonly TopicDefinition FactionNotBuySellList = MutagenTopicBuilder.FromDiscussion(
             549,
             "NotBuySell set to wrong value",
@@ -25,26 +32,9 @@ public class FactionNotBuySellAnalyzer : IIsolatedRecordAnalyzer<IFactionGetter>
 
         if (faction.VendorBuySellList.FormKey == FormKey.Null) return;
 
-        //build FormKey Array for VendorBuyLists that should have NotSellBuy set to true
-        FormKey[] vendorBuySellLists =
-        {
-            FormKeys.SkyrimSE.Skyrim.FormList.VendorItemsMisc.FormKey,
-            FormKeys.SkyrimSE.Skyrim.FormList.VendorItemsMiscLucan.FormKey,
-            FormKeys.SkyrimSE.Dragonborn.FormList.DLC2DremoraVendorExclusion.FormKey
-        };
+        if (!VendorBuySellLists.Contains(faction.VendorBuySellList.FormKey)) return;
 
-        bool relevantFaction = false;
-        foreach (FormKey formKey in vendorBuySellLists)
-        {
-            if (faction.VendorBuySellList.FormKey == formKey)
-            {
-                relevantFaction = true;
-            }
-        }
-
-        if (!relevantFaction) return;
-
-        if (faction.VendorValues.NotSellBuy == false)
+        if (!faction.VendorValues.NotSellBuy)
         {
             param.AddTopic(FactionNotBuySellList.Format());
         }
