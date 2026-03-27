@@ -1,11 +1,7 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest
 {
@@ -21,6 +17,11 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest
 
         void IIsolatedRecordAnalyzer<IQuestGetter>.AnalyzeRecord(IsolatedRecordAnalyzerParams<IQuestGetter> param)
         {
+            var forcedTargets = param.Record.Aliases
+                .Select(alias => (uint?)alias.AliasIDToForceIntoWhenFilled)
+                .NotNull()
+                .ToHashSet();
+
             foreach (var alias in param.Record.Aliases)
             {
                 if (alias.Flags?.HasFlag(QuestAlias.Flag.Optional) ?? false)
@@ -35,7 +36,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest
                     && alias.FindMatchingRefFromEvent == null
                     && alias.FindMatchingRefNearAlias == null
                     && alias.Conditions.Count == 0
-                    && alias.SpecificLocation.IsNull)
+                    && alias.SpecificLocation.IsNull
+                    && !forcedTargets.Contains(alias.ID))
                 {
                     param.AddTopic(AliasForcedNone.Format(alias.Name));
                 }
