@@ -35,6 +35,9 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest
                     && alias.CreateReferenceToObject == null
                     && alias.FindMatchingRefFromEvent == null
                     && alias.FindMatchingRefNearAlias == null
+                    // An alias with "find matching ref" and no conditions is
+                    // encoded identically to forced none
+                    // Ditto for "find matching ref in loaded area"
                     && alias.Conditions.Count == 0
                     && alias.SpecificLocation.IsNull
                     && !forcedTargets.Contains(alias.ID))
