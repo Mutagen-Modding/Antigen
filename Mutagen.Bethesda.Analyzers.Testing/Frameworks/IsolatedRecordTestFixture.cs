@@ -46,7 +46,7 @@ public class IsolatedRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
         // ToDo
         // Eventually test that fixrec triggers a rerun in the engine properly
 
-        dropOff = new();
+        dropOff.ClearReports();
         Sut.AnalyzeRecord(param);
         dropOff.Reports.ShouldBeEmpty();
     }

@@ -20,7 +20,6 @@ public class AliasIDAnalyzerTest
             },
             prepForFix: rec =>
             {
-                rec.Aliases.Add(new QuestAlias { ID = 0 });
                 rec.NextAliasID = 1;
             },
             AliasIDAnalyzer.NextAliasIDAlreadyInUse);
@@ -39,9 +38,7 @@ public class AliasIDAnalyzerTest
             },
             prepForFix: rec =>
             {
-                rec.Aliases.Add(new QuestAlias { ID = 0 });
-                rec.Aliases.Add(new QuestAlias { ID = 1 });
-                rec.NextAliasID = 2;
+                rec.Aliases[1].ID = 1;
             },
             AliasIDAnalyzer.AliasIDDuplicate);
     }
@@ -65,13 +62,7 @@ public class AliasIDAnalyzerTest
             },
             prepForFix: rec =>
             {
-                rec.Aliases.Add(new QuestAlias { ID = 0 });
-                rec.Aliases.Add(new QuestAlias
-                {
-                    ID = 1,
-                    CreateReferenceToObject = new CreateReferenceToObject { AliasID = 0 }
-                });
-                rec.NextAliasID = 2;
+                rec.Aliases[1].CreateReferenceToObject!.AliasID = 0;
             },
             AliasIDAnalyzer.AliasReferencesSelf);
     }
@@ -93,13 +84,8 @@ public class AliasIDAnalyzerTest
             },
             prepForFix: rec =>
             {
-                rec.Aliases.Add(new QuestAlias { ID = 0 });
-                rec.Aliases.Add(new QuestAlias
-                {
-                    ID = 1,
-                    Location = new LocationAliasReference { AliasID = 0 }
-                });
-                rec.NextAliasID = 2;
+                // Swap aliases 0 and 1 such that 1 is after its dependent alias
+                (rec.Aliases[1], rec.Aliases[0]) = (rec.Aliases[0], rec.Aliases[1]);
             },
             AliasIDAnalyzer.AliasReferenceNotPreviousAlias);
     }
