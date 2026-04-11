@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
@@ -29,6 +29,9 @@ public class UniqueNpcPlacementAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 
         var placements = param.ResolveCache<ILinkUsageCache>()
             .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks
+            .Select(p => p.TryResolve(param.LinkCache))
+            .WhereNotNull()
+            .Where(p => p.Base.Equals(npc))
             .ToArray();
 
         switch (placements.Length)
@@ -39,8 +42,6 @@ public class UniqueNpcPlacementAnalyzer : IContextualRecordAnalyzer<INpcGetter>
                 break;
             case > 1:
                 var notDeadNpcs = placements
-                    .Select(p => p.TryResolve(param.LinkCache))
-                    .WhereNotNull()
                     .Where(p => !p.MajorFlags.HasFlag(PlacedNpc.MajorFlag.StartsDead))
                     .ToArray();
 
