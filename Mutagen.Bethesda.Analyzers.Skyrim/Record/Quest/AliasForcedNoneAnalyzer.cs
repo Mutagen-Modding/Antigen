@@ -1,7 +1,6 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
-using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest
 {
@@ -17,30 +16,12 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest
 
         void IIsolatedRecordAnalyzer<IQuestGetter>.AnalyzeRecord(IsolatedRecordAnalyzerParams<IQuestGetter> param)
         {
-            var forcedTargets = param.Record.Aliases
-                .Select(alias => (uint?)alias.AliasIDToForceIntoWhenFilled)
-                .NotNull()
-                .ToHashSet();
-
             foreach (var alias in param.Record.Aliases)
             {
                 if (alias.Flags?.HasFlag(QuestAlias.Flag.Optional) ?? false)
                     continue;
 
-                if (
-                    alias.ForcedReference.IsNull
-                    && alias.UniqueActor.IsNull
-                    && alias.Location == null
-                    && alias.External == null
-                    && alias.CreateReferenceToObject == null
-                    && alias.FindMatchingRefFromEvent == null
-                    && alias.FindMatchingRefNearAlias == null
-                    // An alias with "find matching ref" and no conditions is
-                    // encoded identically to forced none
-                    // Ditto for "find matching ref in loaded area"
-                    && alias.Conditions.Count == 0
-                    && alias.SpecificLocation.IsNull
-                    && !forcedTargets.Contains(alias.ID))
+                if (alias.IsForcedNone(param.Record))
                 {
                     param.AddTopic(AliasForcedNone.Format(alias.Name));
                 }

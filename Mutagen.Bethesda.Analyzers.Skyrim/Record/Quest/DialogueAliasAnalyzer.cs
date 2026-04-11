@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
@@ -19,15 +19,7 @@ public class DialogueAliasAnalyzer : IContextualRecordAnalyzer<IQuestGetter>
     {
         var quest = param.Record;
         var relevantAliases = quest.Aliases
-            .Where(alias => alias.ForcedReference.IsNull
-                            && !alias.Conditions.Any()
-                            && alias.SpecificLocation.IsNull
-                            && alias.UniqueActor.IsNull
-                            && alias.VoiceTypes.IsNull
-                            && alias.External is null
-                            && alias.CreateReferenceToObject is null
-                            && alias.FindMatchingRefFromEvent is null
-                            && alias.FindMatchingRefNearAlias is null)
+            .Where(alias => alias.IsForcedNone(quest))
             .ToList();
 
         if (relevantAliases.Count == 0) return;
