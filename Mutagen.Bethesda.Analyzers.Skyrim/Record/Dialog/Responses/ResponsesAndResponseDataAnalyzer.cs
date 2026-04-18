@@ -6,7 +6,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 
 public class ResponsesAndResponseDataAnalyzer : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
 {
-    public static readonly TopicDefinition ResponsesAndResponseData = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition ResponsesAndResponseData = MutagenTopicBuilder.FromDiscussion(
+        560,
         "Dialog Responses Contains Shared ResponseData and Responses",
         Severity.Warning
     );

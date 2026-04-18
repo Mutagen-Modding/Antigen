@@ -7,7 +7,8 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Faction;
 public class VendorDataAnalyzer : IIsolatedRecordAnalyzer<IFactionGetter>
 {
     // Location data -
-    public static readonly TopicDefinition LocationDataWithoutVendor = MutagenTopicBuilder.DevelopmentTopic( // TODO: Proper ID
+    public static readonly TopicDefinition LocationDataWithoutVendor = MutagenTopicBuilder.FromDiscussion(
+        558,
         "Vendor location data without vendor flag",
         Severity.Warning
         ).WithoutFormatting("Faction has vendor location data, but no vendor flag");
