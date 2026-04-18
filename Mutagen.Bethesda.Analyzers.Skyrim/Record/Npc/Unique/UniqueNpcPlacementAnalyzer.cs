@@ -25,12 +25,11 @@ public class UniqueNpcPlacementAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
         var npc = param.Record;
-        if (!npc.IsUniqueActorType(param.LinkCache)) return;
+        if (!npc.IsUnique()) return;
 
         var placements = param.ResolveCache<ILinkUsageCache>()
             .GetUsagesOf<IPlacedNpcGetter>(npc).UsageLinks
-            .Select(p => p.TryResolve(param.LinkCache))
-            .WhereNotNull()
+            .Select(p => p.Resolve(param.LinkCache))
             .Where(p => p.Base.Equals(npc))
             .ToArray();
 
