@@ -20,7 +20,7 @@ public class EncounterZoneAnalyzerTest
             },
             prepForFix: rec =>
             {
-                //nothing to set up, Cell by default is Exterior without Encounter Zone
+                rec.EncounterZone.SetToNull();
             },
             new[]
             {
