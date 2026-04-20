@@ -16,7 +16,7 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
             360,
             "Invalid Quest Stage referenced in Condition",
             Severity.Error)
-        .WithFormatting<int, IConditionGetter>("Quest stage {0} referenced in condition {0} is invalid");
+        .WithFormatting<int, IConditionGetter>("Quest stage {0} referenced in condition {1} is invalid");
 
     public static readonly TopicDefinition<INpcGetter> GetDeadCondition = MutagenTopicBuilder.FromDiscussion(
             361,
