@@ -21,16 +21,16 @@ public class InventoryOwnershipAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 
         foreach (var entry in npc.Items)
         {
-            if (entry.Data is null) return;
+            if (entry.Data?.Owner is not INpcOwnerGetter owner) continue;
 
-            using var enumerator = entry.Data.Owner.EnumerateFormLinks().GetEnumerator();
-            do
+            foreach (var enumerator in owner.EnumerateFormLinks())
             {
-                if (enumerator.Current.FormKeyNullable == npc.FormKey)
+                if (enumerator.FormKeyNullable == npc.FormKey)
                 {
                     param.AddTopic(InventoryItemWithOwner.Format(entry.Item.Item.TryResolve(param.LinkCache)));
                 }
-            } while (enumerator.MoveNext());
+            }
+
         }
     }
     public IEnumerable<Func<INpcGetter, object?>> FieldsOfInterest()
