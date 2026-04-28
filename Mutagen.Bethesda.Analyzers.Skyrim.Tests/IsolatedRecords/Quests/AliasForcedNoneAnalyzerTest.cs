@@ -107,8 +107,7 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests.IsolatedRecords.Quests
                     rec.Aliases[0].FindMatchingRefFromEvent = new()
                     {
                         FromEvent = new RecordType("SCPT"),
-                        // Script event - Ref1
-                        EventData = new byte[] { 0x52, 0x31, 0x00, 0x00 }
+                        EventData = GetEventDataConditionData.EventMember.Value1
                     };
                 });
         }
