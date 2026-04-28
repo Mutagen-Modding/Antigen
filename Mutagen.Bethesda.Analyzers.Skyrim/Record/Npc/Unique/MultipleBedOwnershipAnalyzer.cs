@@ -18,7 +18,7 @@ public class MultipleBedOwnershipAnalyzer : IContextualRecordAnalyzer<INpcGetter
     public static readonly TopicDefinition NpcOwnsNoBeds = MutagenTopicBuilder.FromDiscussion(
             494,
             "Unique Npc Owns No Beds",
-            Severity.Warning)
+            Severity.Suggestion)
         .WithoutFormatting("Unique Npc does not own any beds");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NpcOwnsMultipleBeds, NpcOwnsNoBeds];

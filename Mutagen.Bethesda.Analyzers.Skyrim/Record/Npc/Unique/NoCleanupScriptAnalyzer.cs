@@ -13,7 +13,7 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition NoCleanupScript = MutagenTopicBuilder.FromDiscussion(
             279,
             "Unique Npc Has No Cleanup Script",
-            Severity.Warning)
+            Severity.Suggestion)
         .WithoutFormatting("Unique Npc has no cleanup script");
 
     public static readonly TopicDefinition DeathContainerPropertyNotFilled = MutagenTopicBuilder.FromDiscussion(

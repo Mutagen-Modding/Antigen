@@ -9,7 +9,7 @@ public class NoCrimeFactionAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition NoCrimeFaction = MutagenTopicBuilder.FromDiscussion(
             280,
             "Unique Npc Has No Crime Faction",
-            Severity.Warning)
+            Severity.Suggestion)
         .WithoutFormatting("Unique Npc has no crime faction");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoCrimeFaction];
