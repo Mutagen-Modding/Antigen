@@ -9,9 +9,9 @@ public class NoShortNameAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
     public static readonly TopicDefinition<string, Language> NoShortNameFaction = MutagenTopicBuilder.FromDiscussion(
             403,
-            "Npc has no Short Name",
+            "Unique Npc Has No Short Name",
             Severity.Suggestion)
-        .WithFormatting<string, Language>("Npc has name {0} with a space in {1}, but no short name");
+        .WithFormatting<string, Language>("Unique Npc has name {0} with a space in {1}, but no short name");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoShortNameFaction];
 

@@ -8,9 +8,9 @@ public class NoItemsAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
     public static readonly TopicDefinition NoItems = MutagenTopicBuilder.FromDiscussion(
             281,
-            "Empty Inventory",
+            "Unique Npc Has Empty Inventory",
             Severity.Warning)
-        .WithoutFormatting("Npc has no items in inventory");
+        .WithoutFormatting("Unique Npc has no items in inventory");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoItems];
 
