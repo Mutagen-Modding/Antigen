@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
 
@@ -42,6 +42,11 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
             Severity.Error)
         .WithoutFormatting("CrimeGold conditions running on player with null faction reference will not work correctly as this would check if the player has committed a crime against themselves");
 
+    public static readonly TopicDefinition<ILeveledItemGetter> GetEquippedLeveledItem = MutagenTopicBuilder.DevelopmentTopic(
+            "GetEquipped used with leveled item parameter",
+            Severity.Error)
+        .WithFormatting<ILeveledItemGetter>("GetEquipped condition used with leveled item {0} as parameter");
+
     public IEnumerable<TopicDefinition> Topics { get; } =
     [
         InvalidConditionReference,
@@ -50,6 +55,7 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
         GetCurrentTimeConditionWithOrOnDayBreak,
         GetCurrentTimeConditionWithAndOnDayBreak,
         GetCrimeGoldRunOnPlayer,
+        GetEquippedLeveledItem,
     ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
@@ -157,6 +163,10 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                         param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
                     }
 
+                    break;
+                case IGetEquippedConditionDataGetter getEquipped
+                    when getEquipped.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
+                    param.AddTopic(GetEquippedLeveledItem.Format(leveledItem));
                     break;
             }
         }
