@@ -4,60 +4,59 @@ using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
-namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Weapon
+namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Weapon;
+
+public class TemperAnalyzerWeapon : IContextualRecordAnalyzer<IWeaponGetter>
 {
-    public class TemperAnalyzerWeapon : IContextualRecordAnalyzer<IWeaponGetter>
+    public static readonly TopicDefinition NoTemper = MutagenTopicBuilder.FromDiscussion(
+            574,
+            "No weapon temper recipe",
+            Severity.Suggestion)
+        .WithoutFormatting("Weapon has no tempering recipe");
+
+    public static readonly TopicDefinition MultipleTemper = MutagenTopicBuilder.FromDiscussion(
+            575,
+            "Multiple weapon temper recipies",
+            Severity.Warning)
+        .WithoutFormatting("Weapon has multiple tempering recipies");
+
+    public IEnumerable<TopicDefinition> Topics => [NoTemper, MultipleTemper];
+
+    public void AnalyzeRecord(ContextualRecordAnalyzerParams<IWeaponGetter> param)
     {
-        public static readonly TopicDefinition NoTemper = MutagenTopicBuilder.FromDiscussion(
-                574,
-                "No weapon temper recipe",
-                Severity.Suggestion)
-            .WithoutFormatting("Weapon has no tempering recipe");
+        var weapon = param.Record;
+        // Items with templates inherit their template's temper recipe
+        if (!weapon.Template.IsNull)
+            return;
+        if (weapon.Data?.Flags.HasFlag(WeaponData.Flag.NonPlayable) ?? false)
+            return;
+        if (weapon.Data?.AnimationType == WeaponAnimationType.Staff)
+            return;
+        if (weapon.HasKeyword(FormKeys.SkyrimSE.Skyrim.Keyword.Dummy))
+            return;
 
-        public static readonly TopicDefinition MultipleTemper = MutagenTopicBuilder.FromDiscussion(
-                575,
-                "Multiple weapon temper recipies",
-                Severity.Warning)
-            .WithoutFormatting("Weapon has multiple tempering recipies");
+        var recipes = TemperRecipeAnalyzerUtil.GetTemperRecipes(
+            FormKeys.SkyrimSE.Skyrim.Keyword.CraftingSmithingSharpeningWheel,
+            param.ResolveCache<ILinkUsageCache>(),
+            param.LinkCache,
+            weapon)
+            .ToArray();
 
-        public IEnumerable<TopicDefinition> Topics => [NoTemper, MultipleTemper];
-
-        public void AnalyzeRecord(ContextualRecordAnalyzerParams<IWeaponGetter> param)
+        switch (recipes.Length)
         {
-            var weapon = param.Record;
-            // Items with templates inherit their template's temper recipe
-            if (!weapon.Template.IsNull)
-                return;
-            if (weapon.Data?.Flags.HasFlag(WeaponData.Flag.NonPlayable) ?? false)
-                return;
-            if (weapon.Data?.AnimationType == WeaponAnimationType.Staff)
-                return;
-            if (weapon.HasKeyword(FormKeys.SkyrimSE.Skyrim.Keyword.Dummy))
-                return;
-
-            var recipes = TemperRecipeAnalyzerUtil.GetTemperRecipes(
-                FormKeys.SkyrimSE.Skyrim.Keyword.CraftingSmithingSharpeningWheel,
-                param.ResolveCache<ILinkUsageCache>(),
-                param.LinkCache,
-                weapon)
-                .ToArray();
-
-            switch (recipes.Length)
-            {
-                case 0:
-                    param.AddTopic(NoTemper.Format());
-                    break;
-                case > 1:
-                    param.AddTopic(MultipleTemper.Format());
-                    break;
-            }
+            case 0:
+                param.AddTopic(NoTemper.Format());
+                break;
+            case > 1:
+                param.AddTopic(MultipleTemper.Format());
+                break;
         }
+    }
 
-        public IEnumerable<Func<IWeaponGetter, object?>> FieldsOfInterest()
-        {
-            yield return x => x.Template;
-            yield return x => x.Data;
-            yield return x => x.Keywords;
-        }
+    public IEnumerable<Func<IWeaponGetter, object?>> FieldsOfInterest()
+    {
+        yield return x => x.Template;
+        yield return x => x.Data;
+        yield return x => x.Keywords;
     }
 }
