@@ -30,7 +30,7 @@ public class TemperAnalyzerWeapon : IContextualRecordAnalyzer<IWeaponGetter>
             return;
         if (weapon.Data?.Flags.HasFlag(WeaponData.Flag.NonPlayable) ?? false)
             return;
-        if (weapon.Data?.AnimationType == WeaponAnimationType.Staff)
+        if (weapon.Data?.AnimationType is WeaponAnimationType.Staff or WeaponAnimationType.HandToHand)
             return;
         if (weapon.HasKeyword(FormKeys.SkyrimSE.Skyrim.Keyword.Dummy))
             return;
