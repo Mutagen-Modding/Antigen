@@ -23,12 +23,9 @@ public class InventoryOwnershipAnalyzer : IContextualRecordAnalyzer<INpcGetter>
         {
             if (entry.Data?.Owner is not INpcOwnerGetter owner) continue;
 
-            foreach (var enumerator in owner.EnumerateFormLinks())
+            if(Equals(owner.Npc, npc))
             {
-                if (enumerator.FormKeyNullable == npc.FormKey)
-                {
-                    param.AddTopic(InventoryItemWithOwner.Format(entry.Item.Item.TryResolve(param.LinkCache)));
-                }
+                param.AddTopic(InventoryItemWithOwner.Format(entry.Item.Item.TryResolve(param.LinkCache)));
             }
 
         }
