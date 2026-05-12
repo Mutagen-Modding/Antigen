@@ -265,7 +265,7 @@ public class ConditionAnalyzerTest
                 var data = (rec.Conditions[0].Data as IGetEquippedConditionData);
                 data!.ItemOrList.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Armor.ArmorIronCuirass);
             },
-            ConditionAnalyzer.GetEquippedLeveledItem);
+            ConditionAnalyzer.LeveledItemParameter);
     }
 
     [Theory, MutagenModAutoData]
@@ -286,6 +286,6 @@ public class ConditionAnalyzerTest
                 var data = (rec.Conditions[0].Data as IGetItemCountConditionData);
                 data!.ItemOrList.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Armor.ArmorIronCuirass);
             },
-            ConditionAnalyzer.GetEquippedLeveledItem);
+            ConditionAnalyzer.LeveledItemParameter);
     }
 }

@@ -42,7 +42,7 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
             Severity.Error)
         .WithoutFormatting("CrimeGold conditions running on player with null faction reference will not work correctly as this would check if the player has committed a crime against themselves");
 
-    public static readonly TopicDefinition<ILeveledItemGetter> GetEquippedLeveledItem = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<ILeveledItemGetter> LeveledItemParameter = MutagenTopicBuilder.FromDiscussion(
             570,
             "Leveled item parameter",
             Severity.Error)
@@ -56,7 +56,7 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
         GetCurrentTimeConditionWithOrOnDayBreak,
         GetCurrentTimeConditionWithAndOnDayBreak,
         GetCrimeGoldRunOnPlayer,
-        GetEquippedLeveledItem,
+        LeveledItemParameter,
     ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
@@ -166,11 +166,11 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                     break;
                 case IGetItemCountConditionData getItemCount
                     when getItemCount.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
-                    param.AddTopic(GetEquippedLeveledItem.Format(leveledItem));
+                    param.AddTopic(LeveledItemParameter.Format(leveledItem));
                     break;
                 case IGetEquippedConditionDataGetter getEquipped
                     when getEquipped.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
-                    param.AddTopic(GetEquippedLeveledItem.Format(leveledItem));
+                    param.AddTopic(LeveledItemParameter.Format(leveledItem));
                     break;
             }
         }
