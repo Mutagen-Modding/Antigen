@@ -2,15 +2,15 @@ using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
-namespace Mutagen.Bethesda.Analyzers.Skyrim.Util;
+namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
-public static class TemperRecipeAnalyzerUtil
+public static class ConstructibleExtensions
 {
     public static IEnumerable<IConstructibleObjectGetter> GetTemperRecipes(
+        this IConstructibleGetter item,
         IFormLink<IKeywordGetter> temperKeyword,
         ILinkUsageCache usageCache,
-        ILinkCache linkCache,
-        IConstructibleGetter item)
+        ILinkCache linkCache)
     {
         return usageCache
             .GetUsagesOf<IConstructibleObjectGetter>(item).UsageLinks

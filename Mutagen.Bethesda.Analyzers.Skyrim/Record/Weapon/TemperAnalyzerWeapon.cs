@@ -35,11 +35,10 @@ public class TemperAnalyzerWeapon : IContextualRecordAnalyzer<IWeaponGetter>
         if (weapon.HasKeyword(FormKeys.SkyrimSE.Skyrim.Keyword.Dummy))
             return;
 
-        var recipes = TemperRecipeAnalyzerUtil.GetTemperRecipes(
+        var recipes = weapon.GetTemperRecipes(
             FormKeys.SkyrimSE.Skyrim.Keyword.CraftingSmithingSharpeningWheel,
             param.ResolveCache<ILinkUsageCache>(),
-            param.LinkCache,
-            weapon)
+            param.LinkCache)
             .ToArray();
 
         switch (recipes.Length)

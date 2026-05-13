@@ -37,11 +37,10 @@ public class TemperAnalyzerArmor : IContextualRecordAnalyzer<IArmorGetter>
         if (armor.HasKeyword(FormKeys.SkyrimSE.Skyrim.Keyword.Dummy))
             return;
 
-        var recipes = TemperRecipeAnalyzerUtil.GetTemperRecipes(
+        var recipes = armor.GetTemperRecipes(
             FormKeys.SkyrimSE.Skyrim.Keyword.CraftingSmithingArmorTable,
             param.ResolveCache<ILinkUsageCache>(),
-            param.LinkCache,
-            armor)
+            param.LinkCache)
             .ToArray();
 
         switch (recipes.Length)
