@@ -20,6 +20,7 @@ public class DialogueAliasAnalyzer : IContextualRecordAnalyzer<IQuestGetter>
         var quest = param.Record;
         var relevantAliases = quest.Aliases
             .Where(alias => alias.IsForcedNone(quest))
+            .Where(alias => alias.VoiceTypes.IsNull)
             .ToList();
 
         if (relevantAliases.Count == 0) return;
@@ -33,7 +34,7 @@ public class DialogueAliasAnalyzer : IContextualRecordAnalyzer<IQuestGetter>
 
             foreach (var response in topic.Responses)
             {
-                if (response.Speaker.IsNull) continue;
+                if (!response.Speaker.IsNull) continue;
 
                 foreach (var condition in response.Conditions)
                 {
