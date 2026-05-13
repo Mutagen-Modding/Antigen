@@ -16,9 +16,9 @@ public class TemperAnalyzerWeapon : IContextualRecordAnalyzer<IWeaponGetter>
 
     public static readonly TopicDefinition MultipleTemper = MutagenTopicBuilder.FromDiscussion(
             575,
-            "Multiple weapon temper recipies",
+            "Multiple weapon temper recipes",
             Severity.Warning)
-        .WithoutFormatting("Weapon has multiple tempering recipies");
+        .WithoutFormatting("Weapon has multiple tempering recipes");
 
     public IEnumerable<TopicDefinition> Topics => [NoTemper, MultipleTemper];
 
