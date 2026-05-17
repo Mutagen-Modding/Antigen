@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
 
@@ -6,41 +6,47 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record;
 
 public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGetter>
 {
-    private static readonly TopicDefinition<string?> InvalidConditionReference = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<string?> InvalidConditionReference = MutagenTopicBuilder.FromDiscussion(
             213,
             "Condition Runs on Null Reference",
             Severity.Error)
         .WithFormatting<string?>("Condition {0} runs on reference, but reference is null");
 
-    private static readonly TopicDefinition<int, IConditionGetter> InvalidStageCondition = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<int, IConditionGetter> InvalidStageCondition = MutagenTopicBuilder.FromDiscussion(
             360,
             "Invalid Quest Stage referenced in Condition",
             Severity.Error)
         .WithFormatting<int, IConditionGetter>("Quest stage {0} referenced in condition {0} is invalid");
 
-    private static readonly TopicDefinition<INpcGetter> GetDeadCondition = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<INpcGetter> GetDeadCondition = MutagenTopicBuilder.FromDiscussion(
             361,
             "GetDead condition used on unique npc",
             Severity.Warning)
         .WithFormatting<INpcGetter>("GetDead used on unique npc {0} instead of GetDeadCount");
 
-    private static readonly TopicDefinition GetCurrentTimeConditionWithOrOnDayBreak = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition GetCurrentTimeConditionWithOrOnDayBreak = MutagenTopicBuilder.FromDiscussion(
             543,
             "GetCurrentTime conditions with OR operator are always true",
             Severity.Error)
         .WithoutFormatting("GetCurrentTime conditions with OR operator are always true");
 
-    private static readonly TopicDefinition GetCurrentTimeConditionWithAndOnDayBreak = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition GetCurrentTimeConditionWithAndOnDayBreak = MutagenTopicBuilder.FromDiscussion(
             544,
             "GetCurrentTime conditions with AND operator on Day Break are never true",
             Severity.Error)
         .WithoutFormatting("GetCurrentTime conditions with AND operator on day break can never be true");
 
-    private static readonly TopicDefinition GetCrimeGoldRunOnPlayer = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition GetCrimeGoldRunOnPlayer = MutagenTopicBuilder.FromDiscussion(
             545,
             "CrimeGold conditions running on Player with Null Faction Reference",
             Severity.Error)
         .WithoutFormatting("CrimeGold conditions running on player with null faction reference will not work correctly as this would check if the player has committed a crime against themselves");
+
+    public static readonly TopicDefinition<ILeveledItemGetter> LeveledItemParameter = MutagenTopicBuilder.FromDiscussion(
+            570,
+            "Leveled item parameter",
+            Severity.Error)
+        .WithFormatting<ILeveledItemGetter>("Condition used with leveled item {0} as parameter");
 
     public IEnumerable<TopicDefinition> Topics { get; } =
     [
@@ -50,6 +56,7 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
         GetCurrentTimeConditionWithOrOnDayBreak,
         GetCurrentTimeConditionWithAndOnDayBreak,
         GetCrimeGoldRunOnPlayer,
+        LeveledItemParameter,
     ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
@@ -77,8 +84,7 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                     break;
                 case IGetDeadConditionDataGetter
                     when condition.Data.RunOnType == Condition.RunOnType.Reference
-                         && condition.Data.Reference.TryResolve(param.LinkCache, out var reference)
-                         && reference is IPlacedNpcGetter placedNpc
+                         && condition.Data.Reference.TryResolve<IPlacedNpcGetter>(param.LinkCache, out var placedNpc)
                          && placedNpc.Base.TryResolve(param.LinkCache, out var npc)
                          && npc.IsUnique():
                     param.AddTopic(
@@ -157,6 +163,14 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                         param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
                     }
 
+                    break;
+                case IGetItemCountConditionData getItemCount
+                    when getItemCount.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
+                    param.AddTopic(LeveledItemParameter.Format(leveledItem));
+                    break;
+                case IGetEquippedConditionDataGetter getEquipped
+                    when getEquipped.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
+                    param.AddTopic(LeveledItemParameter.Format(leveledItem));
                     break;
             }
         }

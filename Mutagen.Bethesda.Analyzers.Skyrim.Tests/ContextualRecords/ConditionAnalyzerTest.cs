@@ -1,0 +1,291 @@
+using Mutagen.Bethesda.Analyzers.Skyrim.Record;
+using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
+using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Testing.AutoData;
+using Xunit;
+
+namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests.ContextualRecords;
+
+using Fixture = ContextualRecordTestFixture<ConditionAnalyzer, DialogResponses, ISkyrimMajorRecordGetter>;
+
+public class ConditionAnalyzerTest
+{
+    static void AddCondition(
+        DialogResponses rec,
+        ConditionData data,
+        float comparisonValue,
+        bool and = false,
+        CompareOperator op = CompareOperator.EqualTo)
+    {
+        rec.Conditions.Add(new ConditionFloat()
+        {
+            Flags = and ? 0 : Condition.Flag.OR,
+            Data = data,
+            ComparisonValue = comparisonValue,
+            CompareOperator = op,
+        });
+    }
+
+    // Condition.Reference should not be null if RunOnType == Reference
+    [Theory, MutagenModAutoData]
+    public void RunOnNull(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                AddCondition(rec, new GetActorValueConditionData()
+                {
+                    RunOnType = Condition.RunOnType.Reference,
+                    //Reference = null
+                }, 0);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                rec.Conditions[0].Data.Reference.SetTo(FormKeys.SkyrimSE.Skyrim.PlacedNpc.DelphineREF);
+            },
+            ConditionAnalyzer.InvalidConditionReference);
+    }
+
+    // GetStage should compare to an existing stage
+    [Theory, MutagenModAutoData]
+    public void InvalidQuestStageGetStage(Fixture fixture)
+    {
+
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var quest = fixture.Create<Quest>();
+                mod.Quests.Add(quest);
+                quest.Stages.Add(new QuestStage() { Index = 10 });
+
+                var data = new GetStageConditionData();
+                data.Quest.Link.SetTo(quest);
+
+                AddCondition(rec, data, 20);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                (rec.Conditions[0] as IConditionFloat)!.ComparisonValue = 10;
+            },
+            ConditionAnalyzer.InvalidStageCondition);
+    }
+
+    // GetStage may compare to stage zero, even if it does not exist
+    // This does not apply to GetStageDone
+    [Theory, MutagenModAutoData]
+    public void GetStageZero(Fixture fixture)
+    {
+        var quest = fixture.Create<Quest>();
+
+        fixture.Run(
+            prepForError: (rec, mod) => {
+                mod.Quests.Add(quest);
+                // No stage 0
+                //quest.Stages.Add(new QuestStage() { Index = 0 });
+
+                var data = new GetStageDoneConditionData();
+                data.Quest.Link.SetTo(quest);
+                data.Stage = 0;
+
+                AddCondition(rec, data, 0);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                var data = new GetStageConditionData();
+                data.Quest.Link.SetTo(quest);
+                var condition = rec.Conditions[0] as IConditionFloat;
+                condition!.Data = data;
+                condition.ComparisonValue = 0;
+            },
+            ConditionAnalyzer.InvalidStageCondition);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void InvalidQuestStageGetStageDone(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var quest = fixture.Create<Quest>();
+                mod.Quests.Add(quest);
+                quest.Stages.Add(new QuestStage() { Index = 10 });
+
+                var data = new GetStageDoneConditionData();
+                data.Quest.Link.SetTo(quest);
+                data.Stage = 20;
+                AddCondition(rec, data, 1);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                (rec.Conditions[0].Data as IGetStageDoneConditionData)!.Stage = 10;
+            },
+            ConditionAnalyzer.InvalidStageCondition);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void GetDeadOnUnique(Fixture fixture)
+    {
+        var npc = fixture.Create<Npc>();
+        npc.Configuration.Flags |= NpcConfiguration.Flag.Unique;
+
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                mod.Npcs.Add(npc);
+                var cell = fixture.Create<Cell>();
+                cell.Flags |= Cell.Flag.IsInteriorCell;
+                mod.Cells.AddInteriorCell(cell);
+
+                var placed = fixture.Create<PlacedNpc>();
+                placed.Base.SetTo(npc);
+                cell.Temporary.Add(placed);
+
+                var data = new GetDeadConditionData();
+                data.Reference.SetTo(placed);
+                data.RunOnType = Condition.RunOnType.Reference;
+                AddCondition(rec, data, 1);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                var data = new GetDeadCountConditionData();
+                data.Npc.Link.SetTo(npc);
+                rec.Conditions[0].Data = data;
+            },
+            ConditionAnalyzer.GetDeadCondition);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void GetCurrentTimeAlwaysTrue(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                // Time > 10 || Time < 20
+                AddCondition(rec, new GetCurrentTimeConditionData(), 10, and: false, CompareOperator.GreaterThan);
+                AddCondition(rec, new GetCurrentTimeConditionData(), 20, and: false, CompareOperator.LessThan);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                // Time > 10 && Time < 20
+                rec.Conditions[0].Flags &= ~Condition.Flag.OR;
+            },
+            ConditionAnalyzer.GetCurrentTimeConditionWithOrOnDayBreak);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void GetCurrentTimeAlwaysFalse(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                // Time < 10 && Time > 20
+                AddCondition(rec, new GetCurrentTimeConditionData(), 10, and: true, CompareOperator.LessThan);
+                AddCondition(rec, new GetCurrentTimeConditionData(), 20, and: true, CompareOperator.GreaterThan);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                // Time < 10 || Time > 20
+                rec.Conditions[0].Flags |= Condition.Flag.OR;
+            },
+            ConditionAnalyzer.GetCurrentTimeConditionWithAndOnDayBreak);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void CrimeGoldOnPlayer(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var data = new GetCrimeGoldConditionData();
+                data.Reference.SetTo(FormKeys.SkyrimSE.Skyrim.PlayerRef);
+                data.RunOnType = Condition.RunOnType.Reference;
+                AddCondition(rec, data, 0);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                var data = rec.Conditions[0].Data as IGetCrimeGoldConditionData;
+                data!.Faction.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Faction.CrimeFactionWhiterun);
+            },
+            ConditionAnalyzer.GetCrimeGoldRunOnPlayer);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void CrimeGoldOnPlayerViolent(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var data = new GetCrimeGoldViolentConditionData();
+                data.Reference.SetTo(FormKeys.SkyrimSE.Skyrim.PlayerRef);
+                data.RunOnType = Condition.RunOnType.Reference;
+                AddCondition(rec, data, 0);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                var data = rec.Conditions[0].Data as IGetCrimeGoldViolentConditionData;
+                data!.Faction.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Faction.CrimeFactionWhiterun);
+            },
+            ConditionAnalyzer.GetCrimeGoldRunOnPlayer);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void CrimeGoldOnPlayerNonViolent(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var data = new GetCrimeGoldNonviolentConditionData();
+                data.Reference.SetTo(FormKeys.SkyrimSE.Skyrim.PlayerRef);
+                data.RunOnType = Condition.RunOnType.Reference;
+                AddCondition(rec, data, 0);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                var data = rec.Conditions[0].Data as IGetCrimeGoldNonviolentConditionData;
+                data!.Faction.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Faction.CrimeFactionWhiterun);
+            },
+            ConditionAnalyzer.GetCrimeGoldRunOnPlayer);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void GetEquippedLeveledItem(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var lvli = fixture.Create<LeveledItem>();
+                mod.LeveledItems.Add(lvli);
+
+                var data = new GetEquippedConditionData();
+                data.ItemOrList.Link.SetTo(lvli);
+                AddCondition(rec, data, 0);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                var data = (rec.Conditions[0].Data as IGetEquippedConditionData);
+                data!.ItemOrList.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Armor.ArmorIronCuirass);
+            },
+            ConditionAnalyzer.LeveledItemParameter);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void GetCountLeveledItem(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var lvli = fixture.Create<LeveledItem>();
+                mod.LeveledItems.Add(lvli);
+
+                var data = new GetItemCountConditionData();
+                data.ItemOrList.Link.SetTo(lvli);
+                AddCondition(rec, data, 0);
+            },
+            prepForFix: (rec, mod) =>
+            {
+                var data = (rec.Conditions[0].Data as IGetItemCountConditionData);
+                data!.ItemOrList.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Armor.ArmorIronCuirass);
+            },
+            ConditionAnalyzer.LeveledItemParameter);
+    }
+}
