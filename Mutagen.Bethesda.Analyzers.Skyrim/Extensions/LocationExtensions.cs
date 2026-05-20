@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
@@ -6,19 +6,12 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
 public static class LocationExtensions
 {
-    public static bool IsLocationAppliedToInterior(this ILocationGetter location, ILinkCache linkCache)
+    public static bool IsLocationAppliedToInterior(this ILocationGetter location, ILinkCache linkCache, ILinkUsageCache usageCache)
     {
-        // todo with reference cache, this can be optimized
-        var interiorLocations = new HashSet<FormKey>();
-        foreach (var cell in linkCache.PriorityOrder.WinningOverrides<ICellGetter>())
-        {
-            if (cell.IsInteriorCell() && !cell.Location.FormKey.IsNull)
-            {
-                interiorLocations.Add(cell.Location.FormKey);
-            }
-        }
-
-        return interiorLocations.Contains(location.FormKey);
+        return usageCache.GetUsagesOf<ICellGetter>(location).UsageLinks
+            .Select(c => c.Resolve(linkCache))
+            .Where(c => c.Location.Equals(location))
+            .Any(c => c.IsInteriorCell());
     }
 
     private static readonly HashSet<IFormLinkGetter<IKeywordGetter>> SettlementKeywords =

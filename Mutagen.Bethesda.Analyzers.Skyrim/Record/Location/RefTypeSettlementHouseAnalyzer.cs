@@ -1,6 +1,7 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Location;
@@ -32,7 +33,7 @@ public class RefTypeSettlementHouseAnalyzer : IContextualRecordAnalyzer<ILocatio
 
         if (!location.IsSettlementLocation()) return;
         if (!location.IsSettlementHouseLocationNotPlayerHome()) return;
-        if (!location.IsLocationAppliedToInterior(param.LinkCache)) return;
+        if (!location.IsLocationAppliedToInterior(param.LinkCache, param.ResolveCache<ILinkUsageCache>())) return;
 
         if (location.LocationRefTypesReferences().Any(staticRef => HouseContainerRefTypes.Contains(staticRef.LocationRefType)))
         {
