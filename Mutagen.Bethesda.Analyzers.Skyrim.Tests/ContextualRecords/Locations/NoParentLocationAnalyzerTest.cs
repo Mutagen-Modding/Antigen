@@ -1,8 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record.Location;
 using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
 using Mutagen.Bethesda.Skyrim;
