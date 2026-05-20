@@ -1,5 +1,6 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Cell.Interior.Settlement;
@@ -24,19 +25,17 @@ public class NoMerchantChestLocRefTypeAnalyzer : IContextualRecordAnalyzer<ICell
     {
         var cell = param.Record;
 
-        var merchantChests = param.LinkCache.PriorityOrder.WinningOverrides<IFactionGetter>()
-            .Where(faction => faction.Flags.HasFlag(Bethesda.Skyrim.Faction.FactionFlag.Vendor))
-            .Select(faction => faction.MerchantContainer.FormKey)
-            .ToHashSet();
-
         // Skip non-settlement cells
         if (!cell.IsSettlementCell(param.LinkCache)) return;
 
         foreach (var placedObject in cell.GetAllPlaced(param.LinkCache).OfType<IPlacedObjectGetter>())
         {
             if (placedObject.IsDeleted) continue;
-            // todo: replace with reference cache
-            var isMerchantChest = merchantChests.Contains(placedObject.FormKey);
+
+            var isMerchantChest = param.ResolveCache<ILinkUsageCache>()
+                .GetUsagesOf<IFactionGetter>(placedObject).UsageLinks
+                .Select(f => f.Resolve(param.LinkCache))
+                .Any(f => f.MerchantContainer.Equals(placedObject));
             var hasLocRefType = placedObject.HasLocationRefType(FormKeys.SkyrimSE.Skyrim.LocationReferenceType.MerchantContainerRefType);
 
             if (isMerchantChest && !hasLocRefType)
