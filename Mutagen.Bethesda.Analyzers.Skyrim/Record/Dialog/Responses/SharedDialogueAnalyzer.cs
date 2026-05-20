@@ -1,5 +1,6 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
@@ -34,17 +35,16 @@ public class SharedDialogueAnalyzer : IContextualRecordAnalyzer<IDialogResponses
                 ScriptInSharedDialogue.Format());
         }
 
-        // TODO: add when there is a reference cache - this is too slow
-        // var isNotUsed = param.LinkCache.PriorityOrder
-        //     .SelectMany(x => x.EnumerateMajorRecords<IDialogResponsesGetter>())
-        //     .Where(r => !r.ResponseData.IsNull)
-        //     .All(r => r.ResponseData.FormKey != responses.FormKey);
-        //
-        // if (isNotUsed)
-        // {
-        //     param.AddTopic(
-        //         UnusedSharedDialogue.Format());
-        // }
+        bool isUsed = param.ResolveCache<ILinkUsageCache>()
+            .GetUsagesOf<IDialogResponsesGetter>(responses).UsageLinks
+            .Select(r => r.Resolve(param.LinkCache))
+            .Any(r => r.ResponseData.Equals(responses));
+
+        if (!isUsed)
+        {
+            param.AddTopic(
+                UnusedSharedDialogue.Format());
+        }
     }
 
     public IEnumerable<Func<IDialogResponsesGetter, object?>> FieldsOfInterest()
