@@ -1,6 +1,7 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Location;
@@ -29,6 +30,11 @@ public class NoParentLocationAnalyzer : IContextualRecordAnalyzer<ILocationGette
     {
         var location = param.Record;
 
+        if (!location.ParentLocation.IsNull)
+        {
+            return;
+        }
+
         // Ignore some well known top level locations
         if (ValidTopLevelLocations.Contains(location))
         {
@@ -36,17 +42,17 @@ public class NoParentLocationAnalyzer : IContextualRecordAnalyzer<ILocationGette
         }
 
         // Ignore locations that are assigned on a worldspace level
-        if (param.LinkCache.PriorityOrder.WinningOverrides<IWorldspaceGetter>()
-            .Select(x => x.Location)
-            .Any(x => x.FormKey == location.FormKey))
+        var isWorldspaceLocation = param.ResolveCache<ILinkUsageCache>()
+            .GetUsagesOf<IWorldspaceGetter>(location).UsageLinks
+            .Select(w => w.Resolve(param.LinkCache))
+            .Any(w => w.Location.Equals(location));
+
+        if (isWorldspaceLocation)
         {
             return;
         }
 
-        if (location.ParentLocation.IsNull)
-        {
-            param.AddTopic(NoParentLocation.Format());
-        }
+        param.AddTopic(NoParentLocation.Format());
     }
 
     public IEnumerable<Func<ILocationGetter, object?>> FieldsOfInterest()
