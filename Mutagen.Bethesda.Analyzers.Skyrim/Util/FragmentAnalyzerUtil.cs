@@ -1,12 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins.Records;
-using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Util;
@@ -20,7 +14,7 @@ public static class FragmentAnalyzerUtil
     {
         var duplicates = fragments
             .WhereNotNull()
-            .GroupBy(nameSelector)
+            .GroupBy(nameSelector, StringComparer.OrdinalIgnoreCase)
             .Where(g => g.CountGreaterThan(1));
 
         foreach (var dupe in duplicates)
