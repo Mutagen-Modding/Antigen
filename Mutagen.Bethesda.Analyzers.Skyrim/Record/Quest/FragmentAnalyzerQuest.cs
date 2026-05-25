@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -21,7 +22,7 @@ public partial class FragmentAnalyzerQuest : IIsolatedRecordAnalyzer<IQuestGette
             Severity.Suggestion)
         .WithFormatting<string>("Quest has empty fragment script {0}");
 
-    public IEnumerable<TopicDefinition> Topics => [DuplicateFragment];
+    public IEnumerable<TopicDefinition> Topics => [DuplicateFragment, EmptyFragment];
 
     // Find the first attached script that appears to be a fragment script
     public static string? GetFragmentScriptName(IEnumerable<IScriptEntryGetter> scripts)
@@ -33,22 +34,19 @@ public partial class FragmentAnalyzerQuest : IIsolatedRecordAnalyzer<IQuestGette
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IQuestGetter> param)
     {
-        var quest = param.Record;
-        if (quest.VirtualMachineAdapter == null)
+        var vmad = param.Record.VirtualMachineAdapter;
+        if (vmad == null)
             return;
 
-        var duplicates = quest.VirtualMachineAdapter.Fragments
-            .GroupBy(f => f.FragmentName)
-            .Where(g => g.CountGreaterThan(1));
+        FragmentAnalyzerUtil.CheckDuplicateFragments(
+            param,
+            DuplicateFragment,
+            vmad.Fragments,
+            f => f.FragmentName);
 
-        foreach (var dupe in duplicates)
+        if (vmad.Fragments.Count == 0)
         {
-            param.AddTopic(DuplicateFragment.Format(dupe.Key), ("Usages", dupe));
-        }
-
-        if (quest.VirtualMachineAdapter.Fragments.Count == 0)
-        {
-            var fragment = GetFragmentScriptName(quest.VirtualMachineAdapter.Scripts);
+            var fragment = GetFragmentScriptName(vmad.Scripts);
             if (fragment != null)
             {
                 param.AddTopic(EmptyFragment.Format(fragment));
