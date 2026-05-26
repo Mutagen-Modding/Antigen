@@ -59,7 +59,7 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
         {
             new ModListing<ISkyrimMod>(mod)
         };
-        var linkCache = loadOrder.ToMutableLinkCache();
+        var linkCache = mod.ToMutableLinkCache();
         var dropOff = new TestDropoff();
         return new TestParameters()
         {
