@@ -7,13 +7,15 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Scene;
 
 public class FragmentAnalyzerScene : IIsolatedRecordAnalyzer<ISceneGetter>
 {
-    public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Duplicate fragment scene",
+    public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.FromDiscussion(
+            591,
+            "Duplicate scene fragment name",
             Severity.Error)
         .WithFormatting<string>("Fragment function {0} is used multiple times");
 
-    public static readonly TopicDefinition EmptyFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Empty fragment scene",
+    public static readonly TopicDefinition EmptyFragment = MutagenTopicBuilder.FromDiscussion(
+            592,
+            "Empty scene fragment script",
             Severity.Suggestion)
         .WithoutFormatting("Scene has script attached, but no fragments");
 

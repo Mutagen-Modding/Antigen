@@ -11,13 +11,15 @@ public partial class FragmentAnalyzerQuest : IIsolatedRecordAnalyzer<IQuestGette
     [GeneratedRegex(@"^([A-Z0-9]{1,4}_)?QF_", RegexOptions.IgnoreCase)]
     private static partial Regex FragmentRegex { get; }
 
-    public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Duplicate fragment quest",
+    public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.FromDiscussion(
+            584,
+            "Duplicate quest fragment name",
             Severity.Error)
         .WithFormatting<string>("Fragment function {0} is used multiple times");
 
-    public static readonly TopicDefinition<string> EmptyFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Empty fragment quest",
+    public static readonly TopicDefinition<string> EmptyFragment = MutagenTopicBuilder.FromDiscussion(
+            585,
+            "Empty quest fragment script",
             Severity.Suggestion)
         .WithFormatting<string>("Quest has empty fragment script {0}");
 

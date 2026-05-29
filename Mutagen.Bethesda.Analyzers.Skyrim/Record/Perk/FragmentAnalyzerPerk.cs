@@ -7,13 +7,15 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Perk;
 
 public class FragmentAnalyzerPerk : IIsolatedRecordAnalyzer<IPerkGetter>
 {
-    public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Duplicate fragment perk",
+    public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.FromDiscussion(
+            589,
+            "Duplicate perk fragment name",
             Severity.Error)
         .WithFormatting<string>("Fragment function {0} is used multiple times");
 
-    public static readonly TopicDefinition EmptyFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Empty fragment perk",
+    public static readonly TopicDefinition EmptyFragment = MutagenTopicBuilder.FromDiscussion(
+            590,
+            "Empty perk fragment script",
             Severity.Suggestion)
         .WithoutFormatting("Perk has script attached, but no fragments");
 
