@@ -1,5 +1,6 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -20,20 +21,24 @@ public class DialogueAliasAnalyzer : IContextualRecordAnalyzer<IQuestGetter>
         var quest = param.Record;
         var relevantAliases = quest.Aliases
             .Where(alias => alias.IsForcedNone(quest))
+            .Where(alias => alias.VoiceTypes.IsNull)
             .ToList();
 
         if (relevantAliases.Count == 0) return;
 
         var referencedDialogue = new Dictionary<IQuestAliasGetter, List<IDialogResponsesGetter>>();
 
-        // TODO: potentially replace with reference cache
-        foreach (var topic in param.LinkCache.PriorityOrder.WinningOverrides<IDialogTopicGetter>())
+        var topics = param.ResolveCache<ILinkUsageCache>()
+            .GetUsagesOf<IDialogTopicGetter>(quest).UsageLinks
+            .Select(t => t.Resolve(param.LinkCache));
+
+        foreach (var topic in topics)
         {
             if (quest.FormKey != topic.Quest.FormKey) continue;
 
             foreach (var response in topic.Responses)
             {
-                if (response.Speaker.IsNull) continue;
+                if (!response.Speaker.IsNull) continue;
 
                 foreach (var condition in response.Conditions)
                 {
