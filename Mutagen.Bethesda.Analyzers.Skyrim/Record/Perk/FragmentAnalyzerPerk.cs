@@ -8,14 +8,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Perk;
 public class FragmentAnalyzerPerk : IIsolatedRecordAnalyzer<IPerkGetter>
 {
     public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Duplicate fragment",
+            "Duplicate fragment perk",
             Severity.Error)
         .WithFormatting<string>("Fragment function {0} is used multiple times");
 
     public static readonly TopicDefinition EmptyFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Empty fragment script",
+            "Empty fragment perk",
             Severity.Suggestion)
-        .WithoutFormatting("Responses has script attached, but no fragments");
+        .WithoutFormatting("Perk has script attached, but no fragments");
 
     public IEnumerable<TopicDefinition> Topics => [DuplicateFragment, EmptyFragment];
 
@@ -34,8 +34,7 @@ public class FragmentAnalyzerPerk : IIsolatedRecordAnalyzer<IPerkGetter>
             FragmentAnalyzerUtil.CheckDuplicateFragments(
                 param,
                 DuplicateFragment,
-                vmad.ScriptFragments.Fragments,
-                f => f.FragmentName);
+                vmad.ScriptFragments.Fragments.Select(f => f.FragmentName));
         }
     }
 

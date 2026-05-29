@@ -8,12 +8,12 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Scene;
 public class FragmentAnalyzerScene : IIsolatedRecordAnalyzer<ISceneGetter>
 {
     public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Duplicate fragment",
+            "Duplicate fragment scene",
             Severity.Error)
         .WithFormatting<string>("Fragment function {0} is used multiple times");
 
     public static readonly TopicDefinition EmptyFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Empty fragment script",
+            "Empty fragment scene",
             Severity.Suggestion)
         .WithoutFormatting("Scene has script attached, but no fragments");
 
@@ -31,12 +31,14 @@ public class FragmentAnalyzerScene : IIsolatedRecordAnalyzer<ISceneGetter>
         }
         else
         {
-            // FIXME: Also include OnBegin and OnEnd, these are a different interface, may want to do it in Mutagen directly
+            var names = vmad.ScriptFragments.PhaseFragments
+                .Select(f => f.FragmentName)
+                .Append(vmad.ScriptFragments.OnBegin?.FragmentName)
+                .Append(vmad.ScriptFragments.OnEnd?.FragmentName);
             FragmentAnalyzerUtil.CheckDuplicateFragments(
                 param,
                 DuplicateFragment,
-                vmad.ScriptFragments.PhaseFragments,
-                f => f.FragmentName);
+                names);
         }
     }
 

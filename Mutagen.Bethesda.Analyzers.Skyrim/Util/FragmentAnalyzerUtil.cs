@@ -6,20 +6,19 @@ using Noggog;
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Util;
 public static class FragmentAnalyzerUtil
 {
-    public static void CheckDuplicateFragments<T, U>(
+    public static void CheckDuplicateFragments<T>(
         IsolatedRecordAnalyzerParams<T> param,
         TopicDefinition<string> topic,
-        IEnumerable<U?> fragments,
-        Func<U, string> nameSelector) where T : IMajorRecordGetter where U : class
+        IEnumerable<string?> fragmentNames) where T : IMajorRecordGetter
     {
-        var duplicates = fragments
+        var duplicates = fragmentNames
             .WhereNotNull()
-            .GroupBy(nameSelector, StringComparer.OrdinalIgnoreCase)
+            .GroupBy(f => f, StringComparer.OrdinalIgnoreCase)
             .Where(g => g.CountGreaterThan(1));
 
         foreach (var dupe in duplicates)
         {
-            param.AddTopic(topic.Format(dupe.Key), ("Usages", dupe));
+            param.AddTopic(topic.Format(dupe.Key));
         }
     }
 }

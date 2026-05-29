@@ -8,14 +8,14 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 public class FragmentAnalyzerResponses : IIsolatedRecordAnalyzer<IDialogResponsesGetter>
 {
     public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Duplicate fragment",
+            "Duplicate fragment dialog responses",
             Severity.Error)
         .WithFormatting<string>("Fragment function {0} is used multiple times");
 
     public static readonly TopicDefinition EmptyFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Empty fragment script",
+            "Empty fragment dialog responses",
             Severity.Suggestion)
-        .WithoutFormatting("Responses has script attached, but no fragments");
+        .WithoutFormatting("Dialog responses has script attached, but no fragments");
 
     public IEnumerable<TopicDefinition> Topics => [DuplicateFragment, EmptyFragment];
 
@@ -34,8 +34,7 @@ public class FragmentAnalyzerResponses : IIsolatedRecordAnalyzer<IDialogResponse
             FragmentAnalyzerUtil.CheckDuplicateFragments(
                 param,
                 DuplicateFragment,
-                [vmad.ScriptFragments.OnBegin, vmad.ScriptFragments.OnEnd],
-                f => f.FragmentName);
+                [vmad.ScriptFragments.OnBegin?.FragmentName, vmad.ScriptFragments.OnEnd?.FragmentName]);
         }
 
     }

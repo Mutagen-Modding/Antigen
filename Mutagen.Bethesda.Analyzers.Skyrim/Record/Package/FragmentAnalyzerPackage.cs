@@ -8,12 +8,12 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Package;
 public class FragmentAnalyzerPackage : IIsolatedRecordAnalyzer<IPackageGetter>
 {
     public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Duplicate fragment",
+            "Duplicate fragment package",
             Severity.Error)
         .WithFormatting<string>("Fragment function {0} is used multiple times");
 
     public static readonly TopicDefinition EmptyFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Empty fragment script",
+            "Empty fragment package",
             Severity.Suggestion)
         .WithoutFormatting("Package has script attached, but no fragments");
 
@@ -34,8 +34,7 @@ public class FragmentAnalyzerPackage : IIsolatedRecordAnalyzer<IPackageGetter>
             FragmentAnalyzerUtil.CheckDuplicateFragments(
                 param,
                 DuplicateFragment,
-                [vmad.ScriptFragments.OnBegin, vmad.ScriptFragments.OnChange, vmad.ScriptFragments.OnEnd],
-                f => f.FragmentName);
+                [vmad.ScriptFragments.OnBegin?.FragmentName, vmad.ScriptFragments.OnChange?.FragmentName, vmad.ScriptFragments.OnEnd?.FragmentName]);
         }
     }
 

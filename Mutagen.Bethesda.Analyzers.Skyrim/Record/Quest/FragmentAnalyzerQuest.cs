@@ -3,7 +3,6 @@ using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Util;
 using Mutagen.Bethesda.Skyrim;
-using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest;
 
@@ -13,12 +12,12 @@ public partial class FragmentAnalyzerQuest : IIsolatedRecordAnalyzer<IQuestGette
     private static partial Regex FragmentRegex { get; }
 
     public static readonly TopicDefinition<string> DuplicateFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Duplicate fragment",
+            "Duplicate fragment quest",
             Severity.Error)
         .WithFormatting<string>("Fragment function {0} is used multiple times");
 
     public static readonly TopicDefinition<string> EmptyFragment = MutagenTopicBuilder.DevelopmentTopic(
-            "Empty fragment script",
+            "Empty fragment quest",
             Severity.Suggestion)
         .WithFormatting<string>("Quest has empty fragment script {0}");
 
@@ -41,8 +40,7 @@ public partial class FragmentAnalyzerQuest : IIsolatedRecordAnalyzer<IQuestGette
         FragmentAnalyzerUtil.CheckDuplicateFragments(
             param,
             DuplicateFragment,
-            vmad.Fragments,
-            f => f.FragmentName);
+            vmad.Fragments.Select(f => f.FragmentName));
 
         if (vmad.Fragments.Count == 0)
         {

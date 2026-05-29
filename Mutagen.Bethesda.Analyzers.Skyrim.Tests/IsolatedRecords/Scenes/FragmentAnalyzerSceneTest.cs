@@ -54,7 +54,8 @@ public class FragmentAnalyzerSceneTest
             },
             prepForFix: rec =>
             {
-                rec.VirtualMachineAdapter!.ScriptFragments!.PhaseFragments[1].FragmentName = "Fragment_1";
+                rec.VirtualMachineAdapter!.ScriptFragments!.OnBegin!.FragmentName = "Fragment_1";
+                rec.VirtualMachineAdapter!.ScriptFragments!.OnEnd!.FragmentName = "Fragment_2";
             },
             FragmentAnalyzerScene.DuplicateFragment);
     }
