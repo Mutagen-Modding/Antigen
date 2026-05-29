@@ -1,4 +1,3 @@
-using Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record.Scene;
 using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
 using Mutagen.Bethesda.Skyrim;
@@ -72,7 +71,7 @@ public class FragmentAnalyzerSceneTest
             {
                 rec.VirtualMachineAdapter = null;
             },
-            FragmentAnalyzerResponses.EmptyFragment);
+            FragmentAnalyzerScene.EmptyFragment);
     }
 
     [Theory, MutagenModAutoData]
@@ -90,6 +89,6 @@ public class FragmentAnalyzerSceneTest
                     OnBegin = new() { FragmentName = "Fragment_0" }
                 };
             },
-            FragmentAnalyzerResponses.EmptyFragment);
+            FragmentAnalyzerScene.EmptyFragment);
     }
 }

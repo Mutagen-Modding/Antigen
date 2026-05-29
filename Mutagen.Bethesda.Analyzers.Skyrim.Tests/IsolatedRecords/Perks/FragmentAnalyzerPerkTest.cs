@@ -1,6 +1,4 @@
-using Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record.Perk;
-using Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest;
 using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Testing.AutoData;
@@ -34,7 +32,7 @@ public class FragmentAnalyzerPerkTest
             {
                 rec.VirtualMachineAdapter!.ScriptFragments!.Fragments[1].FragmentName = "Fragment_1";
             },
-            FragmentAnalyzerQuest.DuplicateFragment);
+            FragmentAnalyzerPerk.DuplicateFragment);
     }
 
     [Theory, MutagenModAutoData]
@@ -49,7 +47,7 @@ public class FragmentAnalyzerPerkTest
             {
                 rec.VirtualMachineAdapter = null;
             },
-            FragmentAnalyzerResponses.EmptyFragment);
+            FragmentAnalyzerPerk.EmptyFragment);
     }
 
     [Theory, MutagenModAutoData]
@@ -67,6 +65,6 @@ public class FragmentAnalyzerPerkTest
                     Fragments = [new() { FragmentName = "Fragment_0" }]
                 };
             },
-            FragmentAnalyzerResponses.EmptyFragment);
+            FragmentAnalyzerPerk.EmptyFragment);
     }
 }
