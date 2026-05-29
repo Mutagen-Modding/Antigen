@@ -14,7 +14,7 @@ public class FragmentAnalyzerResponses : IIsolatedRecordAnalyzer<IDialogResponse
         .WithFormatting<string>("Fragment function {0} is used multiple times");
 
     public static readonly TopicDefinition EmptyFragment = MutagenTopicBuilder.FromDiscussion(
-            587,
+            593,
             "Empty dialog fragment script",
             Severity.Suggestion)
         .WithoutFormatting("Dialog responses has script attached, but no fragments");
