@@ -17,8 +17,10 @@ public static class RecordExtension
             IMagicEffectGetter magicEffect => magicEffect.Conditions,
             IMessageGetter message => message.MenuButtons.SelectMany(x => x.Conditions),
             IMusicTrackGetter musicTrack => musicTrack.Conditions,
+            IObjectEffectGetter objectEffect => objectEffect.Effects.SelectMany(effect => effect.Conditions),
             IPackageGetter package => package.Conditions.Concat(package.ProcedureTree.SelectMany(b => b.Conditions)),
-            IPerkGetter perk => perk.Conditions,
+            IPerkGetter perk => perk.Conditions
+                .Concat(perk.Effects.SelectMany(effect => effect.Conditions.SelectMany(tab => tab.Conditions))),
             IQuestGetter quest => quest.DialogConditions
                 .Concat(quest.EventConditions)
                 .Concat(quest.Aliases.SelectMany(a => a.Conditions))
@@ -27,7 +29,9 @@ public static class RecordExtension
             ISceneGetter scene => scene.Conditions
                 .Concat(scene.Phases.SelectMany(phase => phase.StartConditions))
                 .Concat(scene.Phases.SelectMany(phase => phase.CompletionConditions)),
+            IScrollGetter scroll => scroll.Effects.SelectMany(effect => effect.Conditions),
             ISoundDescriptorGetter soundDescriptor => soundDescriptor.Conditions,
+            ISpellGetter spell => spell.Effects.SelectMany(effect => effect.Conditions),
             IAStoryManagerNodeGetter storyManagerNode => storyManagerNode.Conditions,
             _ => null
         };
