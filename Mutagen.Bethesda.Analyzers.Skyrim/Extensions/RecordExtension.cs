@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
@@ -24,7 +24,9 @@ public static class RecordExtension
                 .Concat(quest.Aliases.SelectMany(a => a.Conditions))
                 .Concat(quest.Stages.SelectMany(s => s.LogEntries.SelectMany(e => e.Conditions)))
                 .Concat(quest.Objectives.SelectMany(o => o.Targets.SelectMany(t => t.Conditions))),
-            ISceneGetter scene => scene.Conditions,
+            ISceneGetter scene => scene.Conditions
+                .Concat(scene.Phases.SelectMany(phase => phase.StartConditions))
+                .Concat(scene.Phases.SelectMany(phase => phase.CompletionConditions)),
             ISoundDescriptorGetter soundDescriptor => soundDescriptor.Conditions,
             IAStoryManagerNodeGetter storyManagerNode => storyManagerNode.Conditions,
             _ => null
