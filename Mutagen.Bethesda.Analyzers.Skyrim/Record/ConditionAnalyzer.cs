@@ -49,7 +49,8 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
             Severity.Error)
         .WithFormatting<ILeveledItemGetter>("Condition used with leveled item {0} as parameter");
 
-    public static readonly TopicDefinition<IConditionGetter, IFormLinkGetter<IRaceGetter>> NoVampireRace = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<IConditionGetter, IFormLinkGetter<IRaceGetter>> NoVampireRace = MutagenTopicBuilder.FromDiscussion(
+            602,
             "No vampire condition",
             Severity.Warning)
         .WithFormatting<IConditionGetter, IFormLinkGetter<IRaceGetter>>("Condition {0} checks for mortal race {1} but not its vampire equivalent");
