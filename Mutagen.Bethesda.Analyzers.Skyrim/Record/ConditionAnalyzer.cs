@@ -1,5 +1,6 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record;
@@ -48,6 +49,11 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
             Severity.Error)
         .WithFormatting<ILeveledItemGetter>("Condition used with leveled item {0} as parameter");
 
+    public static readonly TopicDefinition<IConditionGetter, IFormLinkGetter<IRaceGetter>> NoVampireRace = MutagenTopicBuilder.DevelopmentTopic(
+            "No vampire condition",
+            Severity.Warning)
+        .WithFormatting<IConditionGetter, IFormLinkGetter<IRaceGetter>>("Condition {0} checks for mortal race {1} but not its vampire equivalent");
+
     public IEnumerable<TopicDefinition> Topics { get; } =
     [
         InvalidConditionReference,
@@ -57,7 +63,41 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
         GetCurrentTimeConditionWithAndOnDayBreak,
         GetCrimeGoldRunOnPlayer,
         LeveledItemParameter,
+        NoVampireRace,
     ];
+
+    private static readonly Dictionary<IFormLinkGetter<IRaceGetter>, IFormLinkGetter<IRaceGetter>> VampireRaceLookup = new()
+    {
+        { FormKeys.SkyrimSE.Skyrim.Race.ArgonianRace, FormKeys.SkyrimSE.Skyrim.Race.ArgonianRaceVampire },
+        { FormKeys.SkyrimSE.Skyrim.Race.BretonRace, FormKeys.SkyrimSE.Skyrim.Race.BretonRaceVampire },
+        { FormKeys.SkyrimSE.Skyrim.Race.DarkElfRace, FormKeys.SkyrimSE.Skyrim.Race.DarkElfRaceVampire },
+        { FormKeys.SkyrimSE.Skyrim.Race.HighElfRace, FormKeys.SkyrimSE.Skyrim.Race.HighElfRaceVampire },
+        { FormKeys.SkyrimSE.Skyrim.Race.ImperialRace, FormKeys.SkyrimSE.Skyrim.Race.ImperialRaceVampire },
+        { FormKeys.SkyrimSE.Skyrim.Race.KhajiitRace, FormKeys.SkyrimSE.Skyrim.Race.KhajiitRaceVampire },
+        { FormKeys.SkyrimSE.Skyrim.Race.NordRace, FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire },
+        { FormKeys.SkyrimSE.Skyrim.Race.OrcRace, FormKeys.SkyrimSE.Skyrim.Race.OrcRaceVampire },
+        { FormKeys.SkyrimSE.Skyrim.Race.RedguardRace, FormKeys.SkyrimSE.Skyrim.Race.RedguardRaceVampire },
+        { FormKeys.SkyrimSE.Skyrim.Race.WoodElfRace, FormKeys.SkyrimSE.Skyrim.Race.WoodElfRaceVampire },
+    };
+
+    static IFormLinkGetter<IRaceGetter> GetComparisonRace(IConditionDataGetter data)
+    {
+        return data switch
+        {
+            IGetIsRaceConditionDataGetter getRace => getRace.Race.Link,
+            IGetPCIsRaceConditionDataGetter getRace => getRace.Race.Link,
+            _ => FormLink<IRaceGetter>.Null
+        };
+    }
+
+    static bool HasVampireCondition(IConditionGetter condition, IFormLinkGetter<IRaceGetter> vampireRace, IEnumerable<IConditionGetter> allConditions)
+    {
+        return allConditions.Any(
+            c => c.Data.Function == condition.Data.Function
+            && c.Data.RunOnType == condition.Data.RunOnType
+            && c.Data.Reference.Equals(condition.Data.Reference)
+            && GetComparisonRace(c.Data).Equals(vampireRace));
+    }
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
     {
@@ -171,6 +211,17 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                 case IGetEquippedConditionDataGetter getEquipped
                     when getEquipped.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
                     param.AddTopic(LeveledItemParameter.Format(leveledItem));
+                    break;
+
+                case IGetIsRaceConditionDataGetter getRace
+                    when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
+                    if (!HasVampireCondition(condition, vampire, conditions))
+                        param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
+                    break;
+                case IGetPCIsRaceConditionDataGetter getRace
+                    when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
+                    if (!HasVampireCondition(condition, vampire, conditions))
+                        param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
                     break;
             }
         }
