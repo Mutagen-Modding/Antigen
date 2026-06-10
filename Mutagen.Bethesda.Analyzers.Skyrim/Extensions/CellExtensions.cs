@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
@@ -108,6 +108,19 @@ public static class CellExtensions
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Returns the winning override of the cell's landscape
+    /// </summary>
+    /// <param name="cell">Cell to get placed from</param>
+    /// <param name="linkCache">Link cache to determine the load order</param>
+    /// <returns>Winning landscape override, if it exists</returns>
+    public static ILandscapeGetter? GetLandscape(this ICellGetter cell, ILinkCache linkCache)
+    {
+        var allCells = linkCache.ResolveAll<ICellGetter>(cell.FormKey);
+
+        return allCells.Select(c => c.Landscape).LastOrDefault(l => l != null);
     }
 
     /// <summary>
