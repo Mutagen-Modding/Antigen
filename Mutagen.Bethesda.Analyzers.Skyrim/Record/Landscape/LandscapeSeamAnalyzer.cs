@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
-using Mutagen.Bethesda.Plugins.Cache;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -39,6 +34,39 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
             _ => throw new ArgumentOutOfRangeException(nameof(direction)),
         };
     }
+    static Direction Opposite(Direction direction)
+    {
+        return direction switch
+        {
+            Direction.North => Direction.South,
+            Direction.East => Direction.West,
+            Direction.South => Direction.North,
+            Direction.West => Direction.East,
+            _ => throw new ArgumentOutOfRangeException(nameof(direction)),
+        };
+    }
+
+    static IEnumerable<float> GetEdge(float[,] data, Direction direction)
+    {
+        return direction switch
+        {
+            Direction.North => data.GetRow(LandscapeExtensions.GridSize - 1),
+            Direction.East => data.GetColumn(LandscapeExtensions.GridSize - 1),
+            Direction.South => data.GetRow(0),
+            Direction.West => data.GetColumn(0),
+            _ => throw new ArgumentOutOfRangeException(nameof(direction)),
+        };
+    }
+
+    static bool HasSeam(IEnumerable<float> a, IEnumerable<float> b)
+    {
+        foreach (var (a1, b1) in a.Zip(b))
+        {
+            if (!a1.EqualsWithin(b1))
+                return true;
+        }
+        return false;
+    }
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ILandscapeGetter> param)
     {
@@ -50,11 +78,6 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         var worldspace = cell?.GetWorldspace(param.LinkCache);
         if (cell?.Grid == null || worldspace == null) return;
 
-        // For testing. Cell with recognisable shape when unlit
-        if (cell.EditorID != "Riverwood02") return;
-        //if (cell.Grid.Point != new P2Int(4, -14)) return;
-        //if (worldspace.EditorID != "Tamriel") return;
-
         var heights = landscape.VertexHeightMap.Decode();
 
         void CheckNeigbour(Direction dir)
@@ -63,18 +86,18 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
                 ?.GetLandscape(param.LinkCache);
             if (neighbour?.VertexHeightMap == null) return;
 
-            var neighbourData = neighbour.VertexHeightMap.Decode();
-            File.WriteAllText($"C:\\Modding\\Godot\\Riverwood{dir}.obj", LandscapeExtensions.ToObj(neighbourData));
+            var neighbourHeights = neighbour.VertexHeightMap.Decode();
+
+            var edgeSelf = GetEdge(heights, dir);
+            var edgeOther = GetEdge(neighbourHeights, Opposite(dir));
+
+            if (HasSeam(edgeSelf, edgeOther))
+                param.AddTopic(LandscapeSeam.Format(dir));
         }
         CheckNeigbour(Direction.North);
         CheckNeigbour(Direction.East);
         CheckNeigbour(Direction.South);
         CheckNeigbour(Direction.West);
-
-        var obj = LandscapeExtensions.ToObj(heights);
-        File.WriteAllText("C:\\Modding\\Godot\\Riverwood.obj", obj);
-
-        throw new NotImplementedException();
     }
 
     public IEnumerable<Func<ILandscapeGetter, object?>> FieldsOfInterest()
