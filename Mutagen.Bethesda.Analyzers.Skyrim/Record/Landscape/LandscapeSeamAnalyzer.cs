@@ -1,6 +1,5 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
-using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -16,12 +15,13 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         West
     };
 
-    public static readonly TopicDefinition<Direction> LandscapeSeam = MutagenTopicBuilder.DevelopmentTopic(
-            "Landscape seam",
+    public static readonly TopicDefinition<Direction> HeightMapSeam = MutagenTopicBuilder.FromDiscussion(
+            606,
+            "Landscape height map seam",
             Severity.Error)
-        .WithFormatting<Direction>("Landscape has seam in direction {0}");
+        .WithFormatting<Direction>("Landscape heightmap has seam in direction {0}");
 
-    public IEnumerable<TopicDefinition> Topics => [LandscapeSeam];
+    public IEnumerable<TopicDefinition> Topics => [HeightMapSeam];
 
     static P2Int NeighbourCoords(P2Int origin, Direction direction)
     {
@@ -62,6 +62,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
     {
         foreach (var (a1, b1) in a.Zip(b))
         {
+            // Don't need a large epsilon here. While the heightmap is a float, all vanilla landscape uses integer offsets
             if (!a1.EqualsWithin(b1))
                 return true;
         }
@@ -92,7 +93,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
             var edgeOther = GetEdge(neighbourHeights, Opposite(dir));
 
             if (HasSeam(edgeSelf, edgeOther))
-                param.AddTopic(LandscapeSeam.Format(dir));
+                param.AddTopic(HeightMapSeam.Format(dir));
         }
         CheckNeigbour(Direction.North);
         CheckNeigbour(Direction.East);
