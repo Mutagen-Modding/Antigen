@@ -6,16 +6,16 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
 public static class LandscapeExtensions
 {
-    static readonly int GridSize = 33;
-    static readonly float HeightMult = 8;
-    static readonly float TriangleWidth = CellExtensions.CellLength / (GridSize - 1);
-    static readonly float ObjScale = 1.0f / 128.0f;
+    public static readonly int GridSize = 33;
+    public static readonly float HeightMult = 8;
+    public static readonly float TriangleWidth = CellExtensions.CellLength / (GridSize - 1);
+    public static readonly float ObjScale = 1.0f / 128.0f;
 
     /// <summary>
-    /// Decode a landscape's heightma
+    /// Decode a landscape's heightmap
     /// </summary>
     /// <param name="heightMap"></param>
-    /// <returns>Height data, where [0,x] is the south edge and [x,0] is the west edge</returns>
+    /// <returns>Height data as a row-major array</returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
     public static float[,] Decode(this ILandscapeVertexHeightMapGetter heightMap)
     {
@@ -29,16 +29,16 @@ public static class LandscapeExtensions
         {
             for (int row = 0; row < GridSize; row++)
             {
-                var prev = (col, row) switch
+                var prev = (row, col) switch
                 {
                     (0, 0) => heightMap.Offset * HeightMult,
-                    (_, 0) => result[col - 1, row],
-                    (_, _) => result[col, row - 1],
+                    (0, _) => result[row, col-1],
+                    (_, _) => result[row-1, col],
                 };
 
                 var delta = (sbyte)heightMap.HeightMap[row, col] * HeightMult;
 
-                result[col, row] = prev + delta;
+                result[row, col] = prev + delta;
             }
         }
 
@@ -69,6 +69,7 @@ public static class LandscapeExtensions
                 var y = data[col, row] * ObjScale;
 
                 sb.AppendLine($"v {x} {y} {z}");
+                sb.AppendLine($"vt {x / 33.0} {z / 33.0}");
             }
         }
 
@@ -82,8 +83,8 @@ public static class LandscapeExtensions
                 var bl = Index(col + 1, row);
                 var br = Index(col + 1, row + 1);
 
-                sb.AppendLine($"f {tl} {tr} {bl}");
-                sb.AppendLine($"f {tr} {br} {bl}");
+                sb.AppendLine($"f {tl}/{tl} {tr}/{tr} {bl}/{bl}");
+                sb.AppendLine($"f {tr}/{tr} {br}/{br} {bl}/{bl}");
             }
         }
 
