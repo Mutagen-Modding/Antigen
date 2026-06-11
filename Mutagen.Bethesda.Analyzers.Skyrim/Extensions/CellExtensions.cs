@@ -118,9 +118,9 @@ public static class CellExtensions
     /// <returns>Winning landscape override, if it exists</returns>
     public static ILandscapeGetter? GetLandscape(this ICellGetter cell, ILinkCache linkCache)
     {
-        var allCells = linkCache.ResolveAll<ICellGetter>(cell.FormKey);
+        var allCells = linkCache.ResolveAll<ICellGetter>(cell.FormKey, ResolveTarget.Winner);
 
-        return allCells.Select(c => c.Landscape).LastOrDefault(l => l != null);
+        return allCells.Select(c => c.Landscape).FirstOrDefault(l => l != null);
     }
 
     /// <summary>
