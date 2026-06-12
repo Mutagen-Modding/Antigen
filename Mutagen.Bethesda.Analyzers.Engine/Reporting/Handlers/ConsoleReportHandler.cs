@@ -34,22 +34,16 @@ public class ConsoleReportHandler : IReportHandler
         _workDropoff.Enqueue(() =>
         {
             IMajorRecordGetter? parent = null;
-            ImmutableModLinkCache? sourceModLinkCache = null;
-            string? editorId = "";
-            foreach (var modGetter in _linkCache.ListedOrder)
+            var editorId = "";
+            var modGetter = _linkCache.ListedOrder.FirstOrDefault(l => l.ModKey == sourceMod);
+            if (modGetter is not null)
             {
-                if (modGetter.ModKey == sourceMod)
-                {
-                    sourceModLinkCache = new ImmutableModLinkCache(modGetter);
-                }
-            }
-            if (sourceModLinkCache is null)
-            {
-                _linkCache.TryResolveIdentifier(majorRecord, out editorId);
+                var sourceModLinkCache = new ImmutableModLinkCache(modGetter);
+                sourceModLinkCache.TryResolveIdentifier(majorRecord, out editorId);
             }
             else
             {
-                sourceModLinkCache.TryResolveIdentifier(majorRecord, out editorId);
+                _linkCache.TryResolveIdentifier(majorRecord, out editorId);
             }
 
             if (_linkCache.TryResolveSimpleContext(majorRecord, out var parentContext) && parentContext?.Parent?.Record is IMajorRecordGetter parentRecord)
