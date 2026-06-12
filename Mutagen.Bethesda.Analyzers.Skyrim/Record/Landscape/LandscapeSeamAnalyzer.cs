@@ -21,6 +21,12 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
             Severity.Error)
         .WithFormatting<Direction>("Landscape heightmap has seam in direction {0}");
 
+    public static readonly TopicDefinition<Direction> VertexColorSeam = MutagenTopicBuilder.FromDiscussion(
+            609,
+            "Landscape vertex color seam",
+            Severity.Warning)
+        .WithFormatting<Direction>("Landscape vertex colors has seam in direction {0}");
+
     public IEnumerable<TopicDefinition> Topics => [HeightMapSeam];
 
     static P2Int NeighbourCoords(P2Int origin, Direction direction)
@@ -46,7 +52,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         };
     }
 
-    static IEnumerable<float> GetEdge(float[,] data, Direction direction)
+    static IEnumerable<T> GetEdge<T>(IReadOnlyArray2d<T> data, Direction direction)
     {
         return direction switch
         {
@@ -58,12 +64,13 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         };
     }
 
-    static bool HasSeam(IEnumerable<float> a, IEnumerable<float> b)
+    static bool HasSeam<T>(IEnumerable<T> a, IEnumerable<T> b)
+        where T : IEquatable<T>
     {
         foreach (var (a1, b1) in a.Zip(b))
         {
             // Don't need a large epsilon here. While the heightmap is a float, all vanilla landscape uses integer offsets
-            if (!a1.EqualsWithin(b1))
+            if (!a1.Equals(b1))
                 return true;
         }
         return false;
@@ -72,33 +79,42 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ILandscapeGetter> param)
     {
         var landscape = param.Record;
-        if (landscape.VertexHeightMap == null)
-            return;
+
 
         var cell = landscape.GetCell(param.LinkCache);
         var worldspace = cell?.GetWorldspace(param.LinkCache);
         if (cell?.Grid == null || worldspace == null) return;
 
-        var heights = landscape.VertexHeightMap.Decode();
-
-        void CheckNeigbour(Direction dir)
+        void CheckSeams<T>(TopicDefinition<Direction> topic, Func<ILandscapeGetter, IReadOnlyArray2d<T>?> getData)
+            where T : IEquatable<T>
         {
-            var neighbour = worldspace.GetCell(NeighbourCoords(cell.Grid.Point, dir), param.LinkCache)
-                ?.GetLandscape(param.LinkCache);
-            if (neighbour?.VertexHeightMap == null) return;
+            var data = getData(landscape);
+            if (data == null)
+                return;
 
-            var neighbourHeights = neighbour.VertexHeightMap.Decode();
+            void CheckNeigbour(Direction dir)
+            {
+                // TODO: Worldspace.GetCell is fairly slow.
+                var neighbour = worldspace.GetCell(NeighbourCoords(cell.Grid.Point, dir), param.LinkCache)
+                    ?.GetLandscape(param.LinkCache);
+                if (neighbour == null) return;
+                var neighbourData = getData(neighbour);
+                if (neighbourData == null) return;
 
-            var edgeSelf = GetEdge(heights, dir);
-            var edgeOther = GetEdge(neighbourHeights, Opposite(dir));
+                var edgeSelf = GetEdge(data, dir);
+                var edgeOther = GetEdge(neighbourData, Opposite(dir));
 
-            if (HasSeam(edgeSelf, edgeOther))
-                param.AddTopic(HeightMapSeam.Format(dir));
+                if (HasSeam(edgeSelf, edgeOther))
+                    param.AddTopic(topic.Format(dir));
+            }
+            CheckNeigbour(Direction.North);
+            CheckNeigbour(Direction.East);
+            CheckNeigbour(Direction.South);
+            CheckNeigbour(Direction.West);
         }
-        CheckNeigbour(Direction.North);
-        CheckNeigbour(Direction.East);
-        CheckNeigbour(Direction.South);
-        CheckNeigbour(Direction.West);
+
+        CheckSeams(HeightMapSeam, l => l.VertexHeightMap?.Decode());
+        CheckSeams(VertexColorSeam, l => l.VertexColors);
     }
 
     public IEnumerable<Func<ILandscapeGetter, object?>> FieldsOfInterest()

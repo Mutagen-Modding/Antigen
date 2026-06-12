@@ -1,6 +1,7 @@
 using System.Text;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
@@ -17,13 +18,13 @@ public static class LandscapeExtensions
     /// <param name="heightMap"></param>
     /// <returns>Height data as a row-major array</returns>
     /// <exception cref="ArgumentOutOfRangeException"></exception>
-    public static float[,] Decode(this ILandscapeVertexHeightMapGetter heightMap)
+    public static Array2d<float> Decode(this ILandscapeVertexHeightMapGetter heightMap)
     {
         if (heightMap.HeightMap.Width != GridSize || heightMap.HeightMap.Height != GridSize)
             throw new ArgumentOutOfRangeException(nameof(heightMap), $"Expected heightmap to be {GridSize}x{GridSize}");
 
         // Based on UESP https://en.uesp.net/wiki/Skyrim_Mod:Mod_File_Format/LAND
-        var result = new float[GridSize, GridSize];
+        var result = new Array2d<float>(new P2Int(GridSize, GridSize), 0);
 
         for (int col = 0; col < GridSize; col++)
         {
