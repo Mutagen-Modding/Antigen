@@ -52,7 +52,7 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
 
     TestParameters Setup()
     {
-        var mod = new SkyrimMod(ModKey.Null, SkyrimRelease.SkyrimSE);
+        var mod = new SkyrimMod("mod1.esp", SkyrimRelease.SkyrimSE);
         // TODO: Insert record into mod. GetTopLevelGroup returns a getter
         var rec = _fixture.Create<TMajor>();
         var loadOrder = new LoadOrder<IModListing<ISkyrimMod>>
