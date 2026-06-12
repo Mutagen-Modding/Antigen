@@ -25,7 +25,9 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
             609,
             "Landscape vertex color seam",
             Severity.Warning)
-        .WithFormatting<Direction>("Landscape vertex colors has seam in direction {0}");
+        .WithFormatting<Direction>("Landscape vertex colors have seam in direction {0}");
+
+    static readonly IReadOnlyArray2d<P3UInt8> DefaultVertexColors = new Array2d<P3UInt8>(new P2Int(LandscapeExtensions.GridSize, LandscapeExtensions.GridSize), new P3UInt8(255, 255, 255));
 
     public IEnumerable<TopicDefinition> Topics => [HeightMapSeam];
 
@@ -114,7 +116,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         }
 
         CheckSeams(HeightMapSeam, l => l.VertexHeightMap?.Decode());
-        CheckSeams(VertexColorSeam, l => l.VertexColors);
+        CheckSeams(VertexColorSeam, l => l.VertexColors ?? DefaultVertexColors);
     }
 
     public IEnumerable<Func<ILandscapeGetter, object?>> FieldsOfInterest()
