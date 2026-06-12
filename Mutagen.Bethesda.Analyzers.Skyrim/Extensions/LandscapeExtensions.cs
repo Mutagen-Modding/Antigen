@@ -95,9 +95,6 @@ public static class LandscapeExtensions
     {
         if (!linkCache.TryResolveSimpleContext(landscape, out var context)) return null;
 
-        if (context.Parent?.Record is not ICellGetter cell) return null;
-
-        // Get winning override of cell
-        return linkCache.Resolve(cell);
+        return context.Parent?.Record as ICellGetter;
     }
 }

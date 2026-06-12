@@ -77,7 +77,9 @@ public static class CellExtensions
 
     public static IWorldspaceGetter? GetWorldspace(this ICellGetter cell, ILinkCache linkCache)
     {
-        var context = linkCache.ResolveSimpleContext(cell);
+        linkCache.TryResolveSimpleContext(cell, out var context);
+        if (context == null)
+            return null;
         context.TryGetParent<IWorldspaceGetter>(out var world);
         return world;
     }
