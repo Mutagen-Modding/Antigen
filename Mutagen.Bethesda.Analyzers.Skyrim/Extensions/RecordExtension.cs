@@ -1,3 +1,4 @@
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
@@ -34,6 +35,23 @@ public static class RecordExtension
             ISpellGetter spell => spell.Effects.SelectMany(effect => effect.Conditions),
             IAStoryManagerNodeGetter storyManagerNode => storyManagerNode.Conditions,
             _ => null
+        };
+    }
+
+    public static IQuestGetter? GetOwningQuest(this ISkyrimMajorRecordGetter record, ILinkCache linkCache)
+    {
+        switch (record)
+        {
+            case IDialogResponsesGetter dialogResponses:
+                linkCache.TryResolveSimpleContext(dialogResponses, out var context);
+                return (context?.Parent?.Record as IDialogTopicGetter)?.GetOwningQuest(linkCache);
+            case IDialogTopicGetter topic: return topic.Quest.TryResolve(linkCache);
+            case IDialogBranch branch: return branch.Quest.TryResolve(linkCache);
+            case IMessageGetter message: return message.Quest.TryResolve(linkCache);
+            case IPackageGetter package: return package.OwnerQuest.TryResolve(linkCache);
+            case IQuestGetter quest: return quest;
+            case ISceneGetter scene: return scene.Quest.TryResolve(linkCache);
+            default: return null;
         };
     }
 }
