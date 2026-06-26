@@ -1,5 +1,6 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -82,10 +83,11 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
     {
         var landscape = param.Record;
 
-
         var cell = landscape.GetCell(param.LinkCache);
         var worldspace = cell?.GetWorldspace(param.LinkCache);
         if (cell?.Grid == null || worldspace == null) return;
+
+        var lookup = param.ResolveCache<IExteriorCellCache>();
 
         void CheckSeams<T>(TopicDefinition<Direction> topic, Func<ILandscapeGetter, IReadOnlyArray2d<T>?> getData)
             where T : IEquatable<T>
@@ -97,7 +99,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
             void CheckNeigbour(Direction dir)
             {
                 // TODO: Worldspace.GetCell is fairly slow.
-                var neighbour = worldspace.GetCell(NeighbourCoords(cell.Grid.Point, dir), param.LinkCache)
+                var neighbour = lookup.GetExterior(worldspace, NeighbourCoords(cell.Grid.Point, dir)).TryResolve(param.LinkCache)
                     ?.GetLandscape(param.LinkCache);
                 if (neighbour == null) return;
                 var neighbourData = getData(neighbour);
