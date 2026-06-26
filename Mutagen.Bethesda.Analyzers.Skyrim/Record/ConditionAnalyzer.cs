@@ -99,6 +99,8 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
             c => c.Data.Function == condition.Data.Function
             && c.Data.RunOnType == condition.Data.RunOnType
             && c.Data.Reference.Equals(condition.Data.Reference)
+            && (c as IConditionFloatGetter)?.ComparisonValue == (condition as IConditionFloatGetter)?.ComparisonValue
+            && Equals((c as IConditionGlobalGetter)?.ComparisonValue, (condition as IConditionGlobalGetter)?.ComparisonValue)
             && GetComparisonRace(c.Data).Equals(vampireRace));
     }
 
