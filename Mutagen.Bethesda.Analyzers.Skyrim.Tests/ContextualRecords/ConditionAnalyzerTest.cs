@@ -371,4 +371,29 @@ public class ConditionAnalyzerTest
         },
         ConditionAnalyzer.InvalidAliasIndex);
     }
+
+    // Invalid alias may coexist with other topics on the same condition
+    [Theory, MutagenModAutoData]
+    public void InvalidAliasAndOtherError(Fixture fixture, Quest quest)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                mod.Quests.Add(quest);
+                rec.OwnerQuest.SetTo(quest);
+
+                rec.Conditions.Add(new ConditionFloat()
+                {
+                    Data = new GetIsAliasRefConditionData() { ReferenceAliasIndex = 1, RunOnType = Condition.RunOnType.Reference },
+                });
+            },
+            prepForFix: (rec, mod) =>
+            {
+                var data = rec.Conditions[0].Data as GetIsAliasRefConditionData;
+                data!.Reference.SetTo(FormKeys.SkyrimSE.Skyrim.PlacedNpc.AlvorREF);
+                quest.Aliases.Add(new() { ID = (ushort)data.ReferenceAliasIndex });
+            },
+            ConditionAnalyzer.InvalidConditionReference,
+            ConditionAnalyzer.InvalidAliasIndex);
+    }
 }

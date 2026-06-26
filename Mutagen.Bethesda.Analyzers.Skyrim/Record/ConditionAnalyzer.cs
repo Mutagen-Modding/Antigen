@@ -200,13 +200,13 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                     when getEquipped.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
                     param.AddTopic(LeveledItemParameter.Format(leveledItem));
                     break;
-                case IGetIsAliasRefConditionDataGetter getIsAliasRef:
-                    CheckAlias(getIsAliasRef.ReferenceAliasIndex);
-                    break;
-                case { RunOnType: Condition.RunOnType.QuestAlias }:
-                    CheckAlias(condition.Data.RunOnTypeIndex);
-                    break;
             }
+
+            // Invalid aliases may coexist with other topics on the same condition
+            if (condition.Data is IGetIsAliasRefConditionDataGetter getIsAliasRef)
+                CheckAlias(getIsAliasRef.ReferenceAliasIndex);
+            if (condition.Data.RunOnType == Condition.RunOnType.QuestAlias)
+                CheckAlias(condition.Data.RunOnTypeIndex);
         }
     }
 
