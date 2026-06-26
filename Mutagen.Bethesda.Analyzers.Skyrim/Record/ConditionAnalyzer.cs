@@ -5,6 +5,8 @@ using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record;
 
+using Races = FormKeys.SkyrimSE.Skyrim.Race;
+
 public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGetter>
 {
     public static readonly TopicDefinition<string?> InvalidConditionReference = MutagenTopicBuilder.FromDiscussion(
@@ -69,16 +71,16 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
 
     private static readonly Dictionary<IFormLinkGetter<IRaceGetter>, IFormLinkGetter<IRaceGetter>> VampireRaceLookup = new()
     {
-        { FormKeys.SkyrimSE.Skyrim.Race.ArgonianRace, FormKeys.SkyrimSE.Skyrim.Race.ArgonianRaceVampire },
-        { FormKeys.SkyrimSE.Skyrim.Race.BretonRace, FormKeys.SkyrimSE.Skyrim.Race.BretonRaceVampire },
-        { FormKeys.SkyrimSE.Skyrim.Race.DarkElfRace, FormKeys.SkyrimSE.Skyrim.Race.DarkElfRaceVampire },
-        { FormKeys.SkyrimSE.Skyrim.Race.HighElfRace, FormKeys.SkyrimSE.Skyrim.Race.HighElfRaceVampire },
-        { FormKeys.SkyrimSE.Skyrim.Race.ImperialRace, FormKeys.SkyrimSE.Skyrim.Race.ImperialRaceVampire },
-        { FormKeys.SkyrimSE.Skyrim.Race.KhajiitRace, FormKeys.SkyrimSE.Skyrim.Race.KhajiitRaceVampire },
-        { FormKeys.SkyrimSE.Skyrim.Race.NordRace, FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire },
-        { FormKeys.SkyrimSE.Skyrim.Race.OrcRace, FormKeys.SkyrimSE.Skyrim.Race.OrcRaceVampire },
-        { FormKeys.SkyrimSE.Skyrim.Race.RedguardRace, FormKeys.SkyrimSE.Skyrim.Race.RedguardRaceVampire },
-        { FormKeys.SkyrimSE.Skyrim.Race.WoodElfRace, FormKeys.SkyrimSE.Skyrim.Race.WoodElfRaceVampire },
+        { Races.ArgonianRace, Races.ArgonianRaceVampire },
+        { Races.BretonRace, Races.BretonRaceVampire },
+        { Races.DarkElfRace, Races.DarkElfRaceVampire },
+        { Races.HighElfRace, Races.HighElfRaceVampire },
+        { Races.ImperialRace, Races.ImperialRaceVampire },
+        { Races.KhajiitRace, Races.KhajiitRaceVampire },
+        { Races.NordRace, Races.NordRaceVampire },
+        { Races.OrcRace, Races.OrcRaceVampire },
+        { Races.RedguardRace, Races.RedguardRaceVampire },
+        { Races.WoodElfRace, Races.WoodElfRaceVampire },
     };
 
     static IFormLinkGetter<IRaceGetter> GetComparisonRace(IConditionDataGetter data)
