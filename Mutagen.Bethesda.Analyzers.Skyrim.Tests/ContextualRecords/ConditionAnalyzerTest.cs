@@ -300,6 +300,7 @@ public class ConditionAnalyzerTest
                 rec.Conditions.Add(new ConditionFloat()
                 {
                     Data = data,
+                    Flags = Condition.Flag.OR,
                 });
             },
             prepForFix: (rec, mod) =>
@@ -325,6 +326,7 @@ public class ConditionAnalyzerTest
                 rec.Conditions.Add(new ConditionFloat()
                 {
                     Data = data,
+                    Flags = Condition.Flag.OR,
                 });
             },
             prepForFix: (rec, mod) =>
@@ -351,6 +353,7 @@ public class ConditionAnalyzerTest
                 rec.Conditions.Add(new ConditionFloat()
                 {
                     Data = data,
+                    Flags = Condition.Flag.OR,
                 });
                 var vampData = new GetIsRaceConditionData();
                 vampData.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire);
@@ -363,6 +366,92 @@ public class ConditionAnalyzerTest
             prepForFix: (rec, mod) =>
             {
                 rec.Conditions[1].Data.RunOnType = Condition.RunOnType.Subject;
+            },
+            ConditionAnalyzer.NoVampireRace);
+    }
+
+    // Vampire conditions should compare against the same value
+    [Theory, MutagenModAutoData]
+    public void VampireConditionDifferentValue(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var data = new GetIsRaceConditionData();
+                data.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRace);
+                rec.Conditions.Add(new ConditionFloat()
+                {
+                    Data = data,
+                    ComparisonValue = 0,
+                    Flags = Condition.Flag.OR,
+                });
+                var data2 = new GetIsRaceConditionData();
+                data2.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire);
+                rec.Conditions.Add(new ConditionFloat()
+                {
+                    Data = data2,
+                    ComparisonValue = 1
+                });
+            },
+            prepForFix: (rec, mod) =>
+            {
+                (rec.Conditions[1] as ConditionFloat)!.ComparisonValue = 0;
+            },
+            ConditionAnalyzer.NoVampireRace);
+    }
+
+    // Vampire conditions should be part of the same OR block
+    [Theory, MutagenModAutoData]
+    public void VampireConditionCombineAnd(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var data = new GetIsRaceConditionData();
+                data.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRace);
+                rec.Conditions.Add(new ConditionFloat()
+                {
+                    Data = data,
+                });
+                var data2 = new GetIsRaceConditionData();
+                data2.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire);
+                rec.Conditions.Add(new ConditionFloat()
+                {
+                    Data = data2,
+                });
+            },
+            prepForFix: (rec, mod) =>
+            {
+                rec.Conditions[0].Flags |= Condition.Flag.OR;
+            },
+            ConditionAnalyzer.NoVampireRace);
+    }
+
+    // Vampire conditions should be part of the same field
+    [Theory, MutagenModAutoData]
+    public void VampireConditionDifferentField(ContextualRecordTestFixture<ConditionAnalyzer, Quest, ISkyrimMajorRecordGetter> fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var data = new GetIsRaceConditionData();
+                data.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRace);
+                rec.DialogConditions.Add(new ConditionFloat()
+                {
+                    Data = data,
+                    Flags = Condition.Flag.OR,
+                });
+                var data2 = new GetIsRaceConditionData();
+                data2.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire);
+                rec.EventConditions.Add(new ConditionFloat()
+                {
+                    Data = data2,
+                });
+            },
+            prepForFix: (rec, mod) =>
+            {
+                rec.DialogConditions.Add(rec.EventConditions[0]);
+                rec.EventConditions.Clear();
             },
             ConditionAnalyzer.NoVampireRace);
     }

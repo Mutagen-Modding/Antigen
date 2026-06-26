@@ -214,16 +214,27 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                     param.AddTopic(LeveledItemParameter.Format(leveledItem));
                     break;
 
-                case IGetIsRaceConditionDataGetter getRace
+
+            }
+        }
+
+        foreach (var block in conditions.SplitOrBlocks())
+        {
+            foreach (var condition in block)
+            {
+                switch (condition.Data)
+                {
+                    case IGetIsRaceConditionDataGetter getRace
                     when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
-                    if (!HasVampireCondition(condition, vampire, conditions))
-                        param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
-                    break;
-                case IGetPCIsRaceConditionDataGetter getRace
+                        if (!HasVampireCondition(condition, vampire, block))
+                            param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
+                        break;
+                    case IGetPCIsRaceConditionDataGetter getRace
                     when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
-                    if (!HasVampireCondition(condition, vampire, conditions))
-                        param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
-                    break;
+                        if (!HasVampireCondition(condition, vampire, block))
+                            param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
+                        break;
+                }
             }
         }
     }
