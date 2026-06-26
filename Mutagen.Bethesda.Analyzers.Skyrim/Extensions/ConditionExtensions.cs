@@ -18,9 +18,10 @@ public static class ConditionExtensions
             if (!condition.Flags.HasFlag(Condition.Flag.OR))
             {
                 yield return block;
-                block.Clear();
+                block = [];
             }
         }
-        yield return block;
+        if (block.Count > 0)
+            yield return block;
     }
 }

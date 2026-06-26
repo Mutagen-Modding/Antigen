@@ -104,138 +104,145 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
     {
-        var conditions = param.Record.GetConditions()?.ToArray();
-        if (conditions is null) return;
-
-        for (var i = 0; i < conditions.Length; i++)
+        var blocks = param.Record.GetConditions();
+        foreach (var block in blocks)
         {
-            var condition = conditions[i];
-            switch (condition.Data)
+            // GetCurrentTime analyzer relies on index within the block
+            var conditions = block.ToArray();
+            for (var i = 0; i < conditions.Length; i++)
             {
-                case { RunOnType: Condition.RunOnType.Reference, Reference.IsNull: true }:
-                    switch (condition.Data)
-                    {
-                        case IGetEventDataConditionDataGetter getEventData:
-                            param.AddTopic(
-                                InvalidConditionReference.Format(getEventData.Function.ToString()));
-                            break;
-                        case {} conditionData:
-                            param.AddTopic(
-                                InvalidConditionReference.Format(conditionData.Function.ToString()));
-                            break;
-                    }
-                    break;
-                case IGetDeadConditionDataGetter
-                    when condition.Data.RunOnType == Condition.RunOnType.Reference
-                         && condition.Data.Reference.TryResolve<IPlacedNpcGetter>(param.LinkCache, out var placedNpc)
-                         && placedNpc.Base.TryResolve(param.LinkCache, out var npc)
-                         && npc.IsUnique():
-                    param.AddTopic(
-                        GetDeadCondition.Format(npc));
-                    break;
-                case IGetStageConditionDataGetter getStage:
-                {
-                    if (condition is IConditionFloatGetter floatCondition
-                        && getStage.Quest.UsesLink() && getStage.Quest.Link.TryResolve(param.LinkCache, out var quest)
-                        && floatCondition.ComparisonValue != 0
-                        && quest.Stages.All(s => s.Index != (int)floatCondition.ComparisonValue))
-                    {
-                        param.AddTopic(
-                            InvalidStageCondition.Format((int)floatCondition.ComparisonValue, condition));
-                    }
-                    break;
-                }
-                case IGetStageDoneConditionDataGetter getStageDone
-                    when getStageDone.Quest.UsesLink() && getStageDone.Quest.Link.TryResolve(param.LinkCache, out var quest2)
-                                                       && quest2.Stages.All(s => s.Index != getStageDone.Stage):
-                    param.AddTopic(
-                        InvalidStageCondition.Format(getStageDone.Stage, condition));
-                    break;
-                case IGetCurrentTimeConditionDataGetter when condition is IConditionFloatGetter currentFloatCondition: {
-                    if (i + 1 >= conditions.Length) break;
-
-                    var nextCondition = conditions[i + 1];
-                    if (nextCondition is not IConditionFloatGetter { Data: IGetCurrentTimeConditionDataGetter } nextFloatCondition) break;
-
-                    var firstGreater = currentFloatCondition.CompareOperator is CompareOperator.GreaterThan or CompareOperator.GreaterThanOrEqualTo;
-                    var thenLess = nextFloatCondition.CompareOperator is CompareOperator.LessThan or CompareOperator.LessThanOrEqualTo;
-                    var firstLess = currentFloatCondition.CompareOperator is CompareOperator.LessThan or CompareOperator.LessThanOrEqualTo;
-                    var thenGreater = nextFloatCondition.CompareOperator is CompareOperator.GreaterThan or CompareOperator.GreaterThanOrEqualTo;
-
-                    if (currentFloatCondition.Flags.HasFlag(Condition.Flag.OR))
-                    {
-                        if (firstGreater && thenLess && currentFloatCondition.ComparisonValue < nextFloatCondition.ComparisonValue)
-                        {
-                            param.AddTopic(GetCurrentTimeConditionWithOrOnDayBreak.Format());
-                        }
-
-                        if (firstLess && thenGreater && currentFloatCondition.ComparisonValue > nextFloatCondition.ComparisonValue)
-                        {
-                            param.AddTopic(GetCurrentTimeConditionWithOrOnDayBreak.Format());
-                        }
-                    }
-                    else
-                    {
-                        if (firstGreater && thenLess && currentFloatCondition.ComparisonValue >= nextFloatCondition.ComparisonValue)
-                        {
-                            param.AddTopic(GetCurrentTimeConditionWithAndOnDayBreak.Format());
-                        }
-
-                        if (firstLess && thenGreater && currentFloatCondition.ComparisonValue <= nextFloatCondition.ComparisonValue)
-                        {
-                            param.AddTopic(GetCurrentTimeConditionWithAndOnDayBreak.Format());
-                        }
-                    }
-
-                    break;
-                }
-                case IGetCrimeGoldConditionDataGetter getCrimeGold:
-                    if (condition.Data.RunsOnPlayer() && getCrimeGold.Faction.UsesLink() && getCrimeGold.Faction.Link.IsNull) {
-                        param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
-                    }
-
-                    break;
-                case IGetCrimeGoldNonviolentConditionDataGetter getCrimeGoldNonViolent:
-                    if (condition.Data.RunsOnPlayer() && getCrimeGoldNonViolent.Faction.UsesLink() && getCrimeGoldNonViolent.Faction.Link.IsNull) {
-                        param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
-                    }
-
-                    break;
-                case IGetCrimeGoldViolentConditionDataGetter getCrimeGoldViolent:
-                    if (condition.Data.RunsOnPlayer() && getCrimeGoldViolent.Faction.UsesLink() && getCrimeGoldViolent.Faction.Link.IsNull) {
-                        param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
-                    }
-
-                    break;
-                case IGetItemCountConditionData getItemCount
-                    when getItemCount.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
-                    param.AddTopic(LeveledItemParameter.Format(leveledItem));
-                    break;
-                case IGetEquippedConditionDataGetter getEquipped
-                    when getEquipped.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
-                    param.AddTopic(LeveledItemParameter.Format(leveledItem));
-                    break;
-
-
-            }
-        }
-
-        foreach (var block in conditions.SplitOrBlocks())
-        {
-            foreach (var condition in block)
-            {
+                var condition = conditions[i];
                 switch (condition.Data)
                 {
-                    case IGetIsRaceConditionDataGetter getRace
-                    when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
-                        if (!HasVampireCondition(condition, vampire, block))
-                            param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
+                    case { RunOnType: Condition.RunOnType.Reference, Reference.IsNull: true }:
+                        switch (condition.Data)
+                        {
+                            case IGetEventDataConditionDataGetter getEventData:
+                                param.AddTopic(
+                                    InvalidConditionReference.Format(getEventData.Function.ToString()));
+                                break;
+                            case { } conditionData:
+                                param.AddTopic(
+                                    InvalidConditionReference.Format(conditionData.Function.ToString()));
+                                break;
+                        }
                         break;
-                    case IGetPCIsRaceConditionDataGetter getRace
-                    when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
-                        if (!HasVampireCondition(condition, vampire, block))
-                            param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
+                    case IGetDeadConditionDataGetter
+                        when condition.Data.RunOnType == Condition.RunOnType.Reference
+                             && condition.Data.Reference.TryResolve<IPlacedNpcGetter>(param.LinkCache, out var placedNpc)
+                             && placedNpc.Base.TryResolve(param.LinkCache, out var npc)
+                             && npc.IsUnique():
+                        param.AddTopic(
+                            GetDeadCondition.Format(npc));
                         break;
+                    case IGetStageConditionDataGetter getStage:
+                        {
+                            if (condition is IConditionFloatGetter floatCondition
+                                && getStage.Quest.UsesLink() && getStage.Quest.Link.TryResolve(param.LinkCache, out var quest)
+                                && floatCondition.ComparisonValue != 0
+                                && quest.Stages.All(s => s.Index != (int)floatCondition.ComparisonValue))
+                            {
+                                param.AddTopic(
+                                    InvalidStageCondition.Format((int)floatCondition.ComparisonValue, condition));
+                            }
+                            break;
+                        }
+                    case IGetStageDoneConditionDataGetter getStageDone
+                        when getStageDone.Quest.UsesLink() && getStageDone.Quest.Link.TryResolve(param.LinkCache, out var quest2)
+                                                           && quest2.Stages.All(s => s.Index != getStageDone.Stage):
+                        param.AddTopic(
+                            InvalidStageCondition.Format(getStageDone.Stage, condition));
+                        break;
+                    case IGetCurrentTimeConditionDataGetter when condition is IConditionFloatGetter currentFloatCondition:
+                        {
+                            if (i + 1 >= conditions.Length) break;
+
+                            var nextCondition = conditions[i + 1];
+                            if (nextCondition is not IConditionFloatGetter { Data: IGetCurrentTimeConditionDataGetter } nextFloatCondition) break;
+
+                            var firstGreater = currentFloatCondition.CompareOperator is CompareOperator.GreaterThan or CompareOperator.GreaterThanOrEqualTo;
+                            var thenLess = nextFloatCondition.CompareOperator is CompareOperator.LessThan or CompareOperator.LessThanOrEqualTo;
+                            var firstLess = currentFloatCondition.CompareOperator is CompareOperator.LessThan or CompareOperator.LessThanOrEqualTo;
+                            var thenGreater = nextFloatCondition.CompareOperator is CompareOperator.GreaterThan or CompareOperator.GreaterThanOrEqualTo;
+
+                            if (currentFloatCondition.Flags.HasFlag(Condition.Flag.OR))
+                            {
+                                if (firstGreater && thenLess && currentFloatCondition.ComparisonValue < nextFloatCondition.ComparisonValue)
+                                {
+                                    param.AddTopic(GetCurrentTimeConditionWithOrOnDayBreak.Format());
+                                }
+
+                                if (firstLess && thenGreater && currentFloatCondition.ComparisonValue > nextFloatCondition.ComparisonValue)
+                                {
+                                    param.AddTopic(GetCurrentTimeConditionWithOrOnDayBreak.Format());
+                                }
+                            }
+                            else
+                            {
+                                if (firstGreater && thenLess && currentFloatCondition.ComparisonValue >= nextFloatCondition.ComparisonValue)
+                                {
+                                    param.AddTopic(GetCurrentTimeConditionWithAndOnDayBreak.Format());
+                                }
+
+                                if (firstLess && thenGreater && currentFloatCondition.ComparisonValue <= nextFloatCondition.ComparisonValue)
+                                {
+                                    param.AddTopic(GetCurrentTimeConditionWithAndOnDayBreak.Format());
+                                }
+                            }
+
+                            break;
+                        }
+                    case IGetCrimeGoldConditionDataGetter getCrimeGold:
+                        if (condition.Data.RunsOnPlayer() && getCrimeGold.Faction.UsesLink() && getCrimeGold.Faction.Link.IsNull)
+                        {
+                            param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
+                        }
+
+                        break;
+                    case IGetCrimeGoldNonviolentConditionDataGetter getCrimeGoldNonViolent:
+                        if (condition.Data.RunsOnPlayer() && getCrimeGoldNonViolent.Faction.UsesLink() && getCrimeGoldNonViolent.Faction.Link.IsNull)
+                        {
+                            param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
+                        }
+
+                        break;
+                    case IGetCrimeGoldViolentConditionDataGetter getCrimeGoldViolent:
+                        if (condition.Data.RunsOnPlayer() && getCrimeGoldViolent.Faction.UsesLink() && getCrimeGoldViolent.Faction.Link.IsNull)
+                        {
+                            param.AddTopic(GetCrimeGoldRunOnPlayer.Format());
+                        }
+
+                        break;
+                    case IGetItemCountConditionData getItemCount
+                        when getItemCount.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
+                        param.AddTopic(LeveledItemParameter.Format(leveledItem));
+                        break;
+                    case IGetEquippedConditionDataGetter getEquipped
+                        when getEquipped.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
+                        param.AddTopic(LeveledItemParameter.Format(leveledItem));
+                        break;
+
+
+                }
+            }
+
+            foreach (var orBlock in conditions.SplitOrBlocks())
+            {
+                foreach (var condition in block)
+                {
+                    switch (condition.Data)
+                    {
+                        case IGetIsRaceConditionDataGetter getRace
+                        when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
+                            if (!HasVampireCondition(condition, vampire, orBlock))
+                                param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
+                            break;
+                        case IGetPCIsRaceConditionDataGetter getRace
+                        when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
+                            if (!HasVampireCondition(condition, vampire, orBlock))
+                                param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
+                            break;
+                    }
                 }
             }
         }

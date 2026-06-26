@@ -4,36 +4,41 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
 public static class RecordExtension
 {
-    public static IEnumerable<IConditionGetter>? GetConditions(this ISkyrimMajorRecordGetter record)
+    /// <summary>
+    /// Get conditions attached to the record, split by field
+    /// </summary>
+    /// <param name="record"></param>
+    /// <returns></returns>
+    public static IEnumerable<IEnumerable<IConditionGetter>> GetConditions(this ISkyrimMajorRecordGetter record)
     {
         return record switch
         {
-            ICameraPathGetter cameraPath => cameraPath.Conditions,
-            IConstructibleObjectGetter constructibleObject => constructibleObject.Conditions,
-            IDialogResponsesGetter dialogResponses => dialogResponses.Conditions,
-            IFactionGetter faction => faction.Conditions,
-            IIdleAnimationGetter idleAnimation => idleAnimation.Conditions,
-            ILoadScreenGetter loadScreen => loadScreen.Conditions,
-            IMagicEffectGetter magicEffect => magicEffect.Conditions,
-            IMessageGetter message => message.MenuButtons.SelectMany(x => x.Conditions),
-            IMusicTrackGetter musicTrack => musicTrack.Conditions,
-            IObjectEffectGetter objectEffect => objectEffect.Effects.SelectMany(effect => effect.Conditions),
-            IPackageGetter package => package.Conditions.Concat(package.ProcedureTree.SelectMany(b => b.Conditions)),
-            IPerkGetter perk => perk.Conditions
-                .Concat(perk.Effects.SelectMany(effect => effect.Conditions.SelectMany(tab => tab.Conditions))),
-            IQuestGetter quest => quest.DialogConditions
-                .Concat(quest.EventConditions)
-                .Concat(quest.Aliases.SelectMany(a => a.Conditions))
-                .Concat(quest.Stages.SelectMany(s => s.LogEntries.SelectMany(e => e.Conditions)))
-                .Concat(quest.Objectives.SelectMany(o => o.Targets.SelectMany(t => t.Conditions))),
-            ISceneGetter scene => scene.Conditions
-                .Concat(scene.Phases.SelectMany(phase => phase.StartConditions))
-                .Concat(scene.Phases.SelectMany(phase => phase.CompletionConditions)),
-            IScrollGetter scroll => scroll.Effects.SelectMany(effect => effect.Conditions),
-            ISoundDescriptorGetter soundDescriptor => soundDescriptor.Conditions,
-            ISpellGetter spell => spell.Effects.SelectMany(effect => effect.Conditions),
-            IAStoryManagerNodeGetter storyManagerNode => storyManagerNode.Conditions,
-            _ => null
+            ICameraPathGetter cameraPath => [cameraPath.Conditions],
+            IConstructibleObjectGetter constructibleObject => [constructibleObject.Conditions],
+            IDialogResponsesGetter dialogResponses => [dialogResponses.Conditions],
+            IFactionGetter faction => [faction.Conditions ?? []],
+            IIdleAnimationGetter idleAnimation => [idleAnimation.Conditions],
+            ILoadScreenGetter loadScreen => [loadScreen.Conditions],
+            IMagicEffectGetter magicEffect => [magicEffect.Conditions],
+            IMessageGetter message => message.MenuButtons.Select(x => x.Conditions),
+            IMusicTrackGetter musicTrack => [musicTrack.Conditions ?? []],
+            IObjectEffectGetter objectEffect => objectEffect.Effects.Select(effect => effect.Conditions),
+            IPackageGetter package => [package.Conditions, ..package.ProcedureTree.Select(b => b.Conditions)],
+            IPerkGetter perk => [perk.Conditions,
+                ..perk.Effects.SelectMany(effect => effect.Conditions.Select(tab => tab.Conditions))],
+            IQuestGetter quest => [quest.DialogConditions,
+                quest.EventConditions,
+                ..quest.Aliases.Select(a => a.Conditions),
+                ..quest.Stages.SelectMany(s => s.LogEntries.Select(e => e.Conditions)),
+                ..quest.Objectives.SelectMany(o => o.Targets.Select(t => t.Conditions))],
+            ISceneGetter scene => [scene.Conditions,
+                ..scene.Phases.Select(phase => phase.StartConditions),
+                ..scene.Phases.Select(phase => phase.CompletionConditions)],
+            IScrollGetter scroll => scroll.Effects.Select(effect => effect.Conditions),
+            ISoundDescriptorGetter soundDescriptor => [soundDescriptor.Conditions],
+            ISpellGetter spell => spell.Effects.Select(effect => effect.Conditions),
+            IAStoryManagerNodeGetter storyManagerNode => [storyManagerNode.Conditions],
+            _ => []
         };
     }
 }
