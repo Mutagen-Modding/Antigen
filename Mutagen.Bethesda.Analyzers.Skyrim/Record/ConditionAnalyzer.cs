@@ -93,15 +93,35 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
         };
     }
 
-    static bool HasVampireCondition(IConditionGetter condition, IFormLinkGetter<IRaceGetter> vampireRace, IEnumerable<IConditionGetter> allConditions)
+    static bool CheckVampireCondition(IConditionGetter condition, IFormLinkGetter<IRaceGetter> vampireRace, IEnumerable<IConditionGetter> allConditions, IEnumerable<IConditionGetter> orBlock)
     {
-        return allConditions.Any(
-            c => c.Data.Function == condition.Data.Function
-            && c.Data.RunOnType == condition.Data.RunOnType
-            && c.Data.Reference.Equals(condition.Data.Reference)
-            && (c as IConditionFloatGetter)?.ComparisonValue == (condition as IConditionFloatGetter)?.ComparisonValue
-            && Equals((c as IConditionGlobalGetter)?.ComparisonValue, (condition as IConditionGlobalGetter)?.ComparisonValue)
-            && GetComparisonRace(c.Data).Equals(vampireRace));
+        if (condition is not IConditionFloatGetter conditionFloat)
+            return true;
+
+        bool ChecksVampire(IEnumerable<IConditionGetter> block)
+        {
+            return block.Any(
+                c => c is IConditionFloatGetter cf
+                // Same function
+                && cf.Data.Function == conditionFloat.Data.Function
+                // Runs on same ref
+                && cf.Data.RunOnType == conditionFloat.Data.RunOnType
+                && cf.Data.Reference.Equals(conditionFloat.Data.Reference)
+                && cf.Data.RunOnTypeIndex == conditionFloat.Data.RunOnTypeIndex
+                // Same include/exclude
+                && cf.ComparisonValue == conditionFloat.ComparisonValue
+                // Checks vampire race
+                && GetComparisonRace(c.Data).Equals(vampireRace));
+        }
+
+        return conditionFloat.ComparisonValue switch
+        {
+            // Negative conditions should be combined with AND
+            0 => ChecksVampire(allConditions) && !ChecksVampire(orBlock),
+            // Positive conditions should be combined with OR
+            1 => ChecksVampire(orBlock),
+            _ => true
+        };
     }
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
@@ -230,18 +250,18 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
 
             foreach (var orBlock in conditions.SplitOrBlocks())
             {
-                foreach (var condition in block)
+                foreach (var condition in orBlock)
                 {
                     switch (condition.Data)
                     {
                         case IGetIsRaceConditionDataGetter getRace
                         when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
-                            if (!HasVampireCondition(condition, vampire, orBlock))
+                            if (!CheckVampireCondition(condition, vampire, conditions, orBlock))
                                 param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
                             break;
                         case IGetPCIsRaceConditionDataGetter getRace
                         when VampireRaceLookup.TryGetValue(getRace.Race.Link, out var vampire):
-                            if (!HasVampireCondition(condition, vampire, orBlock))
+                            if (!CheckVampireCondition(condition, vampire, conditions, orBlock))
                                 param.AddTopic(NoVampireRace.Format(condition, getRace.Race.Link));
                             break;
                     }

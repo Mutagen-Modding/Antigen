@@ -301,6 +301,7 @@ public class ConditionAnalyzerTest
                 {
                     Data = data,
                     Flags = Condition.Flag.OR,
+                    ComparisonValue = 1,
                 });
             },
             prepForFix: (rec, mod) =>
@@ -310,6 +311,7 @@ public class ConditionAnalyzerTest
                 rec.Conditions.Add(new ConditionFloat()
                 {
                     Data = data,
+                    ComparisonValue = 1,
                 });
             },
             ConditionAnalyzer.NoVampireRace);
@@ -327,6 +329,7 @@ public class ConditionAnalyzerTest
                 {
                     Data = data,
                     Flags = Condition.Flag.OR,
+                    ComparisonValue = 1,
                 });
             },
             prepForFix: (rec, mod) =>
@@ -336,6 +339,7 @@ public class ConditionAnalyzerTest
                 rec.Conditions.Add(new ConditionFloat()
                 {
                     Data = data,
+                    ComparisonValue = 1
                 });
             },
             ConditionAnalyzer.NoVampireRace);
@@ -354,6 +358,7 @@ public class ConditionAnalyzerTest
                 {
                     Data = data,
                     Flags = Condition.Flag.OR,
+                    ComparisonValue = 1,
                 });
                 var vampData = new GetIsRaceConditionData();
                 vampData.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire);
@@ -361,6 +366,7 @@ public class ConditionAnalyzerTest
                 rec.Conditions.Add(new ConditionFloat()
                 {
                     Data = vampData,
+                    ComparisonValue = 1,
                 });
             },
             prepForFix: (rec, mod) =>
@@ -395,14 +401,14 @@ public class ConditionAnalyzerTest
             },
             prepForFix: (rec, mod) =>
             {
-                (rec.Conditions[1] as ConditionFloat)!.ComparisonValue = 0;
+                (rec.Conditions[0] as ConditionFloat)!.ComparisonValue = 1;
             },
             ConditionAnalyzer.NoVampireRace);
     }
 
-    // Vampire conditions should be part of the same OR block
+    // GetRace == 0 vampire conditions should be ANDed together
     [Theory, MutagenModAutoData]
-    public void VampireConditionCombineAnd(Fixture fixture)
+    public void VampireConditionNegativeCombineAnd(Fixture fixture)
     {
         fixture.Run(
             prepForError: (rec, mod) =>
@@ -412,12 +418,44 @@ public class ConditionAnalyzerTest
                 rec.Conditions.Add(new ConditionFloat()
                 {
                     Data = data,
+                    ComparisonValue = 0,
+                    Flags = Condition.Flag.OR,
                 });
                 var data2 = new GetIsRaceConditionData();
                 data2.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire);
                 rec.Conditions.Add(new ConditionFloat()
                 {
                     Data = data2,
+                    ComparisonValue = 0,
+                });
+            },
+            prepForFix: (rec, mod) =>
+            {
+                rec.Conditions[0].Flags &= ~Condition.Flag.OR;
+            },
+            ConditionAnalyzer.NoVampireRace);
+    }
+
+    // GetRace == 1 vampire conditions should be part of the same OR block
+    [Theory, MutagenModAutoData]
+    public void VampireConditionPositiveCombineOr(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                var data = new GetIsRaceConditionData();
+                data.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRace);
+                rec.Conditions.Add(new ConditionFloat()
+                {
+                    Data = data,
+                    ComparisonValue = 1,
+                });
+                var data2 = new GetIsRaceConditionData();
+                data2.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire);
+                rec.Conditions.Add(new ConditionFloat()
+                {
+                    Data = data2,
+                    ComparisonValue = 1,
                 });
             },
             prepForFix: (rec, mod) =>
@@ -440,12 +478,14 @@ public class ConditionAnalyzerTest
                 {
                     Data = data,
                     Flags = Condition.Flag.OR,
+                    ComparisonValue = 1,
                 });
                 var data2 = new GetIsRaceConditionData();
                 data2.Race.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Race.NordRaceVampire);
                 rec.EventConditions.Add(new ConditionFloat()
                 {
                     Data = data2,
+                    ComparisonValue = 1,
                 });
             },
             prepForFix: (rec, mod) =>
