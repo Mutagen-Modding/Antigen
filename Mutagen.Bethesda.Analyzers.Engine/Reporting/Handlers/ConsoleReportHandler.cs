@@ -35,11 +35,10 @@ public class ConsoleReportHandler : IReportHandler
         {
             IMajorRecordGetter? parent = null;
             var editorId = "";
-            var modGetter = _linkCache.ListedOrder.FirstOrDefault(l => l.ModKey == sourceMod);
-            if (modGetter is not null)
+
+            if (_linkCache.TryGetLinkCacheForMod(sourceMod, out var cache))
             {
-                var sourceModLinkCache = new ImmutableModLinkCache(modGetter);
-                sourceModLinkCache.TryResolveIdentifier(majorRecord, out editorId);
+                cache.TryResolveIdentifier(majorRecord, out editorId);
             }
             else
             {
