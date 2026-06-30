@@ -3,7 +3,6 @@ using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
-using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
@@ -19,32 +18,39 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
     where TAnalyzer : IContextualRecordAnalyzer<TMajorGetter>
 {
     private readonly IFixture _fixture;
+    private readonly SkyrimMod _mod;
+    private readonly TMajor _rec;
     public TAnalyzer Sut { get; }
 
-    public ContextualRecordTestFixture(TAnalyzer sut, IFixture fixture)
+    public ContextualRecordTestFixture(TAnalyzer sut, IFixture fixture, SkyrimMod mod, TMajor rec)
     {
         _fixture = fixture;
         Sut = sut;
+        _mod = mod;
+        _rec = rec;
     }
 
     readonly struct TestParameters
     {
-        public ISkyrimMod Mod { get; init; }
-        public TMajor Rec { get; init; }
         public ILoadOrder<IModListing<ISkyrimMod>> LoadOrder { get; init; }
         public ILinkCache LinkCache { get; init; }
         public TestDropoff DropOff { get; init; }
     };
 
-    public T Create<T>() where T : IMajorRecord => _fixture.Create<T>();
+    [Obsolete("Use test case parameters or Group.AddNew instead")]
+    public T Create<T>() where T : IMajorRecord {
+        var rec = _fixture.Create<T>();
+        _mod.Remove(rec); // Fixture.Create inserts the record into our mod which existing test cases do manually
+        return rec;
+    }
 
     ContextualRecordAnalyzerParams<TMajorGetter> CreateAnalyserParams(TestParameters baseParams)
     {
         return new ContextualRecordAnalyzerParams<TMajorGetter>(
             linkCache: baseParams.LinkCache,
             loadOrder: baseParams.LoadOrder,
-            modKey: ModKey.Null,
-            record: baseParams.Rec,
+            modKey: _mod.ModKey,
+            record: _rec,
             reportDropbox: baseParams.DropOff,
             // Usage caches are always immutable, therefore we need a new cache after prepForFix
             provideCaches: new ProvideCaches(baseParams.LinkCache, [new UsageCacheProvider()]));
@@ -52,19 +58,14 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
 
     TestParameters Setup()
     {
-        var mod = new SkyrimMod("mod1.esp", SkyrimRelease.SkyrimSE);
-        // TODO: Insert record into mod. GetTopLevelGroup returns a getter
-        var rec = _fixture.Create<TMajor>();
         var loadOrder = new LoadOrder<IModListing<ISkyrimMod>>
         {
-            new ModListing<ISkyrimMod>(mod)
+            new ModListing<ISkyrimMod>(_mod)
         };
-        var linkCache = mod.ToMutableLinkCache();
+        var linkCache = _mod.ToMutableLinkCache();
         var dropOff = new TestDropoff();
         return new TestParameters()
         {
-            Mod = mod,
-            Rec = rec,
             LoadOrder = loadOrder,
             LinkCache = linkCache,
             DropOff = dropOff
@@ -78,13 +79,13 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
     {
         var param = Setup();
 
-        prepForError(param.Rec, param.Mod);
+        prepForError(_rec, _mod);
 
         Sut.AnalyzeRecord(CreateAnalyserParams(param));
         param.DropOff.Reports.Select(x => x.TopicDefinition.Id)
             .ShouldEqualEnumerable(expectedTopics.Select(x => x.Id));
 
-        prepForFix(param.Rec, param.Mod);
+        prepForFix(_rec, _mod);
 
         // ToDo
         // Eventually test that fixrec triggers a rerun in the engine properly
@@ -98,7 +99,7 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
         Action<TMajor, ISkyrimMod> prep)
     {
         var param = Setup();
-        prep(param.Rec, param.Mod);
+        prep(_rec, _mod);
         Sut.AnalyzeRecord(CreateAnalyserParams(param));
         param.DropOff.Reports.ShouldBeEmpty();
     }
