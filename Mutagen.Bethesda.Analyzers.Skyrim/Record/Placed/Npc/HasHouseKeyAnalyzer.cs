@@ -1,5 +1,6 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
 
@@ -25,7 +26,7 @@ public class HasHouseKeyAnalyzer : IContextualRecordAnalyzer<IPlacedNpcGetter>
         if (!npc.IsUnique()) return;
         if (!npc.IsActorTypeNpc(param.LinkCache)) return;
 
-        var cell = placedNpc.GetCell(param.LinkCache);
+        var cell = placedNpc.GetCell(param.LinkCache, param.ResolveCache<IExteriorCellCache>());
         if (cell is null) return;
 
         var missingKeys = new HashSet<FormKey>();
