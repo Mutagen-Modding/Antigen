@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
@@ -13,37 +14,37 @@ public interface IExteriorCellCache
 
 public class ImmutableExteriorCellCache(ILinkCache linkCache) : IExteriorCellCache
 {
-    private readonly Dictionary<FormKey, Dictionary<P2Int, IFormLinkGetter<ICellGetter>>> _worldLookup = [];
+    private readonly ConcurrentDictionary<FormKey, Dictionary<P2Int, IFormLinkGetter<ICellGetter>>> _worldLookup = new();
 
-    private Dictionary<P2Int, IFormLinkGetter<ICellGetter>>? GetLookupForWorld(FormKey world)
+    private Dictionary<P2Int, IFormLinkGetter<ICellGetter>> GetLookupForWorld(FormKey world)
     {
-        if (_worldLookup.TryGetValue(world, out var lookup)) return lookup;
-
-        lookup = [];
-
-        foreach (var worldspaceOverride in linkCache.ResolveAll<IWorldspaceGetter>(world))
+        return _worldLookup.GetOrAdd(world, static (w, cache) =>
         {
-            foreach (var block in worldspaceOverride.SubCells)
+            var lookup = new Dictionary<P2Int, IFormLinkGetter<ICellGetter>>();
+
+            foreach (var worldspaceOverride in cache.ResolveAll<IWorldspaceGetter>(w))
             {
-                foreach (var subBlock in block.Items)
+                foreach (var block in worldspaceOverride.SubCells)
                 {
-                    foreach (var cell in subBlock.Items)
+                    foreach (var subBlock in block.Items)
                     {
-                        if (cell.Grid != null)
+                        foreach (var cell in subBlock.Items)
                         {
-                            lookup[cell.Grid.Point] = cell.ToLink();
+                            if (cell.Grid != null)
+                            {
+                                lookup[cell.Grid.Point] = cell.ToLink();
+                            }
                         }
                     }
                 }
             }
-        }
-        _worldLookup[world] = lookup;
-        return lookup;
+            return lookup;
+        }, linkCache);
     }
 
     IFormLinkGetter<ICellGetter> GetExterior(FormKey worldspace, P2Int grid)
     {
-        if (GetLookupForWorld(worldspace)?.TryGetValue(grid, out var cell) ?? false)
+        if (GetLookupForWorld(worldspace).TryGetValue(grid, out var cell))
             return cell;
         return FormLink<ICellGetter>.Null;
     }
