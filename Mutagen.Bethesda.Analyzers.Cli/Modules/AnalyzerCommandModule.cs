@@ -77,8 +77,8 @@ public class AnalyzerCommandModule(RunAnalyzersCommand command) : Module
                 .Select(x => ModKey.FromFileName(x));
 
             builder.RegisterInstance(new InjectedEnabledPluginListingsProvider(loadOrder)).As<IEnabledPluginListingsProvider>();
-            builder.RegisterType<NullPluginListingsPathProvider>().As<IPluginListingsPathProvider>();
-            builder.RegisterType<NullCreationClubListingsPathProvider>().As<ICreationClubListingsPathProvider>();
+            builder.RegisterType<EmptyPluginListingsPathProvider>().As<IPluginListingsPathProvider>();
+            builder.RegisterType<EmptyCreationClubListingsPathProvider>().As<ICreationClubListingsPathProvider>();
         }
 
         if (command.BlacklistedMods is not null)

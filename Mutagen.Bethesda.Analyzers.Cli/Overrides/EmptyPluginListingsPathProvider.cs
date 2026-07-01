@@ -3,7 +3,7 @@ using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Cli.Overrides;
 
-internal class NullPluginListingsPathProvider : IPluginListingsPathProvider
+internal class EmptyPluginListingsPathProvider : IPluginListingsPathProvider
 {
     public FilePath? Get(GameRelease release) => string.Empty;
 }
