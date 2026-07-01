@@ -1,4 +1,3 @@
-using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
@@ -19,29 +18,6 @@ public static class WorldspaceExtensions
         }
 
         return worldLocations;
-    }
-
-    /// <summary>
-    /// Gets a cell for the specified cell coordinates if it exists in any override of the worldspace.
-    /// </summary>
-    /// <param name="worldspace">Worldspace to add the cell to</param>
-    /// <param name="cellCoordinates">Cell coordinates to get the cell for</param>
-    /// <param name="linkCache">Link cache to resolve worldspace overrides</param>
-    /// <returns>The cell at the specified coordinates or null if it does not exist</returns>
-    [Obsolete($"Use {nameof(IExteriorCellCache)} instead")]
-    public static ICellGetter? GetCell(this IWorldspaceGetter worldspace, P2Int cellCoordinates, ILinkCache linkCache)
-    {
-        foreach (var worldspaceOverride in linkCache.ResolveAll(worldspace))
-        {
-            var subBlock = worldspaceOverride.GetSubBlock(cellCoordinates);
-            var cell = subBlock?.Items.FirstOrDefault(b => b.Grid is not null && b.Grid.Point == cellCoordinates);
-            if (cell is not null)
-            {
-                return cell;
-            }
-        }
-
-        return null;
     }
 
     /// <summary>

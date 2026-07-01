@@ -98,7 +98,6 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
 
             void CheckNeigbour(Direction dir)
             {
-                // TODO: Worldspace.GetCell is fairly slow.
                 var neighbour = lookup.GetExterior(worldspace, NeighbourCoords(cell.Grid.Point, dir)).TryResolve(param.LinkCache)
                     ?.GetLandscape(param.LinkCache);
                 if (neighbour == null) return;
