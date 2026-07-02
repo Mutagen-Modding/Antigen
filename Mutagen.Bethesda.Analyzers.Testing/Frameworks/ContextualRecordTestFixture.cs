@@ -1,8 +1,10 @@
 using AutoFixture;
+using Mutagen.Bethesda;
 using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Order;
 using Mutagen.Bethesda.Plugins.Records;
@@ -14,7 +16,7 @@ namespace Mutagen.Bethesda.Analyzers.Testing.Frameworks;
 
 public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
     where TMajor : IMajorRecord, TMajorGetter
-    where TMajorGetter : IMajorRecordGetter
+    where TMajorGetter : class, IMajorRecordGetter
     where TAnalyzer : IContextualRecordAnalyzer<TMajorGetter>
 {
     private readonly IFixture _fixture;
@@ -46,14 +48,23 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
 
     ContextualRecordAnalyzerParams<TMajorGetter> CreateAnalyserParams(TestParameters baseParams)
     {
+        return CreateAnalyserParams(_rec, baseParams.LinkCache, baseParams.LoadOrder, baseParams.DropOff);
+    }
+
+    ContextualRecordAnalyzerParams<TMajorGetter> CreateAnalyserParams(
+        TMajorGetter record,
+        ILinkCache linkCache,
+        ILoadOrderGetter<IModListingGetter<IModGetter>> loadOrder,
+        TestDropoff dropOff)
+    {
         return new ContextualRecordAnalyzerParams<TMajorGetter>(
-            linkCache: baseParams.LinkCache,
-            loadOrder: baseParams.LoadOrder,
+            linkCache: linkCache,
+            loadOrder: loadOrder,
             modKey: _mod.ModKey,
-            record: _rec,
-            reportDropbox: baseParams.DropOff,
+            record: record,
+            reportDropbox: dropOff,
             // Caches are immutable, so a fresh ProvideCaches is needed after prepForFix
-            provideCaches: new ProvideCaches(baseParams.LinkCache, TestCacheConstructors.All));
+            provideCaches: new ProvideCaches(linkCache, TestCacheConstructors.All));
     }
 
     TestParameters Setup()
@@ -102,5 +113,63 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
         prep(_rec, _mod);
         Sut.AnalyzeRecord(CreateAnalyserParams(param));
         param.DropOff.Reports.ShouldBeEmpty();
+    }
+
+    readonly struct FileParameters
+    {
+        public IModGetter Mod { get; init; }
+        public ILoadOrderGetter<IModListingGetter<IModGetter>> LoadOrder { get; init; }
+        public ILinkCache LinkCache { get; init; }
+    }
+
+    FileParameters SetupFromFile(ModPath path, GameRelease release)
+    {
+        var mod = ModFactory.ImportGetter(path, release);
+        var loadOrder = new LoadOrder<IModListingGetter<IModGetter>>
+        {
+            new ModListing<IModGetter>(mod, enabled: true)
+        };
+        return new FileParameters
+        {
+            Mod = mod,
+            LoadOrder = loadOrder,
+            LinkCache = mod.ToUntypedImmutableLinkCache(),
+        };
+    }
+
+    void AnalyzeFromFile(
+        FileParameters param,
+        FormKey record,
+        params TopicDefinition[] expectedTopics)
+    {
+        var dropOff = new TestDropoff();
+        var rec = param.LinkCache.Resolve<TMajorGetter>(record);
+        Sut.AnalyzeRecord(CreateAnalyserParams(rec, param.LinkCache, param.LoadOrder, dropOff));
+        dropOff.Reports.Select(x => x.TopicDefinition.Id)
+            .ShouldEqualEnumerable(expectedTopics.Select(x => x.Id));
+    }
+
+    public void RunWithFile(
+        ModPath path,
+        GameRelease release,
+        FormKey errorRecord,
+        FormKey fixRecord,
+        params TopicDefinition[] expectedTopics)
+    {
+        var param = SetupFromFile(path, release);
+        using var mod = param.Mod as IDisposable;
+        AnalyzeFromFile(param, errorRecord, expectedTopics);
+        AnalyzeFromFile(param, fixRecord);
+    }
+
+    public void RunWithFile(
+        ModPath path,
+        GameRelease release,
+        FormKey record,
+        params TopicDefinition[] expectedTopics)
+    {
+        var param = SetupFromFile(path, release);
+        using var mod = param.Mod as IDisposable;
+        AnalyzeFromFile(param, record, expectedTopics);
     }
 }
