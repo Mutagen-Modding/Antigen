@@ -2,7 +2,6 @@ using AutoFixture;
 using Mutagen.Bethesda.Analyzers.Drivers;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
-using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Order;
@@ -46,8 +45,8 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
             modKey: ModKey.Null,
             record: baseParams.Rec,
             reportDropbox: baseParams.DropOff,
-            // Usage caches are always immutable, therefore we need a new cache after prepForFix
-            provideCaches: new ProvideCaches(baseParams.LinkCache, [new UsageCacheProvider(), new ExteriorCellCacheProvider()]));
+            // Caches are immutable, so a fresh ProvideCaches is needed after prepForFix
+            provideCaches: new ProvideCaches(baseParams.LinkCache, TestCacheConstructors.All));
     }
 
     TestParameters Setup()
