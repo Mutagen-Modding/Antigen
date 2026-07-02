@@ -9,7 +9,7 @@ public static class RecordExtension
     /// </summary>
     /// <param name="record"></param>
     /// <returns></returns>
-    public static IEnumerable<IEnumerable<IConditionGetter>> GetConditions(this ISkyrimMajorRecordGetter record)
+    public static IEnumerable<IEnumerable<IConditionGetter>> GetConditionsByField(this ISkyrimMajorRecordGetter record)
     {
         return record switch
         {

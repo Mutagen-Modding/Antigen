@@ -126,7 +126,7 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ISkyrimMajorRecordGetter> param)
     {
-        var blocks = param.Record.GetConditions();
+        var blocks = param.Record.GetConditionsByField();
         foreach (var block in blocks)
         {
             // GetCurrentTime analyzer relies on index within the block
