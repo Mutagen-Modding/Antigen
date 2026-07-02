@@ -1,6 +1,8 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
+using Mutagen.Bethesda.Plugins.Cache;
+using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
 
@@ -28,9 +30,14 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
             Severity.Warning)
         .WithFormatting<Direction>("Landscape vertex colors have seam in direction {0}");
 
+    public static readonly TopicDefinition<Quadrant, Direction> TextureSeam = MutagenTopicBuilder.DevelopmentTopic(
+            "Landscape texture seam",
+            Severity.Warning)
+        .WithFormatting<Quadrant, Direction>("Landscape quadrant {0} has seam in direction {1}");
+
     static readonly IReadOnlyArray2d<P3UInt8> DefaultVertexColors = new Array2d<P3UInt8>(new P2Int(LandscapeExtensions.GridSize, LandscapeExtensions.GridSize), new P3UInt8(255, 255, 255));
 
-    public IEnumerable<TopicDefinition> Topics => [HeightMapSeam];
+    public IEnumerable<TopicDefinition> Topics => [HeightMapSeam, VertexColorSeam, TextureSeam];
 
     static P2Int NeighbourCoords(P2Int origin, Direction direction)
     {
@@ -87,7 +94,12 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         var worldspace = cell?.GetWorldspace(param.LinkCache);
         if (cell?.Grid == null || worldspace == null) return;
 
-        var lookup = param.ResolveCache<IExteriorCellCache>();
+        var usageCache = param.ResolveCache<ILinkUsageCache>();
+        var exteriorCache = param.ResolveCache<IExteriorCellCache>();
+
+        if (!cell.IsNearBorderRegion(param.LinkCache, usageCache, exteriorCache))
+            return;
+
 
         void CheckSeams<T>(TopicDefinition<Direction> topic, Func<ILandscapeGetter, IReadOnlyArray2d<T>?> getData)
             where T : IEquatable<T>
@@ -98,7 +110,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
 
             void CheckNeigbour(Direction dir)
             {
-                var neighbour = lookup.GetExterior(worldspace, NeighbourCoords(cell.Grid.Point, dir)).TryResolve(param.LinkCache)
+                var neighbour = exteriorCache.GetExterior(worldspace, NeighbourCoords(cell.Grid.Point, dir)).TryResolve(param.LinkCache)
                     ?.GetLandscape(param.LinkCache);
                 if (neighbour == null) return;
                 var neighbourData = getData(neighbour);
@@ -107,6 +119,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
                 var edgeSelf = GetEdge(data, dir);
                 var edgeOther = GetEdge(neighbourData, Opposite(dir));
 
+                // TODO: Add context about sizes and positions of seams
                 if (HasSeam(edgeSelf, edgeOther))
                     param.AddTopic(topic.Format(dir));
             }
