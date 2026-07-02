@@ -52,8 +52,8 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
             modKey: _mod.ModKey,
             record: _rec,
             reportDropbox: baseParams.DropOff,
-            // Usage caches are always immutable, therefore we need a new cache after prepForFix
-            provideCaches: new ProvideCaches(baseParams.LinkCache, [new UsageCacheProvider()]));
+            // Caches are immutable, so a fresh ProvideCaches is needed after prepForFix
+            provideCaches: new ProvideCaches(baseParams.LinkCache, TestCacheConstructors.All));
     }
 
     TestParameters Setup()

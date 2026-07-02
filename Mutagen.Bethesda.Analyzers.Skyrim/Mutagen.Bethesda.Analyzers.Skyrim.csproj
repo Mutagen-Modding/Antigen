@@ -21,4 +21,8 @@
       <PackageReference Include="Microsoft.SourceLink.GitHub" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Record\MagicEffect\" />
+    </ItemGroup>
+
 </Project>
