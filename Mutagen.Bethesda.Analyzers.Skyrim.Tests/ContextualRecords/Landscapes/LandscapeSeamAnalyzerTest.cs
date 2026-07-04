@@ -104,4 +104,52 @@ public class LandscapeSeamAnalyzerTest
             },
             LandscapeSeamAnalyzer.VertexColorSeam);
     }
+
+    // A quadrant's textures should match its neighbors
+    [Theory, MutagenModAutoData]
+    public void TextureSeam(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+
+            },
+            prepForFix: (rec, mod) =>
+            {
+
+            },
+            LandscapeSeamAnalyzer.TextureSeam);
+    }
+
+    // A landscape should not be considered if its cell is not near a border region
+    [Theory, MutagenModAutoData]
+    public void NotInBorderRegion(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+
+            },
+            prepForFix: (rec, mod) =>
+            {
+
+            },
+            LandscapeSeamAnalyzer.VertexColorSeam);
+    }
+
+    // A null texture should be treated as LDirt02
+    [Theory, MutagenModAutoData]
+    public void DefaultTexture(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+
+            },
+            prepForFix: (rec, mod) =>
+            {
+
+            },
+            LandscapeSeamAnalyzer.VertexColorSeam);
+    }
 }
