@@ -16,6 +16,7 @@ public static class LandscapeExtensions
     public static readonly float TriangleWidth = CellExtensions.CellLength / (GridSize - 1);
     public static readonly float ObjScale = 1.0f / 128.0f;
     public static readonly IFormLinkGetter<ILandscapeTextureGetter> DefaultTexture = FormKeys.SkyrimSE.Skyrim.LandscapeTexture.LDirt02;
+    public static readonly IReadOnlyArray2d<float> DefaultAlphaOpacity = new Array2d<float>(QuadSize, QuadSize, 0);
 
     /// <summary>
     /// Decode a landscape's heightmap
@@ -51,97 +52,80 @@ public static class LandscapeExtensions
         return result;
     }
 
-    public class TextureData
-    {
-        public QuadrantData GetQuadrant(Quadrant quadrant)
-        {
-            return quadrant switch
-            {
-                Quadrant.BottomLeft => BottomLeft,
-                Quadrant.BottomRight => BottomRight,
-                Quadrant.TopLeft => TopLeft,
-                Quadrant.TopRight => TopRight,
-                _ => throw new ArgumentOutOfRangeException(nameof(quadrant)),
-            };
-        }
-
-        public TextureData(IEnumerable<IBaseLayerGetter> layers)
-        {
-            TopLeft = new QuadrantData(layers.Where(l => l.Header?.Quadrant == Quadrant.TopLeft));
-            TopRight = new QuadrantData(layers.Where(l => l.Header?.Quadrant == Quadrant.TopRight));
-            BottomLeft = new QuadrantData(layers.Where(l => l.Header?.Quadrant == Quadrant.BottomLeft));
-            BottomRight = new QuadrantData(layers.Where(l => l.Header?.Quadrant == Quadrant.BottomRight));
-            // Texture paint is stored as a base layer and zero or more alpha layers for each quadrant
-            // Alpha layers are layered on top of the base layer and are defined as a key-value map of position->alpha
-            // Alpha layer values for a position sum to <= 1, if sum is less then 1 then the remainder is the base layer
-            // If a layer's texture is null, it is treated as LDirt02
-        }
-
-        public QuadrantData TopLeft { get; }
-        public QuadrantData TopRight { get; }
-        public QuadrantData BottomLeft { get; }
-        public QuadrantData BottomRight { get; }
-    }
-
     public class QuadrantData
     {
-        P2Int ToCoords(ushort encoded)
+        public readonly struct Layer
         {
-            return new(encoded / QuadSize, encoded % QuadSize);
+            public required readonly IFormLinkGetter<ILandscapeTextureGetter> Texture { get; init; }
+            public required readonly IReadOnlyArray2d<float> Opacity { get; init; }
+        };
+
+        static P2Int ToCoords(ushort encoded)
+        {
+            // Slight deviation from xEdit: transpose coordinates to match that of color and height data
+            // which slightly simplifies the analyser
+            return new(encoded % QuadSize, encoded / QuadSize);
         }
 
-        public QuadrantData(IEnumerable<IBaseLayerGetter> layers)
+        public QuadrantData(Quadrant quadrant, IEnumerable<IBaseLayerGetter> layers)
         {
-            _baseTexture = DefaultTexture;
+            Quadrant = quadrant;
+            var baseTexture = DefaultTexture;
+            var layerData = new List<Layer>();
+
             foreach (var layer in layers)
             {
                 if (layer.Header == null)
                     throw new ArgumentException("Layer header should not be null");
+                var texture = layer.Header.Texture.IsNull ? DefaultTexture : layer.Header.Texture;
 
                 if (layer is IAlphaLayerGetter alpha)
                 {
                     if (alpha.AlphaLayerData == null)
                         continue;
 
-                    var texture = layer.Header.Texture.IsNull ? DefaultTexture : layer.Header.Texture;
-                    _alphaLayers[texture.FormKey] = alpha.AlphaLayerData
-                        .ToDictionary(p => ToCoords(p.Position), p => p.Opacity);
+                    var data = new Array2d<float>(QuadSize, QuadSize, 0);
+                    foreach (var point in alpha.AlphaLayerData)
+                    {
+                        data[ToCoords(point.Position)] = point.Opacity;
+                    }
+                    layerData.Add(new() { Texture = texture, Opacity = data });
                 }
                 else
                 {
-                    _baseTexture = layer.Header.Texture;
+                    baseTexture = texture;
                 }
             }
+
+            var baseAlpha = new Array2d<float>(QuadSize, QuadSize, 0);
+            foreach (var point in baseAlpha)
+            {
+                baseAlpha[point.Key] = 1.0f - layerData.Sum(l => l.Opacity[point.Key]);
+            }
+            layerData.Add(new() { Texture = baseTexture, Opacity = baseAlpha });
+            Layers = layerData;
         }
 
-        IFormLinkGetter<ILandscapeTextureGetter> _baseTexture;
-        Dictionary<FormKey, Dictionary<P2Int, float>> _alphaLayers = [];
+        public readonly IReadOnlyList<Layer> Layers;
+        public readonly Quadrant Quadrant;
 
 
         public IEnumerable<IFormLinkGetter<ILandscapeTextureGetter>> GetTextures()
         {
-            yield return _baseTexture;
-            foreach (var layer in _alphaLayers.Keys)
-                yield return layer.ToLink<ILandscapeTextureGetter>();
+            return Layers.Select(l => l.Texture);
         }
 
-        public float GetOpacity(IFormLinkGetter<ILandscapeTextureGetter> texture, P2Int position)
+        public Layer GetLayer(IFormLinkGetter<ILandscapeTextureGetter> texture)
         {
-            if (texture.Equals(_baseTexture))
-            {
-                var sum = _alphaLayers.Values.Select(l => l.GetOrDefault(position)).Sum();
-                return 1.0f - sum;
-            }
-            else
-            {
-                return _alphaLayers.GetOrDefault(texture.FormKey)?.GetOrDefault(position) ?? 0;
-            }
+            return Layers.FirstOrDefault(
+                l => l.Texture.Equals(texture),
+                new() { Texture = DefaultTexture, Opacity = DefaultAlphaOpacity });
         }
     }
 
-    public static TextureData Decode(this IEnumerable<IBaseLayerGetter> layers)
+    public static QuadrantData DecodeQuadrant(this IEnumerable<IBaseLayerGetter> layers, Quadrant quadrant)
     {
-        return new TextureData(layers);
+        return new QuadrantData(quadrant, layers.Where(l => l.Header?.Quadrant == quadrant));
     }
 
     /// <summary>
