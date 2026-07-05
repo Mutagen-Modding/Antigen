@@ -100,7 +100,8 @@ public static class LandscapeExtensions
             var baseAlpha = new Array2d<float>(QuadSize, QuadSize, 0);
             foreach (var point in baseAlpha)
             {
-                baseAlpha[point.Key] = 1.0f - layerData.Sum(l => l.Opacity[point.Key]);
+                // TODO: Is this the correct behaviour for when the sum of opacities is > 1?
+                baseAlpha[point.Key] = Math.Max(0.0f, 1.0f - layerData.Sum(l => l.Opacity[point.Key]));
             }
             layerData.Add(new() { Texture = baseTexture, Opacity = baseAlpha });
             Layers = layerData;
