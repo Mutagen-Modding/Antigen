@@ -39,9 +39,9 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
 
     public IEnumerable<TopicDefinition> Topics => [HeightMapSeam, VertexColorSeam, TextureSeam];
 
-    static P2Int NeighbourCoords(P2Int origin, Direction direction)
+    static P2Int ToOffset(Direction direction)
     {
-        return origin + direction switch
+        return direction switch
         {
             Direction.North => new P2Int(0, 1),
             Direction.East => new P2Int(1, 0),
@@ -110,7 +110,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
 
             void CheckNeigbour(Direction dir)
             {
-                var neighbour = exteriorCache.GetExterior(worldspace, NeighbourCoords(cell.Grid.Point, dir)).TryResolve(param.LinkCache)
+                var neighbour = exteriorCache.GetExterior(worldspace, cell.Grid.Point + ToOffset(dir)).TryResolve(param.LinkCache)
                     ?.GetLandscape(param.LinkCache);
                 if (neighbour == null) return;
                 var neighbourData = getData(neighbour);
