@@ -14,10 +14,12 @@ using Fixture = ContextualRecordTestFixture<LandscapeSeamAnalyzer, Landscape, IL
 public class LandscapeSeamAnalyzerTest
 {
     public static readonly ModPath TestPlugin = "Files/LandSeamTest.esp";
-    // Landscape that is flush on its south edge with TestLandNorth
-    public static readonly FormKey TestLandGood = new(TestPlugin.ModKey, 0x000D63);
-    // Landscape that has seams on its south edge with TestLandNorth
-    public static readonly FormKey TestLandBad = new(TestPlugin.ModKey, 0x000D8F);
+    // Landscape that is flush on its edge with TestLandNorth
+    public static readonly FormKey TestHeightGood = new(TestPlugin.ModKey, 0x000D63);
+    public static readonly FormKey TestColorGood = new(TestPlugin.ModKey, 0x001341);
+    // Landscape that has seams on its edge with TestLandNorth
+    public static readonly FormKey TestHeightBad = new(TestPlugin.ModKey, 0x000D8F);
+    public static readonly FormKey TestColorBad = new(TestPlugin.ModKey, 0x001357);
 
     static Array2d<P3UInt8> CreateColorArray(P3UInt8 fill)
     {
@@ -45,8 +47,8 @@ public class LandscapeSeamAnalyzerTest
         fixture.RunWithFile(
             TestPlugin,
             GameRelease.SkyrimSE,
-            errorRecord: TestLandBad,
-            fixRecord: TestLandGood,
+            errorRecord: TestHeightBad,
+            fixRecord: TestHeightGood,
             LandscapeSeamAnalyzer.HeightMapSeam);
     }
 
@@ -54,18 +56,11 @@ public class LandscapeSeamAnalyzerTest
     [Theory, MutagenModAutoData]
     public void ColorSeam(Fixture fixture)
     {
-        fixture.Run(
-            prepForError: (rec, mod) =>
-            {
-                var southLand = Setup(rec, mod);
-
-                rec.VertexColors = CreateColorArray(new(255, 0, 0));
-                southLand.VertexColors = CreateColorArray(new(255, 255, 0));
-            },
-            prepForFix: (rec, mod) =>
-            {
-                rec.VertexColors!.SetAllTo(new P3UInt8(255, 255, 0));
-            },
+        fixture.RunWithFile(
+            TestPlugin,
+            GameRelease.SkyrimSE,
+            errorRecord: TestColorBad,
+            fixRecord: TestColorGood,
             LandscapeSeamAnalyzer.VertexColorSeam);
     }
 
