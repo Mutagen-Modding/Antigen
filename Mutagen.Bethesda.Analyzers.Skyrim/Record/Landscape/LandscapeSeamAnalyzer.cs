@@ -30,10 +30,10 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
             Severity.Warning)
         .WithFormatting<Direction>("Landscape vertex colors have seam in direction {0}");
 
-    public static readonly TopicDefinition<Quadrant, Direction> TextureSeam = MutagenTopicBuilder.DevelopmentTopic(
+    public static readonly TopicDefinition<Quadrant, Direction, IFormLinkGetter<ILandscapeTextureGetter>> TextureSeam = MutagenTopicBuilder.DevelopmentTopic(
             "Landscape texture seam",
             Severity.Warning)
-        .WithFormatting<Quadrant, Direction>("Landscape quadrant {0} has seam in direction {1}");
+        .WithFormatting<Quadrant, Direction, IFormLinkGetter<ILandscapeTextureGetter>>("Landscape quadrant {0} has seam in direction {1} with texture {2}");
 
     static readonly IReadOnlyArray2d<P3UInt8> DefaultVertexColors = new Array2d<P3UInt8>(new P2Int(LandscapeExtensions.GridSize, LandscapeExtensions.GridSize), new P3UInt8(255, 255, 255));
 
@@ -66,8 +66,8 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
     {
         return direction switch
         {
-            Direction.North => data.GetRow(LandscapeExtensions.GridSize - 1),
-            Direction.East => data.GetColumn(LandscapeExtensions.GridSize - 1),
+            Direction.North => data.GetRow(data.Height - 1),
+            Direction.East => data.GetColumn(data.Width - 1),
             Direction.South => data.GetRow(0),
             Direction.West => data.GetColumn(0),
             _ => throw new ArgumentOutOfRangeException(nameof(direction)),
@@ -119,9 +119,9 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
                 var edgeSelf = GetEdge(data, dir);
                 var edgeOther = GetEdge(neighbourData, Opposite(dir));
 
-                // TODO: Add context about sizes and positions of seams
+                // TODO: Add context about sizes and positions of seams. Only include differing points
                 if (HasSeam(edgeSelf, edgeOther))
-                    param.AddTopic(topic.Format(dir));
+                    param.AddTopic(topic.Format(dir), ("Edge", edgeSelf.Zip(edgeOther)));
             }
             CheckNeigbour(Direction.North);
             CheckNeigbour(Direction.East);
@@ -131,6 +131,49 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
 
         CheckSeams(HeightMapSeam, l => l.VertexHeightMap?.Decode());
         CheckSeams(VertexColorSeam, l => l.VertexColors ?? DefaultVertexColors);
+
+        void CheckTextures(LandscapeExtensions.QuadrantData selfQuadrant, LandscapeExtensions.QuadrantData otherQuadrant, Direction firstToSecond)
+        {
+            foreach (var texture in selfQuadrant.GetTextures().And(otherQuadrant.GetTextures()).Distinct())
+            {
+                var edgeSelf = GetEdge(selfQuadrant.GetLayer(texture).Opacity, firstToSecond);
+                var edgeOther = GetEdge(otherQuadrant.GetLayer(texture).Opacity, Opposite(firstToSecond));
+
+                // We need an epsilon here since opacities are stored as floats
+                var zipped = edgeSelf.Zip(edgeOther);
+                // TODO: Add context about sizes and positions of seams. Only include differing points
+                if (!zipped.All(p => p.First.EqualsWithin(p.Second, AlphaOpacityEpsilon)))
+                    param.AddTopic(TextureSeam.Format(selfQuadrant.Quadrant, firstToSecond, texture), ("Edge", zipped));
+            }
+        }
+
+        // Landscape textures ar broken into four quadrants per cell
+        // This analysers checks are described as:
+        // Where `[bt][lr]` defines a quadrant, and `[NESW]` defines a neighbouring cell
+        //     | Nbl | Nbr |
+        // Wtr | tl  | tr  | Etl
+        //     +-----+-----+
+        // Wbr | bl  | br  | Ebl
+        //     | Stl | Str |
+
+
+        var tl = landscape.Layers.DecodeQuadrant(Quadrant.TopLeft);
+        var tr = landscape.Layers.DecodeQuadrant(Quadrant.TopRight);
+        var bl = landscape.Layers.DecodeQuadrant(Quadrant.BottomLeft);
+        var br = landscape.Layers.DecodeQuadrant(Quadrant.BottomRight);
+
+        CheckTextures(tl, tr, Direction.East);
+        CheckTextures(tl, bl, Direction.South);
+        CheckTextures(bl, br, Direction.East);
+        CheckTextures(tr, br, Direction.South);
+
+        var north = exteriorCache.GetExterior(worldspace, cell.Grid.Point + ToOffset(Direction.North)).TryResolve(param.LinkCache)?.GetLandscape(param.LinkCache);
+        if (north?.Layers != null)
+        {
+            CheckTextures(tl, north.Layers.DecodeQuadrant(Quadrant.BottomLeft), Direction.North);
+            CheckTextures(tr, north.Layers.DecodeQuadrant(Quadrant.BottomRight), Direction.North);
+        }
+        // TODO: East, south, west
     }
 
     public IEnumerable<Func<ILandscapeGetter, object?>> FieldsOfInterest()

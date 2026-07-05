@@ -17,9 +17,11 @@ public class LandscapeSeamAnalyzerTest
     // Landscape that is flush on its edge with TestLandNorth
     public static readonly FormKey TestHeightGood = new(TestPlugin.ModKey, 0x000D63);
     public static readonly FormKey TestColorGood = new(TestPlugin.ModKey, 0x001341);
+    public static readonly FormKey TestTextureGood = new(TestPlugin.ModKey, 0x0018FC);
     // Landscape that has seams on its edge with TestLandNorth
     public static readonly FormKey TestHeightBad = new(TestPlugin.ModKey, 0x000D8F);
     public static readonly FormKey TestColorBad = new(TestPlugin.ModKey, 0x001357);
+    public static readonly FormKey TestTextureBad = new(TestPlugin.ModKey, 0x00191E);
 
     static Array2d<P3UInt8> CreateColorArray(P3UInt8 fill)
     {
@@ -86,15 +88,13 @@ public class LandscapeSeamAnalyzerTest
     [Theory, MutagenModAutoData]
     public void TextureSeam(Fixture fixture)
     {
-        fixture.Run(
-            prepForError: (rec, mod) =>
-            {
-
-            },
-            prepForFix: (rec, mod) =>
-            {
-
-            },
+        fixture.RunWithFile(
+            TestPlugin,
+            GameRelease.SkyrimSE,
+            errorRecord: TestTextureBad,
+            fixRecord: TestTextureGood,
+            // Analyser will trigger once for each texture that differs
+            LandscapeSeamAnalyzer.TextureSeam,
             LandscapeSeamAnalyzer.TextureSeam);
     }
 
