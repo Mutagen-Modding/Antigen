@@ -19,14 +19,6 @@ public class LandscapeSeamAnalyzerTest
     // Landscape that has seams on its south edge with TestLandNorth
     public static readonly FormKey TestLandBad = new(TestPlugin.ModKey, 0x000D8F);
 
-    // Landscape that is flush on its north edge with TestLandGood but has seams with TestLandBad
-    public static readonly FormKey TestLandSouth = new(TestPlugin.ModKey, 0x000D8D);
-
-    public static ISkyrimModDisposableGetter GetTestingPlugin()
-    {
-        return SkyrimMod.CreateFromBinaryOverlay(TestPlugin, SkyrimRelease.SkyrimSE);
-    }
-
     static Array2d<P3UInt8> CreateColorArray(P3UInt8 fill)
     {
         return new Array2d<P3UInt8>(new(LandscapeExtensions.GridSize, LandscapeExtensions.GridSize), fill);
@@ -50,21 +42,11 @@ public class LandscapeSeamAnalyzerTest
     [Theory, MutagenModAutoData]
     public void LandscapeSeam(Fixture fixture)
     {
-        using var dataMod = GetTestingPlugin();
-        using var linkCache = dataMod.ToImmutableLinkCache();
-
-        fixture.Run(
-            prepForError: (rec, mod) =>
-            {
-                var southLand = Setup(rec, mod);
-
-                rec.VertexHeightMap = linkCache.Resolve<ILandscapeGetter>(TestLandBad).VertexHeightMap!.DeepCopy();
-                southLand.VertexHeightMap = linkCache.Resolve<ILandscapeGetter>(TestLandSouth).VertexHeightMap!.DeepCopy();
-            },
-            prepForFix: (rec, mod) =>
-            {
-                rec.VertexHeightMap = linkCache.Resolve<ILandscapeGetter>(TestLandGood).VertexHeightMap!.DeepCopy();
-            },
+        fixture.RunWithFile(
+            TestPlugin,
+            GameRelease.SkyrimSE,
+            errorRecord: TestLandBad,
+            fixRecord: TestLandGood,
             LandscapeSeamAnalyzer.HeightMapSeam);
     }
 
