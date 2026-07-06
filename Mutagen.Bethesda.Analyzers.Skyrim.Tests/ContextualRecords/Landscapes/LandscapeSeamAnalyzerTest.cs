@@ -10,6 +10,7 @@ using Xunit;
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests.ContextualRecords.Landscapes;
 
 using Fixture = ContextualRecordTestFixture<LandscapeSeamAnalyzer, Landscape, ILandscapeGetter>;
+using Quadrant = Plugins.Records.Quadrant;
 
 public class LandscapeSeamAnalyzerTest
 {
@@ -29,7 +30,7 @@ public class LandscapeSeamAnalyzerTest
     }
 
     // Set up a test case. Returns a landscape in the cell directly south of the cell containing the passed record
-    static Landscape Setup(Landscape land, ISkyrimMod mod)
+    static (Landscape southLand, Cell selfCell, Worldspace world) Setup(Landscape land, ISkyrimMod mod)
     {
         var world = mod.Worldspaces.AddNew();
         var landCell = new Cell(mod) { Grid = new() { Point = new(0, 0) } };
@@ -39,7 +40,7 @@ public class LandscapeSeamAnalyzerTest
 
         landCell.Landscape = land;
         southCell.Landscape = new Landscape(mod);
-        return southCell.Landscape;
+        return (southCell.Landscape, landCell, world);
     }
 
     // A landscape should not have height seams with its neighbors
@@ -73,7 +74,7 @@ public class LandscapeSeamAnalyzerTest
         fixture.Run(
             prepForError: (rec, mod) =>
             {
-                var southLand = Setup(rec, mod);
+                var (southLand, _, _) = Setup(rec, mod);
                 southLand.VertexColors = null;
                 rec.VertexColors = CreateColorArray(new(255, 0, 0));
             },
@@ -100,18 +101,37 @@ public class LandscapeSeamAnalyzerTest
 
     // A landscape should not be considered if its cell is not near a border region
     [Theory, MutagenModAutoData]
-    public void NotInBorderRegion(Fixture fixture)
+    public void NotInBorderRegion(Fixture fixture, Region region)
     {
+        Cell? selfCell = null;
         fixture.Run(
             prepForError: (rec, mod) =>
             {
+                (var southLand, selfCell, var world) = Setup(rec, mod);
+                southLand.VertexColors = null;
+                rec.VertexColors = CreateColorArray(new(255, 0, 0));
 
+                selfCell.Regions = [region.ToLink()];
+                region.MajorFlags |= Region.MajorFlag.BorderRegion;
+                region.Worldspace.SetTo(world);
             },
             prepForFix: (rec, mod) =>
             {
-
+                selfCell!.Regions!.Clear();
             },
             LandscapeSeamAnalyzer.VertexColorSeam);
+    }
+
+    static BaseLayer CreateLayer(Quadrant quadrant, IFormLinkGetter<ILandscapeTextureGetter> texture)
+    {
+        return new()
+        {
+            Header = new()
+            {
+                Quadrant = quadrant,
+                Texture = texture.AsSetter(),
+            }
+        };
     }
 
     // A null texture should be treated as LDirt02
@@ -121,12 +141,18 @@ public class LandscapeSeamAnalyzerTest
         fixture.Run(
             prepForError: (rec, mod) =>
             {
-
+                Setup(rec, mod);
+                rec.Layers.Add(CreateLayer(Quadrant.TopLeft, FormKeys.SkyrimSE.Skyrim.LandscapeTexture.LBlackreachDirt));
+                rec.Layers.Add(CreateLayer(Quadrant.TopRight, FormLink<ILandscapeTextureGetter>.Null));
             },
             prepForFix: (rec, mod) =>
             {
-
+                rec.Layers[0].Header!.Texture.SetToNull();
             },
-            LandscapeSeamAnalyzer.VertexColorSeam);
+            // Once for each texture, seams with east and south
+            LandscapeSeamAnalyzer.TextureSeam,
+            LandscapeSeamAnalyzer.TextureSeam,
+            LandscapeSeamAnalyzer.TextureSeam,
+            LandscapeSeamAnalyzer.TextureSeam);
     }
 }
