@@ -8,9 +8,9 @@ public class NoVoiceTypeAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
     public static readonly TopicDefinition NoVoiceType = MutagenTopicBuilder.FromDiscussion(
             284,
-            "No Voice Type",
+            "Unique Npc Has No Voice Type",
             Severity.Error)
-        .WithoutFormatting("Npc has no voice type");
+        .WithoutFormatting("Unique Npc has no voice type");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoVoiceType];
 

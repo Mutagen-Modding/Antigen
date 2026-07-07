@@ -60,6 +60,15 @@ public static class CellExtensions
         return locations.Exists(location => location.IsSettlementLocation());
     }
 
+    public static bool IsDungeonCell(this ICellGetter cell, ILinkCache linkCache)
+    {
+        if (!cell.IsInteriorCell()) return false;
+        var locations = cell.GetAllLocations(linkCache).ToList();
+        if (locations.Count == 0) return false;
+
+        return locations.Exists(location => location.IsDungeonLocation());
+    }
+
     public static bool IsInteriorCell(this ICellGetter cell)
     {
         return (cell.Flags & Cell.Flag.IsInteriorCell) != 0;
