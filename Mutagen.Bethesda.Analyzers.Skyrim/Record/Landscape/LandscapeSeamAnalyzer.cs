@@ -189,19 +189,22 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
             CheckTextures(tl, north.Layers.DecodeQuadrant(Quadrant.BottomLeft), Direction.North);
             CheckTextures(tr, north.Layers.DecodeQuadrant(Quadrant.BottomRight), Direction.North);
         }
-        var east = GetLandscape(cell.Grid.Point + ToOffset(Direction.North));
+
+        var east = GetLandscape(cell.Grid.Point + ToOffset(Direction.East));
         if (east != null)
         {
             CheckTextures(tr, east.Layers.DecodeQuadrant(Quadrant.TopLeft), Direction.East);
             CheckTextures(br, east.Layers.DecodeQuadrant(Quadrant.BottomLeft), Direction.East);
         }
-        var south = GetLandscape(cell.Grid.Point + ToOffset(Direction.North));
+
+        var south = GetLandscape(cell.Grid.Point + ToOffset(Direction.South));
         if (south != null)
         {
             CheckTextures(bl, south.Layers.DecodeQuadrant(Quadrant.TopLeft), Direction.South);
             CheckTextures(br, south.Layers.DecodeQuadrant(Quadrant.TopRight), Direction.South);
         }
-        var west = GetLandscape(cell.Grid.Point + ToOffset(Direction.North));
+
+        var west = GetLandscape(cell.Grid.Point + ToOffset(Direction.West));
         if (west != null)
         {
             CheckTextures(tl, west.Layers.DecodeQuadrant(Quadrant.TopRight), Direction.West);
