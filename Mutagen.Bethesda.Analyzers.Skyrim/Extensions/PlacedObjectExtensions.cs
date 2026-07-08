@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.CodeAnalysis;
+using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
@@ -135,7 +136,7 @@ public static class PlacedObjectExtensions
         return (script, property?.Flags == ScriptProperty.Flag.Removed ? null : property);
     }
 
-    public static ICellGetter? GetCell(this IPlacedGetter placed, ILinkCache linkCache)
+    public static ICellGetter? GetCell(this IPlacedGetter placed, ILinkCache linkCache, IExteriorCellCache exteriorCellCache)
     {
         if (!placed.ToLink().TryResolveSimpleContext(linkCache, out var context)) return null;
         if (context.Parent?.Record is not ICellGetter cell) return null;
@@ -147,7 +148,7 @@ public static class PlacedObjectExtensions
         var cellCoordinates = placed.GetCellCoordinates();
         if (cellCoordinates is null) return null;
 
-        return worldspace.GetCell(cellCoordinates.Value, linkCache);
+        return exteriorCellCache.GetExterior(worldspace, cellCoordinates.Value).TryResolve(linkCache);
     }
 
     public static IWorldspaceGetter? GetWorldspace(this IPlacedGetter placed, ILinkCache linkCache)
@@ -172,11 +173,11 @@ public static class PlacedObjectExtensions
             cellY < 0 ? (int)Math.Floor(cellY) : (int)cellY);
     }
 
-    public static IEnumerable<IPlacedObjectGetter> GetNearbyObjects(this IPlacedGetter placed, Func<IFormLinkGetter<IPlaceableObjectGetter>, bool> filterObject, float maxDistance, ILinkCache linkCache)
+    public static IEnumerable<IPlacedObjectGetter> GetNearbyObjects(this IPlacedGetter placed, Func<IFormLinkGetter<IPlaceableObjectGetter>, bool> filterObject, float maxDistance, ILinkCache linkCache, IExteriorCellCache exteriorCellCache)
     {
         if (placed.Placement is not { Position: var position }) yield break;
 
-        var cell = placed.GetCell(linkCache);
+        var cell = placed.GetCell(linkCache, exteriorCellCache);
         if (cell is null) yield break;
 
         var worldspace = placed.GetWorldspace(linkCache);
@@ -200,7 +201,7 @@ public static class PlacedObjectExtensions
         {
             for (var y = -cellDistance; y <= cellDistance; y++)
             {
-                var c = worldspace.GetCell(new P2Int(cellX + x, cellY + y), linkCache);
+                var c = exteriorCellCache.GetExterior(worldspace, new P2Int(cellX + x, cellY + y)).TryResolve(linkCache);
                 if (c is null) yield break;
 
                 foreach (var placedObject in ProcessCell(c))
