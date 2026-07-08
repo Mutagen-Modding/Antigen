@@ -3,6 +3,7 @@ using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
+using Mutagen.Bethesda.Plugins.Cache.Internals.Implementations;
 using Mutagen.Bethesda.Plugins.Records;
 using Noggog.WorkEngine;
 
@@ -33,7 +34,17 @@ public class ConsoleReportHandler : IReportHandler
         _workDropoff.Enqueue(() =>
         {
             IMajorRecordGetter? parent = null;
-            _linkCache.TryResolveIdentifier(majorRecord, out var editorId);
+            var editorId = "";
+
+            if (_linkCache.TryGetLinkCacheForMod(sourceMod, out var cache))
+            {
+                cache.TryResolveIdentifier(majorRecord, out editorId);
+            }
+            else
+            {
+                _linkCache.TryResolveIdentifier(majorRecord, out editorId);
+            }
+
             if (_linkCache.TryResolveSimpleContext(majorRecord, out var parentContext) && parentContext?.Parent?.Record is IMajorRecordGetter parentRecord)
             {
                 parent = parentRecord;
