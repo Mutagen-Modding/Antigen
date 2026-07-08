@@ -1,5 +1,6 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
 
@@ -37,7 +38,7 @@ public class ShowSkyAnalyzer : IContextualRecordAnalyzer<ICellGetter>
         }
 
         foreach (var exteriorDoor in cell.GetExteriorDoorsGoingIntoInteriorRecursively(param.LinkCache)) {
-            var exteriorCell = exteriorDoor.GetCell(param.LinkCache);
+            var exteriorCell = exteriorDoor.GetCell(param.LinkCache, param.ResolveCache<IExteriorCellCache>());
             if (exteriorCell?.Regions is null) continue;
 
             if (!exteriorCell.Regions.Contains(cellSkyAndWeatherFromRegion))

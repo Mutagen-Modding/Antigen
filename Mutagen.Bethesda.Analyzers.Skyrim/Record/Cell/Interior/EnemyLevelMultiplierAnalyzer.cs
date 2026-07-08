@@ -17,8 +17,7 @@ public class EnemyLevelMultiplierAnalyzer : IContextualRecordAnalyzer<ICellGette
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<ICellGetter> param)
     {
         var cell = param.Record;
-        if (cell.IsExteriorCell()) return;
-        if (cell.IsSettlementCell(param.LinkCache)) return;
+        if (!cell.IsDungeonCell(param.LinkCache)) return;
 
         var totalNpcs = 0;
         var leveledNpcs = 0;

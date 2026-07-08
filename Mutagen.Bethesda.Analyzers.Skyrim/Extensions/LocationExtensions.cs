@@ -34,6 +34,13 @@ public static class LocationExtensions
         return location.Keywords.Any(k => SettlementKeywords.Contains(k));
     }
 
+    public static bool IsDungeonLocation(this ILocationGetter location)
+    {
+        if (location.Keywords is null) return false;
+
+        return location.Keywords.Any(k => k.Equals(FormKeys.SkyrimSE.Skyrim.Keyword.LocTypeDungeon));
+    }
+
     private static readonly HashSet<IFormLinkGetter<IKeywordGetter>> SettlementHouseKeywords =
     [
         FormKeys.SkyrimSE.Skyrim.Keyword.LocTypeHouse,

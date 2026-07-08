@@ -1,5 +1,6 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Npc;
@@ -31,7 +32,7 @@ public class PersistenceLocationAnalyzer : IContextualRecordAnalyzer<IPlacedNpcG
         var persistenceLocation = placedNpc.PersistentLocation.TryResolve(param.LinkCache);
         if (persistenceLocation is null) return;
 
-        var cell = placedNpc.GetCell(param.LinkCache);
+        var cell = placedNpc.GetCell(param.LinkCache, param.ResolveCache<IExteriorCellCache>());
         if (cell is null) return;
 
         var location = cell.Location.TryResolve(param.LinkCache);

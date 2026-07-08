@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <IsPackable>false</IsPackable>
@@ -25,6 +25,20 @@
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Engine\Mutagen.Bethesda.Analyzers.Engine.csproj" />
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Testing\Mutagen.Bethesda.Analyzers.Testing.csproj" />
       <ProjectReference Include="..\Mutagen.Bethesda.Analyzers.Skyrim\Mutagen.Bethesda.Analyzers.Skyrim.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="IsolatedRecords\MagicEffects\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Files\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Update="Files\LandSeamTest.esp">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
