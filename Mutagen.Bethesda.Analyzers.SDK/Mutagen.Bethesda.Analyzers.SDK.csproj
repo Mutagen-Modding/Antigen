@@ -10,7 +10,10 @@
         <PackageReference Include="Autofac" />
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
         <PackageReference Include="Mutagen.Bethesda.Core" />
-        <PackageReference Include="GitVersion.MsBuild" />
+        <PackageReference Include="GitVersion.MsBuild">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
         <PackageReference Include="Microsoft.SourceLink.GitHub" />
     </ItemGroup>
 
