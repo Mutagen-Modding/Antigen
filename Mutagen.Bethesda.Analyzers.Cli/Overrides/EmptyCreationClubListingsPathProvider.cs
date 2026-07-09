@@ -3,7 +3,7 @@ using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Cli.Overrides;
 
-internal class NullCreationClubListingsPathProvider : ICreationClubListingsPathProvider
+internal class EmptyCreationClubListingsPathProvider : ICreationClubListingsPathProvider
 {
     public FilePath? Path => string.Empty;
 }

@@ -1,3 +1,4 @@
+using System.Reflection.Metadata.Ecma335;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
@@ -24,7 +25,13 @@ public class GhostKeywordAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Suggestion)
         .WithoutFormatting("Npc has ghost flag but no ghost keyword");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [GhostScriptMissingKeyword, GhostScriptMissingDoesntBleedFlag, GhostFlagMissingKeyword];
+    public static readonly TopicDefinition GhostFlagForceGreetPackage = MutagenTopicBuilder.FromDiscussion(
+            630,
+            "Ghost With Script without Flag Assigned Force Greet Package",
+            Severity.Warning)
+        .WithoutFormatting("Npc has ghost script and Force Greet Package without ghost flag");
+
+    public IEnumerable<TopicDefinition> Topics { get; } = [GhostScriptMissingKeyword, GhostScriptMissingDoesntBleedFlag, GhostFlagMissingKeyword, GhostFlagForceGreetPackage];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
@@ -46,6 +53,24 @@ public class GhostKeywordAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             {
                 param.AddTopic(
                     GhostScriptMissingDoesntBleedFlag.Format());
+            }
+
+            if (!hasFlag)
+            {
+                foreach (var package in npc.Packages)
+                {
+                    param.LinkCache.TryResolve<IPackageGetter>(package.FormKey, out var aipackage);
+                    if (aipackage is null) continue;
+                    if ((aipackage.FormKey == FormKeys.SkyrimSE.Skyrim.Package.ForceGreet.FormKey)
+                        || (aipackage.FormKey == FormKeys.SkyrimSE.Skyrim.Package.ForceGreetFromSitting.FormKey)
+                        || (aipackage.FormKey == FormKeys.SkyrimSE.Skyrim.Package.ForceGreetWaitSitting.FormKey)
+                        || (aipackage.PackageTemplate.FormKey == FormKeys.SkyrimSE.Skyrim.Package.ForceGreet.FormKey)
+                        || (aipackage.PackageTemplate.FormKey == FormKeys.SkyrimSE.Skyrim.Package.ForceGreetFromSitting.FormKey)
+                        || (aipackage.PackageTemplate.FormKey == FormKeys.SkyrimSE.Skyrim.Package.ForceGreetWaitSitting.FormKey))
+                    {
+                        param.AddTopic(GhostFlagForceGreetPackage.Format());
+                    }
+                }
             }
         }
 

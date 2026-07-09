@@ -1,6 +1,8 @@
-﻿using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
+using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
+using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
 
@@ -60,6 +62,15 @@ public static class CellExtensions
         return locations.Exists(location => location.IsSettlementLocation());
     }
 
+    public static bool IsDungeonCell(this ICellGetter cell, ILinkCache linkCache)
+    {
+        if (!cell.IsInteriorCell()) return false;
+        var locations = cell.GetAllLocations(linkCache).ToList();
+        if (locations.Count == 0) return false;
+
+        return locations.Exists(location => location.IsDungeonLocation());
+    }
+
     public static bool IsInteriorCell(this ICellGetter cell)
     {
         return (cell.Flags & Cell.Flag.IsInteriorCell) != 0;
@@ -77,8 +88,53 @@ public static class CellExtensions
 
     public static IWorldspaceGetter? GetWorldspace(this ICellGetter cell, ILinkCache linkCache)
     {
-        var context = linkCache.ResolveSimpleContext(cell);
-        return context.Parent?.Record as IWorldspaceGetter;
+        linkCache.TryResolveSimpleContext(cell, out var context);
+        if (context == null)
+            return null;
+        context.TryGetParent<IWorldspaceGetter>(out var world);
+        return world;
+    }
+
+    public static bool IsInBorderRegion(this ICellGetter cell, ILinkCache linkCache, ILinkUsageCache usageCache)
+    {
+        if (cell.Regions != null && cell.Regions.Any(r => r.TryResolve(linkCache, out var region) && region.MajorFlags.HasFlag(Region.MajorFlag.BorderRegion)))
+            return true;
+
+        // All cells in a worldspace without any border regions are considered part of the playable area
+        var world = cell.GetWorldspace(linkCache);
+        if (world == null) return true;
+
+        var worldHasBorderRegion = usageCache.GetUsagesOf<IRegionGetter>(world).UsageLinks
+            .Select(r => r.Resolve(linkCache))
+            .Any(r => r.MajorFlags.HasFlag(Region.MajorFlag.BorderRegion));
+        return !worldHasBorderRegion;
+    }
+
+    /// <summary>
+    /// Get whether the cell is part of a border region or near a cell that is
+    /// </summary>
+    /// <param name="cell"></param>
+    /// <param name="linkCache"></param>
+    /// <param name="usageCache"></param>
+    /// <param name="exteriorCache"></param>
+    /// <param name="maxDistance">Maximum Chebyshev distance (king moves) in cells from this cell</param>
+    /// <returns></returns>
+    public static bool IsNearBorderRegion(this ICellGetter cell, ILinkCache linkCache, ILinkUsageCache usageCache, IExteriorCellCache exteriorCache, int maxDistance = 2)
+    {
+        var world = cell.GetWorldspace(linkCache);
+        if (world == null || cell.Grid == null)
+            return false;
+
+        for (int x = -maxDistance; x <= maxDistance; x++)
+        {
+            for (int y = -maxDistance; y <= maxDistance; y++)
+            {
+                var nearby = exteriorCache.GetExterior(world, cell.Grid.Point + new P2Int(x, y));
+                if (nearby.TryResolve(linkCache, out var nearbyCell) && nearbyCell.IsInBorderRegion(linkCache, usageCache))
+                    return true;
+            }
+        }
+        return false;
     }
 
     /// <summary>
@@ -107,6 +163,19 @@ public static class CellExtensions
                 }
             }
         }
+    }
+
+    /// <summary>
+    /// Returns the winning override of the cell's landscape
+    /// </summary>
+    /// <param name="cell">Cell to get placed from</param>
+    /// <param name="linkCache">Link cache to determine the load order</param>
+    /// <returns>Winning landscape override, if it exists</returns>
+    public static ILandscapeGetter? GetLandscape(this ICellGetter cell, ILinkCache linkCache)
+    {
+        var allCells = linkCache.ResolveAll<ICellGetter>(cell.FormKey, ResolveTarget.Winner);
+
+        return allCells.Select(c => c.Landscape).FirstOrDefault(l => l != null);
     }
 
     /// <summary>

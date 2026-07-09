@@ -20,7 +20,7 @@ public class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition AmbushNotInEditorId = MutagenTopicBuilder.FromDiscussion(
             313,
             "Ambush not in EditorId",
-            Severity.Suggestion)
+            Severity.None)
         .WithoutFormatting("Npc has ambush script but is not called 'Ambush' in the EditorId");
 
     public static readonly TopicDefinition<Aggression> AmbushAggressive = MutagenTopicBuilder.FromDiscussion(

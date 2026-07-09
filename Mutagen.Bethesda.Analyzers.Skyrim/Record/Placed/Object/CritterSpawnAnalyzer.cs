@@ -1,5 +1,6 @@
 ﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Object;
@@ -58,7 +59,8 @@ public class CritterSpawnAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGette
                     var nearbyObjectsOfType = spawnRef.GetNearbyObjects(
                         placeable => landingList.Items.Contains(placeable),
                         distanceProperty.Data,
-                        param.LinkCache);
+                        param.LinkCache,
+                        param.ResolveCache<IExteriorCellCache>());
 
                     if (!nearbyObjectsOfType.Any())
                     {

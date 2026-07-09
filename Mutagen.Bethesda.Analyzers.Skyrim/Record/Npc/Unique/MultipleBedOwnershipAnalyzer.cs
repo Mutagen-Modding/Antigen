@@ -11,15 +11,15 @@ public class MultipleBedOwnershipAnalyzer : IContextualRecordAnalyzer<INpcGetter
 {
     public static readonly TopicDefinition<int> NpcOwnsMultipleBeds = MutagenTopicBuilder.FromDiscussion(
             493,
-            "Npc Owns Multiple Beds",
+            "Unique Npc Owns Multiple Beds",
             Severity.Suggestion)
-        .WithFormatting<int>("Npc owns {0} beds");
+        .WithFormatting<int>("Unique Npc owns {0} beds");
 
     public static readonly TopicDefinition NpcOwnsNoBeds = MutagenTopicBuilder.FromDiscussion(
             494,
-            "Npc Owns No Beds",
-            Severity.Warning)
-        .WithoutFormatting("Npc does not own any beds");
+            "Unique Npc Owns No Beds",
+            Severity.Suggestion)
+        .WithoutFormatting("Unique Npc does not own any beds");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NpcOwnsMultipleBeds, NpcOwnsNoBeds];
 

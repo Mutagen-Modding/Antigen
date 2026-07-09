@@ -8,9 +8,9 @@ public class NoOutfitAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
     public static readonly TopicDefinition NoOutfit = MutagenTopicBuilder.FromDiscussion(
             282,
-            "No Outfit",
+            "Unique Npc Has No Outfit",
             Severity.Warning)
-        .WithoutFormatting("Npc doesn't wear any outfit");
+        .WithoutFormatting("Unique Npc doesn't wear any outfit");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoOutfit];
 

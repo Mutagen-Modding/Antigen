@@ -20,8 +20,8 @@ public class RunConfigModule(IRunConfigLookup runConfig) : Module
         if (runConfig.LoadOrderSetToMods is not null)
         {
             builder.RegisterInstance(new InjectedEnabledPluginListingsProvider(runConfig.LoadOrderSetToMods)).As<IEnabledPluginListingsProvider>();
-            builder.RegisterType<NullPluginListingsPathProvider>().As<IPluginListingsPathProvider>();
-            builder.RegisterType<NullCreationClubListingsPathProvider>().As<ICreationClubListingsPathProvider>();
+            builder.RegisterType<EmptyPluginListingsPathProvider>().As<IPluginListingsPathProvider>();
+            builder.RegisterType<EmptyCreationClubListingsPathProvider>().As<ICreationClubListingsPathProvider>();
         }
 
         if (runConfig.OutputFilePath is not null)

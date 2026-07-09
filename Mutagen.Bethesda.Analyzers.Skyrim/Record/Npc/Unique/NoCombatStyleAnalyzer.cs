@@ -8,9 +8,9 @@ public class NoCombatStyleAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
     public static readonly TopicDefinition NoCombatStyleFaction = MutagenTopicBuilder.FromDiscussion(
             404,
-            "Npc has no Combat Style",
+            "Unique Npc Has No Combat Style",
             Severity.None)
-        .WithoutFormatting("Npc has no combat style");
+        .WithoutFormatting("Unique Npc has no combat style");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoCombatStyleFaction];
 
