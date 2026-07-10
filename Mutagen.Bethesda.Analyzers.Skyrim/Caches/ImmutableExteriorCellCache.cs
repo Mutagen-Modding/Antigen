@@ -6,6 +6,8 @@ using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 
+using WorldspaceLookup = IReadOnlyDictionary<P2Int, IFormLinkGetter<ICellGetter>>;
+
 public interface IExteriorCellCache
 {
     public IFormLinkGetter<ICellGetter> GetExterior(IFormLinkGetter<IWorldspaceGetter> worldspace, P2Int grid);
@@ -14,37 +16,39 @@ public interface IExteriorCellCache
 
 public class ImmutableExteriorCellCache(ILinkCache linkCache) : IExteriorCellCache
 {
-    private readonly ConcurrentDictionary<FormKey, Dictionary<P2Int, IFormLinkGetter<ICellGetter>>> _worldLookup = new();
-
-    private Dictionary<P2Int, IFormLinkGetter<ICellGetter>> GetLookupForWorld(FormKey world)
+    private WorldspaceLookup CreateLookupForWorld(FormKey worldspace)
     {
-        return _worldLookup.GetOrAdd(world, static (w, cache) =>
-        {
-            var lookup = new Dictionary<P2Int, IFormLinkGetter<ICellGetter>>();
+        var lookup = new Dictionary<P2Int, IFormLinkGetter<ICellGetter>>();
 
-            foreach (var worldspaceOverride in cache.ResolveAll<IWorldspaceGetter>(w))
+        foreach (var worldspaceOverride in linkCache.ResolveAll<IWorldspaceGetter>(worldspace))
+        {
+            foreach (var block in worldspaceOverride.SubCells)
             {
-                foreach (var block in worldspaceOverride.SubCells)
+                foreach (var subBlock in block.Items)
                 {
-                    foreach (var subBlock in block.Items)
+                    foreach (var cell in subBlock.Items)
                     {
-                        foreach (var cell in subBlock.Items)
+                        if (cell.Grid != null)
                         {
-                            if (cell.Grid != null)
-                            {
-                                lookup[cell.Grid.Point] = cell.ToLink();
-                            }
+                            lookup[cell.Grid.Point] = cell.ToLink();
                         }
                     }
                 }
             }
-            return lookup;
-        }, linkCache);
+        }
+        return lookup;
     }
+
+    private readonly ConcurrentDictionary<FormKey, Lazy<WorldspaceLookup>> _worldLookup = new();
 
     IFormLinkGetter<ICellGetter> GetExterior(FormKey worldspace, P2Int grid)
     {
-        if (GetLookupForWorld(worldspace).TryGetValue(grid, out var cell))
+        var lookup = _worldLookup.GetOrAdd(worldspace, static (w, cache) => new Lazy<WorldspaceLookup>(() =>
+        {
+            return cache.CreateLookupForWorld(w);
+        }), this);
+
+        if (lookup.Value.TryGetValue(grid, out var cell))
             return cell;
         return FormLink<ICellGetter>.Null;
     }
