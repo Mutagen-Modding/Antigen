@@ -1,4 +1,4 @@
-using System.Collections.Concurrent;
+using Mutagen.Bethesda.Analyzers.SDK.Caches;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
@@ -14,9 +14,22 @@ public interface IExteriorCellCache
     public IFormLinkGetter<ICellGetter> GetExterior(IWorldspaceGetter worldspace, P2Int grid);
 };
 
+public class ExteriorCellCacheProvider : ICacheConstructor
+{
+    public Type CacheType => typeof(IExteriorCellCache);
+
+    public object Construct(ILinkCache linkCache, IProvideCaches provideCaches)
+    {
+        return new ImmutableExteriorCellCache(linkCache);
+    }
+}
+
 public class ImmutableExteriorCellCache(ILinkCache linkCache) : IExteriorCellCache
 {
-    private WorldspaceLookup CreateLookupForWorld(FormKey worldspace)
+    private readonly LazyEntryCache<FormKey, WorldspaceLookup> _worldLookup =
+        new(worldspace => CreateLookupForWorld(linkCache, worldspace));
+
+    private static WorldspaceLookup CreateLookupForWorld(ILinkCache linkCache, FormKey worldspace)
     {
         var lookup = new Dictionary<P2Int, IFormLinkGetter<ICellGetter>>();
 
@@ -39,16 +52,11 @@ public class ImmutableExteriorCellCache(ILinkCache linkCache) : IExteriorCellCac
         return lookup;
     }
 
-    private readonly ConcurrentDictionary<FormKey, Lazy<WorldspaceLookup>> _worldLookup = new();
-
-    IFormLinkGetter<ICellGetter> GetExterior(FormKey worldspace, P2Int grid)
+    private IFormLinkGetter<ICellGetter> GetExterior(FormKey worldspace, P2Int grid)
     {
-        var lookup = _worldLookup.GetOrAdd(worldspace, static (w, cache) => new Lazy<WorldspaceLookup>(() =>
-        {
-            return cache.CreateLookupForWorld(w);
-        }), this);
+        var lookup = _worldLookup.GetOrAdd(worldspace);
 
-        if (lookup.Value.TryGetValue(grid, out var cell))
+        if (lookup.TryGetValue(grid, out var cell))
             return cell;
         return FormLink<ICellGetter>.Null;
     }
