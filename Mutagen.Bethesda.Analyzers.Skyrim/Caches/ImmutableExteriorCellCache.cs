@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
@@ -5,47 +6,49 @@ using Noggog;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 
+using WorldspaceLookup = IReadOnlyDictionary<P2Int, IFormLinkGetter<ICellGetter>>;
+
 public interface IExteriorCellCache
 {
     public IFormLinkGetter<ICellGetter> GetExterior(IFormLinkGetter<IWorldspaceGetter> worldspace, P2Int grid);
     public IFormLinkGetter<ICellGetter> GetExterior(IWorldspaceGetter worldspace, P2Int grid);
 };
 
-public class ImmutableExteriorCellCache : IExteriorCellCache
+public class ImmutableExteriorCellCache(ILinkCache linkCache) : IExteriorCellCache
 {
-    public ImmutableExteriorCellCache(ILinkCache linkCache)
+    private WorldspaceLookup CreateLookupForWorld(FormKey worldspace)
     {
-        _worldLookup = linkCache.PriorityOrder.WinningOverrides<IWorldspaceGetter>()
-            .ToDictionary(w => w.FormKey, w => new Lazy<IReadOnlyDictionary<P2Int, IFormLinkGetter<ICellGetter>>>(() =>
-            {
-                Console.WriteLine($"World ctor {w.EditorID}");
-                var lookup = new Dictionary<P2Int, IFormLinkGetter<ICellGetter>>();
+        var lookup = new Dictionary<P2Int, IFormLinkGetter<ICellGetter>>();
 
-                foreach (var worldspaceOverride in linkCache.ResolveAll(w))
+        foreach (var worldspaceOverride in linkCache.ResolveAll<IWorldspaceGetter>(worldspace))
+        {
+            foreach (var block in worldspaceOverride.SubCells)
+            {
+                foreach (var subBlock in block.Items)
                 {
-                    foreach (var block in worldspaceOverride.SubCells)
+                    foreach (var cell in subBlock.Items)
                     {
-                        foreach (var subBlock in block.Items)
+                        if (cell.Grid != null)
                         {
-                            foreach (var cell in subBlock.Items)
-                            {
-                                if (cell.Grid != null)
-                                {
-                                    lookup[cell.Grid.Point] = cell.ToLink();
-                                }
-                            }
+                            lookup[cell.Grid.Point] = cell.ToLink();
                         }
                     }
                 }
-                return lookup;
-            }, LazyThreadSafetyMode.ExecutionAndPublication));
+            }
+        }
+        return lookup;
     }
 
-    private readonly IReadOnlyDictionary<FormKey, Lazy<IReadOnlyDictionary<P2Int, IFormLinkGetter<ICellGetter>>>> _worldLookup;
+    private readonly ConcurrentDictionary<FormKey, Lazy<WorldspaceLookup>> _worldLookup = new();
 
     IFormLinkGetter<ICellGetter> GetExterior(FormKey worldspace, P2Int grid)
     {
-        if (_worldLookup.TryGetValue(worldspace, out var lookup) && lookup.Value.TryGetValue(grid, out var cell))
+        var lookup = _worldLookup.GetOrAdd(worldspace, static (w, cache) => new Lazy<WorldspaceLookup>(() =>
+        {
+            return cache.CreateLookupForWorld(w);
+        }), this);
+
+        if (lookup.Value.TryGetValue(grid, out var cell))
             return cell;
         return FormLink<ICellGetter>.Null;
     }
