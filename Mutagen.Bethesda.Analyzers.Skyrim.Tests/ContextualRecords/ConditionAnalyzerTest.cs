@@ -6,12 +6,12 @@ using Xunit;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests.ContextualRecords;
 
-using Fixture = ContextualRecordTestFixture<ConditionAnalyzer, DialogResponses, ISkyrimMajorRecordGetter>;
+using Fixture = ContextualRecordTestFixture<ConditionAnalyzer, Package, ISkyrimMajorRecordGetter>;
 
 public class ConditionAnalyzerTest
 {
     static void AddCondition(
-        DialogResponses rec,
+        Package rec,
         ConditionData data,
         float comparisonValue,
         bool and = false,
@@ -287,6 +287,107 @@ public class ConditionAnalyzerTest
                 data!.ItemOrList.Link.SetTo(FormKeys.SkyrimSE.Skyrim.Armor.ArmorIronCuirass);
             },
             ConditionAnalyzer.LeveledItemParameter);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void AliasWithoutOwningQuest(Fixture fixture, Quest quest)
+    {
+        fixture.Run(prepForError: (rec, mod) =>
+        {
+            rec.Conditions.Add(new ConditionFloat()
+            {
+                Data = new GetDeadConditionData() { RunOnType = Condition.RunOnType.QuestAlias }
+            });
+        },
+        prepForFix: (rec, mod) =>
+        {
+            rec.OwnerQuest.SetTo(quest);
+            quest.Aliases.Add(new() { ID = 1 });
+            rec.Conditions[0].Data.RunOnTypeIndex = (int)quest.Aliases[0].ID;
+        },
+        ConditionAnalyzer.AliasWithoutQuest);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void AliasWithoutOwningQuestGetIsAliasRef(Fixture fixture, Quest quest)
+    {
+        fixture.Run(prepForError: (rec, mod) =>
+        {
+            rec.Conditions.Add(new ConditionFloat()
+            {
+                Data = new GetIsAliasRefConditionData() { RunOnType = Condition.RunOnType.Subject, ReferenceAliasIndex = 1 }
+            });
+        },
+        prepForFix: (rec, mod) =>
+        {
+            rec.OwnerQuest.SetTo(quest);
+            quest.Aliases.Add(new() { ID = 1 });
+        },
+        ConditionAnalyzer.AliasWithoutQuest);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void InvalidAliasIndex(Fixture fixture, Quest quest)
+    {
+        fixture.Run(prepForError: (rec, mod) =>
+        {
+            rec.OwnerQuest.SetTo(quest);
+            quest.Aliases.Add(new() { ID = 1 });
+
+            rec.Conditions.Add(new ConditionFloat()
+            {
+                Data = new GetDeadConditionData() { RunOnType = Condition.RunOnType.QuestAlias, RunOnTypeIndex = 12345 }
+            });
+        },
+        prepForFix: (rec, mod) =>
+        {
+            rec.Conditions[0].Data.RunOnTypeIndex = (int)quest.Aliases[0].ID;
+        },
+        ConditionAnalyzer.InvalidAliasIndex);
+    }
+
+    [Theory, MutagenModAutoData]
+    public void InvalidAliasIndexGetIsAliasRef(Fixture fixture, Quest quest)
+    {
+        fixture.Run(prepForError: (rec, mod) =>
+        {
+            rec.OwnerQuest.SetTo(quest);
+            quest.Aliases.Add(new() { ID = 1 });
+
+            rec.Conditions.Add(new ConditionFloat()
+            {
+                Data = new GetIsAliasRefConditionData() { RunOnType = Condition.RunOnType.Subject, ReferenceAliasIndex = 12345 }
+            });
+        },
+        prepForFix: (rec, mod) =>
+        {
+            (rec.Conditions[0].Data as IGetIsAliasRefConditionData)!.ReferenceAliasIndex = (int)quest.Aliases[0].ID;
+        },
+        ConditionAnalyzer.InvalidAliasIndex);
+    }
+
+    // Invalid alias may coexist with other topics on the same condition
+    [Theory, MutagenModAutoData]
+    public void InvalidAliasAndOtherError(Fixture fixture, Quest quest)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                rec.OwnerQuest.SetTo(quest);
+
+                rec.Conditions.Add(new ConditionFloat()
+                {
+                    Data = new GetIsAliasRefConditionData() { ReferenceAliasIndex = 1, RunOnType = Condition.RunOnType.Reference },
+                });
+            },
+            prepForFix: (rec, mod) =>
+            {
+                var data = rec.Conditions[0].Data as GetIsAliasRefConditionData;
+                data!.Reference.SetTo(FormKeys.SkyrimSE.Skyrim.PlacedNpc.AlvorREF);
+                quest.Aliases.Add(new() { ID = (ushort)data.ReferenceAliasIndex });
+            },
+            ConditionAnalyzer.InvalidConditionReference,
+            ConditionAnalyzer.InvalidAliasIndex);
     }
 
     [Theory, MutagenModAutoData]

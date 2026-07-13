@@ -51,6 +51,18 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
             Severity.Error)
         .WithFormatting<ILeveledItemGetter>("Condition used with leveled item {0} as parameter");
 
+    public static readonly TopicDefinition<IConditionGetter> AliasWithoutQuest = MutagenTopicBuilder.FromDiscussion(
+            611,
+            "Alias condition without owning quest",
+            Severity.Error)
+        .WithFormatting<IConditionGetter>("Condition {0} runs on an alias, but its record is not owned by a quest");
+
+    public static readonly TopicDefinition<IConditionGetter, int, IQuestGetter> InvalidAliasIndex = MutagenTopicBuilder.FromDiscussion(
+            610,
+            "Invalid alias index",
+            Severity.Error)
+        .WithFormatting<IConditionGetter, int, IQuestGetter>("Condition {0} runs on alias {1} of quest {2}, which does not exist");
+
     public static readonly TopicDefinition<IConditionGetter, IFormLinkGetter<IRaceGetter>> NoVampireRace = MutagenTopicBuilder.FromDiscussion(
             602,
             "No vampire condition",
@@ -66,6 +78,8 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
         GetCurrentTimeConditionWithAndOnDayBreak,
         GetCrimeGoldRunOnPlayer,
         LeveledItemParameter,
+        AliasWithoutQuest,
+        InvalidAliasIndex,
         NoVampireRace,
     ];
 
@@ -129,11 +143,26 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
         var blocks = param.Record.GetConditionsByField();
         foreach (var block in blocks)
         {
+
             // GetCurrentTime analyzer relies on index within the block
             var conditions = block.ToArray();
             for (var i = 0; i < conditions.Length; i++)
             {
                 var condition = conditions[i];
+
+                void CheckAlias(int index)
+                {
+                    var quest = param.Record.GetOwningQuest(param.LinkCache);
+                    if (quest == null)
+                    {
+                        param.AddTopic(AliasWithoutQuest.Format(condition));
+                    }
+                    else if (quest.GetAlias((uint)index) == null)
+                    {
+                        param.AddTopic(InvalidAliasIndex.Format(condition, index, quest));
+                    }
+                }
+
                 switch (condition.Data)
                 {
                     case { RunOnType: Condition.RunOnType.Reference, Reference.IsNull: true }:
@@ -243,9 +272,13 @@ public class ConditionAnalyzer : IContextualRecordAnalyzer<ISkyrimMajorRecordGet
                         when getEquipped.ItemOrList.Link.TryResolve<ILeveledItemGetter>(param.LinkCache, out var leveledItem):
                         param.AddTopic(LeveledItemParameter.Format(leveledItem));
                         break;
-
-
                 }
+
+                // Invalid aliases may coexist with other topics on the same condition
+                if (condition.Data is IGetIsAliasRefConditionDataGetter getIsAliasRef)
+                    CheckAlias(getIsAliasRef.ReferenceAliasIndex);
+                if (condition.Data.RunOnType == Condition.RunOnType.QuestAlias)
+                    CheckAlias(condition.Data.RunOnTypeIndex);
             }
 
             foreach (var orBlock in conditions.SplitOrBlocks())
