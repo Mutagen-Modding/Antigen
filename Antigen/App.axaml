@@ -1,0 +1,26 @@
+<Application x:Class="Antigen.App"
+             xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:antigen="clr-namespace:Antigen"
+             xmlns:styling="clr-namespace:FluentAvalonia.Styling;assembly=FluentAvalonia"
+             xmlns:converter="clr-namespace:Antigen.Resources.Converter">
+    <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
+
+    <Application.Resources>
+        <converter:BoolToDoubleConverter x:Key="BoolToDoubleConverter" />
+        <converter:FormattedTopicConverterWrapper x:Key="FormattedTopicConverter" />
+    </Application.Resources>
+
+    <Application.DataTemplates>
+        <antigen:ViewLocator />
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Antigen/Resources/Styles/FlyoutStyles.axaml" />
+        <StyleInclude Source="avares://Avalonia.Controls.DataGrid/Themes/Fluent.xaml" />
+        <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml" />
+        <styling:FluentAvaloniaTheme PreferUserAccentColor="True"
+                                     PreferSystemTheme="True" />
+    </Application.Styles>
+</Application>

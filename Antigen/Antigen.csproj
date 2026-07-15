@@ -1,0 +1,87 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <!--        <ApplicationIcon>Assets\.ico</ApplicationIcon>-->
+        <AssemblyName>Antigen</AssemblyName>
+        <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+        <ApplicationManifest>app.manifest</ApplicationManifest>
+    </PropertyGroup>
+
+    <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+        <DefineConstants>$(DefineConstants);ENABLE_XAML_HOT_RELOAD</DefineConstants>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <AvaloniaResource Include="Assets\**"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Condition="$(DefineConstants.Contains(ENABLE_XAML_HOT_RELOAD))" Include="Avalonia.Markup.Xaml.Loader"/>
+        <PackageReference Include="HotAvalonia" Condition="$(DefineConstants.Contains(ENABLE_XAML_HOT_RELOAD))" PrivateAssets="All" Publish="True"/>
+        <PackageReference Include="Autofac"/>
+        <PackageReference Include="Avalonia"/>
+        <PackageReference Include="Avalonia.Desktop"/>
+        <PackageReference Include="Avalonia.Themes.Fluent"/>
+        <PackageReference Include="Avalonia.Controls.DataGrid"/>
+        <PackageReference Include="AvaloniaUI.DiagnosticsSupport"/>
+        <PackageReference Include="Deadpikle.AvaloniaProgressRing"/>
+        <PackageReference Include="FluentAvaloniaUI"/>
+        <PackageReference Include="Microsoft.Extensions.Logging"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
+        <PackageReference Include="Microsoft.Extensions.Logging.Console"/>
+        <PackageReference Include="Mutagen.Bethesda.Analyzers"/>
+        <PackageReference Include="Mutagen.Bethesda.Analyzers.Skyrim"/>
+        <PackageReference Include="Mutagen.Bethesda.Autofac"/>
+        <PackageReference Include="ReactiveMarbles.ObservableEvents.SourceGenerator"/>
+        <PackageReference Include="ReactiveUI.Avalonia"/>
+        <PackageReference Include="ReactiveUI.SourceGenerators">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="System.Interactive.Async"/>
+        <PackageReference Include="Xaml.Behaviors.Interactivity"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Update="Services\SkyrimAnalyzerFilter.cs">
+            <DependentUpon>IAnalyzerFilter.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Services\AnalyzerService.cs">
+            <DependentUpon>IAnalyzerService.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Services\SkyrimAnalyzerResultInfoFactory.cs">
+            <DependentUpon>IAnalyzerResultInfoFactory.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Services\ModWatcher.cs">
+            <DependentUpon>IModWatcher.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Services\SettingsService.cs">
+            <DependentUpon>ISettingsService.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Services\SkyrimModInfoProvider.cs">
+            <DependentUpon>IModInfoProvider.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Services\CrashLoggingService.cs">
+            <DependentUpon>ICrashLoggingService.cs</DependentUpon>
+        </Compile>
+        <Compile Update="Views\Settings\SettingsWindow.axaml.cs">
+            <DependentUpon>SettingsWindow.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Analyzer\AnalyzerResultView.axaml.cs">
+            <DependentUpon>AnalyzerResultView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\Analyzer\AnalyzerWindow.axaml.cs">
+            <DependentUpon>ModAnalyzerWindow.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="ViewModels\Analyzer\DesignAnalyzerResultVM.cs">
+            <DependentUpon>AnalyzerResultVM.cs</DependentUpon>
+        </Compile>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="Assets\"/>
+    </ItemGroup>
+</Project>

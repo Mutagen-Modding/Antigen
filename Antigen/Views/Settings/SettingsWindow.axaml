@@ -1,0 +1,62 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:settings="clr-namespace:Antigen.ViewModels.Settings"
+        mc:Ignorable="d"
+        d:DesignWidth="600"
+        d:DesignHeight="400"
+        x:Class="Antigen.Views.Settings.SettingsWindow"
+        x:DataType="settings:SettingsVM"
+        Title="Settings"
+        Width="600"
+        Height="400"
+        Topmost="True"
+        WindowStartupLocation="CenterOwner">
+    <Grid RowDefinitions="Auto,*,Auto"
+          Margin="10">
+        <!-- Title -->
+        <TextBlock Grid.Row="0"
+                   Text="Ignore Rules"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   Margin="4" />
+
+        <!-- Rules list -->
+        <DataGrid Grid.Row="1"
+                  ItemsSource="{Binding Rules}"
+                  SelectedIndex="{Binding SelectedIndex}"
+                  AutoGenerateColumns="False"
+                  IsReadOnly="True"
+                  CanUserResizeColumns="True"
+                  CanUserSortColumns="True"
+                  BorderThickness="1"
+                  GridLinesVisibility="All">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Type"
+                                    Binding="{Binding Type}"
+                                    Width="100" />
+                <DataGridTextColumn Header="Identifier"
+                                    Binding="{Binding Identifier}"
+                                    Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+
+        <!-- Action buttons -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    Spacing="10"
+                    HorizontalAlignment="Right"
+                    Margin="0,10,0,0">
+            <Button Content="Remove Selected"
+                    Command="{Binding RemoveSelectedCommand}"
+                    Padding="10,5"
+                    MinWidth="120" />
+            <Button Content="Clear All"
+                    Command="{Binding ClearAllCommand}"
+                    Padding="10,5"
+                    MinWidth="100"
+                    Background="IndianRed" />
+        </StackPanel>
+    </Grid>
+</Window>

@@ -1,0 +1,167 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:analyzer="clr-namespace:Antigen.ViewModels.Analyzer"
+             xmlns:converter="clr-namespace:Antigen.Resources.Converter"
+             xmlns:commands="clr-namespace:Antigen.Resources.Command"
+             mc:Ignorable="d"
+             d:DesignWidth="600"
+             d:DesignHeight="300"
+             x:Class="Antigen.Views.Analyzer.AnalyzerResultView"
+             x:DataType="analyzer:AnalyzerResultVM">
+    <Design.DataContext>
+        <analyzer:DesignAnalyzerResultVM />
+    </Design.DataContext>
+
+    <UserControl.Resources>
+        <converter:SeverityToBrushConverter x:Key="SeverityToBrushConverter" />
+    </UserControl.Resources>
+
+    <Border BorderThickness="0,0,0,1"
+            Padding="8,6"
+            Margin="0,2">
+        <StackPanel Spacing="4"
+                    Background="Transparent">
+            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
+                <!-- Severity -->
+                <Border Grid.Column="0"
+                        ToolTip.Tip="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToDescription}}"
+                        CornerRadius="2"
+                        Padding="4,2"
+                        Margin="0,0,6,0"
+                        VerticalAlignment="Top"
+                        Background="{Binding Result.Topic.Severity, Converter={StaticResource SeverityToBrushConverter}}">
+                    <TextBlock Text="{Binding Result.Topic.Severity}"
+                               FontSize="9"
+                               Foreground="Black"
+                               FontWeight="Bold" />
+                </Border>
+
+                <!-- Record Type -->
+                <Border Grid.Column="1"
+                        CornerRadius="2"
+                        Padding="4,2"
+                        Margin="0,0,6,0"
+                        VerticalAlignment="Top"
+                        Background="Gray">
+                    <TextBlock
+                        Text="{Binding Result.Record?.Type, Converter={x:Static converter:RecordTypeConverters.GetName}}"
+                        FontSize="9"
+                        Foreground="Black"
+                        FontWeight="Bold" />
+                </Border>
+
+                <!-- Topic Title -->
+                <Button Grid.Column="2"
+                        ToolTip.Tip="Open Topic Definition"
+                        Command="{x:Static commands:OpenLinkCommands.OpenUriCommand}"
+                        CommandParameter="{Binding Result.Topic.TopicDefinition.InformationUri}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="2"
+                        Content="{Binding Result.Topic.TopicDefinition.Title}"
+                        FontSize="9"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                        VerticalAlignment="Center" />
+
+                <!-- Metadata -->
+                <Button Grid.Column="3"
+                        IsVisible="{Binding !!Result.Topic.MetaData.Length}"
+                        FontSize="12"
+                        Padding="4, 0"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        VerticalAlignment="Center">
+                    <Button.Flyout>
+                        <Flyout FlyoutPresenterClasses="Flyout1000x500">
+                            <TableView ItemsSource="{Binding Result.Topic.MetaData}">
+                                <TableView.Columns>
+                                    <TableViewColumn Header="Name"
+                                                     Width="200"
+                                                     Binding="{Binding Converter={x:Static converter:MetaDataConverters.ToName}}" />
+                                    <TableViewColumn Header="Value"
+                                                     Width="750"
+                                                     Binding="{Binding Converter={x:Static converter:MetaDataConverters.ToValue}}">
+                                        <TableViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock
+                                                    Text="{Binding Converter={x:Static converter:MetaDataConverters.ToValue}}"
+                                                    TextWrapping="Wrap" />
+                                            </DataTemplate>
+                                        </TableViewColumn.CellTemplate>
+                                    </TableViewColumn>
+                                </TableView.Columns>
+                            </TableView>
+                        </Flyout>
+                    </Button.Flyout>
+
+                    <controls:FAFontIcon Glyph="ℹ️"
+                                         FontSize="12"
+                                         ToolTip.Tip="{Binding Result.Topic.MetaData, Converter={x:Static converter:MetaDataConverters.ToString}}" />
+                </Button>
+            </Grid>
+
+            <Grid ColumnDefinitions="Auto,6,*,Auto,Auto,Auto">
+                <!-- Record Identifier -->
+                <Button Grid.Column="0"
+                        Content="{Binding RecordDisplayName}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="0"
+                        Click="Copy_PointerPressed"
+                        ToolTip.Tip="Copy Record Identifier"
+                        FontSize="10"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                        VerticalAlignment="Center" />
+
+                <!-- Colon -->
+                <TextBlock Grid.Column="1"
+                           Text=":"
+                           FontSize="10"
+                           FontWeight="Medium"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                           VerticalAlignment="Center" />
+
+                <!-- Message -->
+                <ContentControl Grid.Column="2"
+                                Content="{Binding Result.Topic.FormattedTopic, Converter={StaticResource FormattedTopicConverter}}" />
+
+                <!-- Parent -->
+                <Button Grid.Column="4"
+                        Content="{Binding ParentDisplayName}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="2"
+                        ToolTip.Tip="Copy Parent Identifier"
+                        Click="Copy_PointerPressed"
+                        FontSize="10"
+                        FontWeight="Medium"
+                        Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                        VerticalAlignment="Center" />
+
+                <!-- Configure Button -->
+                <Button Grid.Column="5"
+                        FontSize="12"
+                        Padding="4,2"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        VerticalAlignment="Center"
+                        ToolTip.Tip="Configure this result"
+                        Command="{Binding RequestConfigureCommand}">
+                    <controls:FASymbolIcon Symbol="SettingsFilled" />
+
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover">
+                            <Setter Property="IsVisible"
+                                    Value="True" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </Grid>
+        </StackPanel>
+    </Border>
+</UserControl>

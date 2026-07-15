@@ -1,0 +1,283 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avaloniaProgressRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        xmlns:topics="clr-namespace:Mutagen.Bethesda.Analyzers.SDK.Topics;assembly=Mutagen.Bethesda.Analyzers.SDK"
+        xmlns:system="clr-namespace:System;assembly=System.Runtime"
+        xmlns:analyzer="clr-namespace:Antigen.Views.Analyzer"
+        xmlns:converter="clr-namespace:Antigen.Resources.Converter"
+        xmlns:viewModels="clr-namespace:Antigen.ViewModels"
+        xmlns:vm="clr-namespace:Antigen.ViewModels.Analyzer"
+        mc:Ignorable="d"
+        d:DesignWidth="600"
+        d:DesignHeight="500"
+        x:Class="Antigen.Views.Analyzer.AnalyzerWindow"
+        x:DataType="vm:AnalyzerVM"
+        x:Name="Window"
+        Background="Transparent"
+        Width="600"
+        Height="{Binding CurrentWindowHeight}"
+        Title="{Binding ModWatcher.ModKey.FileName, StringFormat='Antigen - {0}'}"
+        Topmost="True"
+        WindowDecorations="None"
+        WindowStartupLocation="Manual">
+    <Window.Resources>
+        <converter:ListContainsConverter x:Key="SeverityEnabled"
+                                         x:TypeArguments="topics:Severity"
+                                         List="{Binding EnabledSeverities}" />
+        <converter:BoolToColorConverter x:Key="BoolToColorConverter"
+                                        ValidColor="ForestGreen"
+                                        ErrorColor="Orange" />
+        <converter:SeverityToBrushConverter x:Key="SeverityToBrushConverter" />
+    </Window.Resources>
+
+    <!-- Main Container -->
+    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+            CornerRadius="8">
+        <Grid RowDefinitions="40,*">
+            <Grid Grid.Row="0"
+                  x:Name="Bar"
+                  Background="Transparent"
+                  ColumnDefinitions="100,*,Auto,Auto,Auto,Auto"
+                  Margin="4,0"
+                  VerticalAlignment="Center">
+                <!-- Status Indicator -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            Spacing="6"
+                            VerticalAlignment="Center">
+                    <Grid>
+                        <!-- Loading Spinner (visible when analyzing) -->
+                        <avaloniaProgressRing:ProgressRing IsActive="{Binding ModWatcher.IsAnalyzing}"
+                                                           HorizontalAlignment="Center"
+                                                           VerticalAlignment="Center"
+                                                           Width="10"
+                                                           Height="10" />
+
+                        <!-- Status Dot (visible when idle) -->
+                        <Ellipse IsVisible="{Binding !ModWatcher.IsAnalyzing}"
+                                 Width="10"
+                                 Height="10"
+                                 VerticalAlignment="Center"
+                                 ToolTip.Tip="{Binding ModWatcher.TotalResults, StringFormat='Total Issues: {0}'}">
+                            <Ellipse.Fill>
+                                <SolidColorBrush
+                                    Color="{Binding !ModWatcher.TotalResults, Converter={StaticResource BoolToColorConverter}}" />
+                            </Ellipse.Fill>
+                        </Ellipse>
+                    </Grid>
+
+                    <TextBlock Text="{Binding ModWatcher.AnalyzerStatus}"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource SystemColorGrayTextColor}"
+                               VerticalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Result Counts -->
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="15"
+                            HorizontalAlignment="Center"
+                            VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="4">
+                        <TextBlock Text="New:"
+                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+                        <TextBlock Text="{Binding ModWatcher.NewResultsCount}"
+                                   FontWeight="Bold"
+                                   Foreground="#FFA500" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="4">
+                        <TextBlock Text="Resolved:"
+                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+                        <TextBlock Text="{Binding ModWatcher.ResolvedResults}"
+                                   FontWeight="Bold"
+                                   Foreground="#00CC00" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="4">
+                        <TextBlock Text="Total:"
+                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}" />
+                        <TextBlock Text="{Binding ModWatcher.TotalResults}"
+                                   FontWeight="Bold"
+                                   Foreground="{DynamicResource SystemColorGrayTextColor}" />
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Expand Button -->
+                <Button Grid.Column="2"
+                        Command="{Binding ToggleDetailsCommand}"
+                        VerticalAlignment="Stretch"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        ToolTip.Tip="Show Details">
+                    <Button.Content>
+                        <Grid>
+                            <TextBlock Text="▲"
+                                       IsVisible="{Binding ShowDetails}"
+                                       Foreground="{DynamicResource SystemColorGrayTextColor}" />
+                            <TextBlock Text="▼"
+                                       IsVisible="{Binding !ShowDetails}"
+                                       Foreground="{DynamicResource SystemColorGrayTextColor}" />
+                        </Grid>
+                    </Button.Content>
+                </Button>
+
+                <!-- Settings Button -->
+                <Button Grid.Column="3"
+                        Command="{Binding OpenSettingsCommand}"
+                        VerticalAlignment="Stretch"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        ToolTip.Tip="Settings">
+                    <controls:FASymbolIcon Symbol="SettingsFilled" />
+                </Button>
+
+                <!-- Return Button -->
+                <Button Grid.Column="5"
+                        Content="✕"
+                        Command="{Binding ReturnCommand}"
+                        VerticalAlignment="Stretch"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        FontWeight="Bold"
+                        ToolTip.Tip="Return" />
+            </Grid>
+
+            <!-- Results List -->
+            <Grid Grid.Row="1"
+                  IsVisible="{Binding ShowDetails}"
+                  RowDefinitions="Auto,*"
+                  Margin="10,5,10,10">
+                <!-- Results Filtering -->
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="*,4,Auto"
+                      Margin="4, 0, 12, 0">
+                    <!-- Search Bar -->
+                    <TextBox Grid.Column="0"
+                             x:Name="SearchBox"
+                             Text="{Binding SearchText, Delay=200}"
+                             PlaceholderText="Search results..." />
+
+                    <!-- Filter Severies Flyout -->
+                    <Button Grid.Column="2"
+                            VerticalAlignment="Stretch"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            ToolTip.Tip="Filter Severities">
+                        <Button.Flyout>
+                            <Flyout>
+                                <ItemsControl ItemsSource="{x:Static viewModels:MainVM.SeverityValues}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate DataType="topics:Severity">
+                                            <StackPanel Orientation="Horizontal">
+                                                <CheckBox
+                                                    IsChecked="{Binding Converter={StaticResource SeverityEnabled}}"
+                                                    Command="{Binding #Window.ViewModel?.ToggleSeverityCommand}"
+                                                    CommandParameter="{Binding}">
+                                                    <CheckBox.Content>
+                                                        <StackPanel Orientation="Horizontal"
+                                                                    Spacing="4">
+                                                            <Rectangle Height="10"
+                                                                       Width="10"
+                                                                       Fill="{Binding Converter={StaticResource SeverityToBrushConverter}}" />
+
+                                                            <TextBlock
+                                                                Text="{Binding Converter={x:Static converter:EnumConverters.ToString}}" />
+                                                        </StackPanel>
+                                                    </CheckBox.Content>
+                                                </CheckBox>
+                                            </StackPanel>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </Flyout>
+                        </Button.Flyout>
+
+                        <controls:FASymbolIcon Symbol="Filter" />
+                    </Button>
+                </Grid>
+
+                <ScrollViewer Grid.Row="1"
+                              CornerRadius="8"
+                              VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer.Resources>
+                        <converter:ReturnParameterIfTrueConverter x:Key="IfTrueConverter"
+                                                                  x:TypeArguments="system:Double"
+                                                                  DefaultValue="5" />
+                    </ScrollViewer.Resources>
+
+                    <ScrollViewer.Effect>
+                        <BlurEffect
+                            Radius="{Binding !CurrentSettingsViewResult,
+                                                 Converter={StaticResource IfTrueConverter},
+                                                 ConverterParameter=0}" />
+                    </ScrollViewer.Effect>
+
+                    <!-- Results List -->
+                    <controls:FAItemsRepeater ItemsSource="{Binding FilteredResults}">
+                        <controls:FAItemsRepeater.Layout>
+                            <controls:FAStackLayout Orientation="Vertical" />
+                        </controls:FAItemsRepeater.Layout>
+
+                        <controls:FAItemsRepeater.ItemTemplate>
+                            <DataTemplate DataType="vm:AnalyzerResultVM">
+                                <analyzer:AnalyzerResultView />
+                            </DataTemplate>
+                        </controls:FAItemsRepeater.ItemTemplate>
+                    </controls:FAItemsRepeater>
+                </ScrollViewer>
+
+                <!-- Configure Mode -->
+                <Grid Grid.Row="0"
+                      Grid.RowSpan="2"
+                      VerticalAlignment="Stretch"
+                      HorizontalAlignment="Stretch"
+                      IsVisible="{Binding CurrentSettingsViewResult, Converter={x:Static ObjectConverters.IsNotNull}}"
+                      Background="#E0151515">
+                    <StackPanel VerticalAlignment="Center"
+                                HorizontalAlignment="Center"
+                                IsVisible="{Binding CurrentSettingsViewResult, Converter={x:Static ObjectConverters.IsNotNull}}"
+                                Spacing="40">
+                        <Button Content="Ignore this instance only"
+                                HorizontalAlignment="Stretch"
+                                Command="{Binding #Window.ViewModel?.IgnoreInstanceCommand}"
+                                CommandParameter="{Binding CurrentSettingsViewResult}" />
+
+                        <Button
+                            Content="{Binding CurrentSettingsViewResult?.Result.Topic.TopicDefinition.Title, StringFormat='{}Ignore all results for topic&#x0a;\'{0}\''}"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding #Window.ViewModel?.IgnoreTopicTypeCommand}"
+                            CommandParameter="{Binding CurrentSettingsViewResult}" />
+
+                        <Button
+                            Content="{Binding CurrentSettingsViewResult?.RecordDisplayName, StringFormat='{}Ignore all reports for record&#x0a;\'{0}\''}"
+                            HorizontalAlignment="Stretch"
+                            Command="{Binding #Window.ViewModel?.IgnoreRecordCommand}"
+                            CommandParameter="{Binding CurrentSettingsViewResult}" />
+
+                        <Button Content="Cancel"
+                                HorizontalAlignment="Center"
+                                Command="{Binding #Window.ViewModel?.LeaveIgnoreModeCommand}" />
+                    </StackPanel>
+                </Grid>
+            </Grid>
+
+            <!-- Resize Grip at bottom -->
+            <Border Grid.Row="1"
+                    x:Name="ResizeGrip"
+                    Height="12"
+                    VerticalAlignment="Bottom"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Cursor="SizeNorthSouth"
+                    ToolTip.Tip="Drag to resize"
+                    PointerPressed="ResizeGrip_PointerPressed"
+                    PointerMoved="ResizeGrip_PointerMoved"
+                    PointerReleased="ResizeGrip_PointerReleased" />
+        </Grid>
+    </Border>
+</Window>
