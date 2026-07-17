@@ -154,16 +154,10 @@
                   Margin="10,5,10,10">
                 <!-- Results Filtering -->
                 <Grid Grid.Row="0"
-                      ColumnDefinitions="*,4,Auto"
+                      ColumnDefinitions="Auto,4,*"
                       Margin="4, 0, 12, 0">
-                    <!-- Search Bar -->
-                    <TextBox Grid.Column="0"
-                             x:Name="SearchBox"
-                             Text="{Binding SearchText, Delay=200}"
-                             PlaceholderText="Search results..." />
-
                     <!-- Filter Severies Flyout -->
-                    <Button Grid.Column="2"
+                    <Button Grid.Column="0"
                             VerticalAlignment="Stretch"
                             Background="Transparent"
                             BorderThickness="0"
@@ -173,24 +167,21 @@
                                 <ItemsControl ItemsSource="{x:Static viewModels:MainVM.SeverityValues}">
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="topics:Severity">
-                                            <StackPanel Orientation="Horizontal">
-                                                <CheckBox
-                                                    IsChecked="{Binding Converter={StaticResource SeverityEnabled}}"
-                                                    Command="{Binding #Window.ViewModel?.ToggleSeverityCommand}"
-                                                    CommandParameter="{Binding}">
-                                                    <CheckBox.Content>
-                                                        <StackPanel Orientation="Horizontal"
-                                                                    Spacing="4">
-                                                            <Rectangle Height="10"
-                                                                       Width="10"
-                                                                       Fill="{Binding Converter={StaticResource SeverityToBrushConverter}}" />
+                                            <CheckBox IsChecked="{Binding Converter={StaticResource SeverityEnabled}}"
+                                                      Command="{Binding #Window.ViewModel?.ToggleSeverityCommand}"
+                                                      CommandParameter="{Binding}">
+                                                <CheckBox.Content>
+                                                    <StackPanel Orientation="Horizontal"
+                                                                Spacing="4">
+                                                        <Rectangle Height="10"
+                                                                   Width="10"
+                                                                   Fill="{Binding Converter={StaticResource SeverityToBrushConverter}}" />
 
-                                                            <TextBlock
-                                                                Text="{Binding Converter={x:Static converter:EnumConverters.ToString}}" />
-                                                        </StackPanel>
-                                                    </CheckBox.Content>
-                                                </CheckBox>
-                                            </StackPanel>
+                                                        <TextBlock
+                                                            Text="{Binding Converter={x:Static converter:EnumConverters.ToString}}" />
+                                                    </StackPanel>
+                                                </CheckBox.Content>
+                                            </CheckBox>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
@@ -199,6 +190,12 @@
 
                         <controls:FASymbolIcon Symbol="Filter" />
                     </Button>
+
+                    <!-- Search Bar -->
+                    <TextBox Grid.Column="2"
+                             x:Name="SearchBox"
+                             Text="{Binding SearchText, Delay=200}"
+                             PlaceholderText="Search results..." />
                 </Grid>
 
                 <ScrollViewer Grid.Row="1"
