@@ -1,29 +1,22 @@
-<Window xmlns="https://github.com/avaloniaui"
-        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:avaloniaProgressRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
-        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-        xmlns:topics="clr-namespace:Mutagen.Bethesda.Analyzers.SDK.Topics;assembly=Mutagen.Bethesda.Analyzers.SDK"
-        xmlns:system="clr-namespace:System;assembly=System.Runtime"
-        xmlns:analyzer="clr-namespace:Antigen.Views.Analyzer"
-        xmlns:converter="clr-namespace:Antigen.Resources.Converter"
-        xmlns:viewModels="clr-namespace:Antigen.ViewModels"
-        xmlns:vm="clr-namespace:Antigen.ViewModels.Analyzer"
-        mc:Ignorable="d"
-        d:DesignWidth="600"
-        d:DesignHeight="500"
-        x:Class="Antigen.Views.Analyzer.AnalyzerWindow"
-        x:DataType="vm:AnalyzerVM"
-        x:Name="Window"
-        Background="Transparent"
-        Width="600"
-        Height="{Binding CurrentWindowHeight}"
-        Title="{Binding ModWatcher.ModKey.FileName, StringFormat='Antigen - {0}'}"
-        Topmost="True"
-        WindowDecorations="None"
-        WindowStartupLocation="Manual">
-    <Window.Resources>
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:avaloniaProgressRing="clr-namespace:AvaloniaProgressRing;assembly=AvaloniaProgressRing"
+             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:topics="clr-namespace:Mutagen.Bethesda.Analyzers.SDK.Topics;assembly=Mutagen.Bethesda.Analyzers.SDK"
+             xmlns:system="clr-namespace:System;assembly=System.Runtime"
+             xmlns:analyzer="clr-namespace:Antigen.Views.Analyzer"
+             xmlns:converter="clr-namespace:Antigen.Resources.Converter"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels"
+             xmlns:vm="clr-namespace:Antigen.ViewModels.Analyzer"
+             mc:Ignorable="d"
+             d:DesignWidth="600"
+             d:DesignHeight="500"
+             x:Class="Antigen.Views.Analyzer.AnalyzerView"
+             x:DataType="vm:AnalyzerVM"
+             x:Name="Root">
+    <UserControl.Resources>
         <converter:ListContainsConverter x:Key="SeverityEnabled"
                                          x:TypeArguments="topics:Severity"
                                          List="{Binding EnabledSeverities}" />
@@ -31,7 +24,7 @@
                                         ValidColor="ForestGreen"
                                         ErrorColor="Orange" />
         <converter:SeverityToBrushConverter x:Key="SeverityToBrushConverter" />
-    </Window.Resources>
+    </UserControl.Resources>
 
     <!-- Main Container -->
     <Border Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
@@ -137,14 +130,31 @@
                 </Button>
 
                 <!-- Return Button -->
-                <Button Grid.Column="5"
-                        Content="✕"
+                <Button Grid.Column="4"
+                        Content="←"
                         Command="{Binding ReturnCommand}"
                         VerticalAlignment="Stretch"
                         Background="Transparent"
                         BorderThickness="0"
                         FontWeight="Bold"
-                        ToolTip.Tip="Return" />
+                        ToolTip.Tip="Back to home" />
+
+                <!-- Close Button -->
+                <Button Grid.Column="5"
+                        Content="✕"
+                        Command="{Binding CloseCommand}"
+                        VerticalAlignment="Stretch"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        FontWeight="Bold"
+                        ToolTip.Tip="Close">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background"
+                                    Value="IndianRed" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
             </Grid>
 
             <!-- Results List -->
@@ -176,7 +186,7 @@
                                             <StackPanel Orientation="Horizontal">
                                                 <CheckBox
                                                     IsChecked="{Binding Converter={StaticResource SeverityEnabled}}"
-                                                    Command="{Binding #Window.ViewModel?.ToggleSeverityCommand}"
+                                                    Command="{Binding #Root.ViewModel?.ToggleSeverityCommand}"
                                                     CommandParameter="{Binding}">
                                                     <CheckBox.Content>
                                                         <StackPanel Orientation="Horizontal"
@@ -244,24 +254,24 @@
                                 Spacing="40">
                         <Button Content="Ignore this instance only"
                                 HorizontalAlignment="Stretch"
-                                Command="{Binding #Window.ViewModel?.IgnoreInstanceCommand}"
+                                Command="{Binding IgnoreInstanceCommand}"
                                 CommandParameter="{Binding CurrentSettingsViewResult}" />
 
                         <Button
                             Content="{Binding CurrentSettingsViewResult?.Result.Topic.TopicDefinition.Title, StringFormat='{}Ignore all results for topic&#x0a;\'{0}\''}"
                             HorizontalAlignment="Stretch"
-                            Command="{Binding #Window.ViewModel?.IgnoreTopicTypeCommand}"
+                            Command="{Binding IgnoreTopicTypeCommand}"
                             CommandParameter="{Binding CurrentSettingsViewResult}" />
 
                         <Button
                             Content="{Binding CurrentSettingsViewResult?.RecordDisplayName, StringFormat='{}Ignore all reports for record&#x0a;\'{0}\''}"
                             HorizontalAlignment="Stretch"
-                            Command="{Binding #Window.ViewModel?.IgnoreRecordCommand}"
+                            Command="{Binding IgnoreRecordCommand}"
                             CommandParameter="{Binding CurrentSettingsViewResult}" />
 
                         <Button Content="Cancel"
                                 HorizontalAlignment="Center"
-                                Command="{Binding #Window.ViewModel?.LeaveIgnoreModeCommand}" />
+                                Command="{Binding LeaveIgnoreModeCommand}" />
                     </StackPanel>
                 </Grid>
             </Grid>
@@ -280,4 +290,4 @@
                     PointerReleased="ResizeGrip_PointerReleased" />
         </Grid>
     </Border>
-</Window>
+</UserControl>

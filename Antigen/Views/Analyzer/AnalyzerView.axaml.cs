@@ -4,30 +4,19 @@ using Avalonia.Input;
 
 namespace Antigen.Views.Analyzer;
 
-public partial class AnalyzerWindow : PinnedWindow
+public partial class AnalyzerView : UserControl
 {
     private double _dragStartY;
 
     private bool _isResizing;
     private double _originalHeight;
 
-    public AnalyzerWindow()
+    public AnalyzerView()
     {
         InitializeComponent();
-
-        MainBar = Bar;
     }
 
-    public AnalyzerWindow(AnalyzerVM analyzerVM)
-    {
-        DataContext = ViewModel = analyzerVM;
-        InitializeComponent();
-
-        MainBar = Bar;
-    }
-    public AnalyzerVM? ViewModel { get; }
-
-    public override sealed Control MainBar { get; set; }
+    public AnalyzerVM? ViewModel => DataContext as AnalyzerVM;
 
     private void ResizeGrip_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
@@ -36,6 +25,9 @@ public partial class AnalyzerWindow : PinnedWindow
         _isResizing = true;
         _dragStartY = e.GetPosition(null).Y;
         _originalHeight = ViewModel.ExpandedViewHeight;
+
+        // Opt out of PinnedWindow's move-drag.
+        e.Handled = true;
     }
 
     private void ResizeGrip_PointerMoved(object? sender, PointerEventArgs e)

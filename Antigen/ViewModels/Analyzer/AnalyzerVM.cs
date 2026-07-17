@@ -5,6 +5,7 @@ using System.Reactive.Subjects;
 using Antigen.Models.Settings;
 using Antigen.Services;
 using Antigen.ViewModels.Settings;
+using Antigen.Views;
 using DynamicData;
 using DynamicData.Binding;
 using Microsoft.Extensions.Logging;
@@ -23,20 +24,23 @@ public enum ExpandableViewState
     Expanded = 1,
     Custom = 2
 }
-public sealed partial class AnalyzerVM : ViewModel
+public sealed partial class AnalyzerVM : ViewModel, IMainPanel
 {
     private const double CollapsedHeight = 40.0;
     private readonly Subject<Unit> _returnTrigger = new();
 
     private readonly Func<ModKey, SettingsVM> _settingsVMFactory;
+    private readonly IMainWindow _mainWindow;
 
     public AnalyzerVM(
         Func<ModKey, SettingsVM> settingsVMFactory,
         ISettingsService settingsService,
         ModWatcherVM modWatcher,
+        IMainWindow mainWindow,
         ILogger<AnalyzerVM> logger)
     {
         _settingsVMFactory = settingsVMFactory;
+        _mainWindow = mainWindow;
         SettingsService = settingsService;
         ModWatcher = modWatcher;
 
@@ -139,6 +143,12 @@ public sealed partial class AnalyzerVM : ViewModel
     private void Return()
     {
         _returnTrigger.OnNext(Unit.Default);
+    }
+
+    [ReactiveCommand]
+    private void Close()
+    {
+        _mainWindow.Close();
     }
 
     [ReactiveCommand]

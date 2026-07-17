@@ -21,7 +21,6 @@ namespace Antigen;
 public sealed class App : Application
 {
     public static IContainer? Container { get; private set; }
-    public static Window? MainAppWindow { get; private set; }
 
     public override void Initialize()
     {
@@ -32,33 +31,33 @@ public sealed class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Setup dependency injection
-            Container = SetupServices();
+            var window = new MainWindow();
+            Container = SetupServices(window);
 
-            MainAppWindow = new MainWindow
-            {
-                DataContext = Container.Resolve<MainVM>()
-            };
+            window.DataContext = Container.Resolve<MainVM>();
 
-            var screen = MainAppWindow.Screens.Primary;
+            var screen = window.Screens.Primary;
             if (screen is not null)
             {
                 const int offset = 25;
-                MainAppWindow.Position = new PixelPoint(
-                    screen.WorkingArea.Right - (int)MainAppWindow.Width - offset,
+                window.Position = new PixelPoint(
+                    screen.WorkingArea.Right - (int)window.Width - offset,
                     offset
                 );
             }
 
-            desktop.MainWindow = MainAppWindow;
+            desktop.MainWindow = window;
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static IContainer SetupServices()
+    private static IContainer SetupServices(MainWindow window)
     {
         var builder = new ContainerBuilder();
+
+        builder.RegisterInstance(window)
+            .As<IMainWindow>();
 
         // Register logger factory and loggers using Microsoft.Extensions.Logging
         var loggerFactory = LoggerFactory.Create(logging =>
@@ -117,6 +116,7 @@ public sealed class App : Application
 
         // Register ViewModels
         builder.RegisterType<MainVM>().SingleInstance();
+        builder.RegisterType<HomeVM>().SingleInstance();
         builder.RegisterType<AnalyzerVM>();
         builder.RegisterType<SettingsVM>();
         builder.RegisterType<ModWatcherVM>();

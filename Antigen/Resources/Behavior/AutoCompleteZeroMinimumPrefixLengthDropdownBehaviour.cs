@@ -21,7 +21,10 @@ public sealed class AutoCompleteZeroMinimumPrefixLengthDropdownBehaviour : Behav
             AssociatedObject.GotFocus += OnGotFocus;
             AssociatedObject.PointerReleased += PointerReleased;
 
-            Task.Delay(500).ContinueWith(_ => Dispatcher.UIThread.Invoke(() => CreateDropdownButton(AssociatedObject)));
+            Task.Delay(500).ContinueWith(_ => Dispatcher.UIThread.Invoke(() =>
+            {
+                if (AssociatedObject is not null) CreateDropdownButton(AssociatedObject);
+            }));
         }
 
         base.OnAttached();

@@ -72,8 +72,12 @@
             <DependentUpon>AnalyzerResultView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
-        <Compile Update="Views\Analyzer\AnalyzerWindow.axaml.cs">
-            <DependentUpon>ModAnalyzerWindow.axaml</DependentUpon>
+        <Compile Update="Views\Analyzer\AnalyzerView.axaml.cs">
+            <DependentUpon>AnalyzerView.axaml</DependentUpon>
+            <SubType>Code</SubType>
+        </Compile>
+        <Compile Update="Views\HomeView.axaml.cs">
+            <DependentUpon>HomeView.axaml</DependentUpon>
             <SubType>Code</SubType>
         </Compile>
         <Compile Update="ViewModels\Analyzer\DesignAnalyzerResultVM.cs">
