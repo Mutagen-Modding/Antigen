@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Antigen.Models.Analyzer;
+using Antigen.Services.Singleton;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;
@@ -10,7 +11,7 @@ using Mutagen.Bethesda.Plugins;
 using ReactiveMarbles.ObservableEvents;
 using ReactiveUI;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Transient;
 
 public sealed class ModWatcher(
     IFileSystem fileSystem,

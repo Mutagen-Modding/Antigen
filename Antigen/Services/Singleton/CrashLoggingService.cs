@@ -1,7 +1,7 @@
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Singleton;
 
 public sealed class CrashLoggingService : ICrashLoggingService
 {

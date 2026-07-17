@@ -8,8 +8,9 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:analyzer="clr-namespace:Antigen.Views.Analyzer"
              xmlns:converter="clr-namespace:Antigen.Resources.Converter"
-             xmlns:viewModels="clr-namespace:Antigen.ViewModels"
-             xmlns:vm="clr-namespace:Antigen.ViewModels.Analyzer"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels.Singleton"
+             xmlns:vm="clr-namespace:Antigen.ViewModels.Transient"
+             xmlns:results="clr-namespace:Antigen.ViewModels.Analyzer"
              mc:Ignorable="d"
              d:DesignWidth="600"
              d:DesignHeight="500"
@@ -234,7 +235,7 @@
                         </controls:FAItemsRepeater.Layout>
 
                         <controls:FAItemsRepeater.ItemTemplate>
-                            <DataTemplate DataType="vm:AnalyzerResultVM">
+                            <DataTemplate DataType="results:AnalyzerResultVM">
                                 <analyzer:AnalyzerResultView />
                             </DataTemplate>
                         </controls:FAItemsRepeater.ItemTemplate>

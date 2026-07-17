@@ -1,4 +1,4 @@
-namespace Antigen.Services;
+namespace Antigen.Services.Singleton;
 
 public interface ICrashLoggingService
 {

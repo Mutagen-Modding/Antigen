@@ -7,7 +7,7 @@ using Mutagen.Bethesda.Analyzers.Skyrim.Record.Static;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record.TextureSet;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record.Weapon;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Game;
 
 public sealed class SkyrimAnalyzerFilter : IAnalyzerFilter
 {

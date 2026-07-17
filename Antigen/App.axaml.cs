@@ -1,10 +1,10 @@
 using System.IO.Abstractions;
 using Antigen.Models.Settings;
 using Antigen.Modules;
-using Antigen.Services;
-using Antigen.ViewModels;
-using Antigen.ViewModels.Analyzer;
-using Antigen.ViewModels.Settings;
+using Antigen.Services.Singleton;
+using Antigen.Services.Transient;
+using Antigen.ViewModels.Singleton;
+using Antigen.ViewModels.Transient;
 using Antigen.Views;
 using Autofac;
 using Avalonia;
@@ -87,11 +87,6 @@ public sealed class App : Application
             .As(typeof(ILogger<>))
             .SingleInstance();
 
-        // Register crash logging service
-        builder.RegisterType<CrashLoggingService>()
-            .As<ICrashLoggingService>()
-            .SingleInstance();
-
         // Register base services
         builder.RegisterType<FileSystem>()
             .As<IFileSystem>()
@@ -109,32 +104,11 @@ public sealed class App : Application
             return GameConstants.Get(gameReleaseContext.Release);
         });
 
-        // Register application services
-        builder.RegisterType<AnalyzerService>()
-            .As<IAnalyzerService>()
-            .SingleInstance();
-
-        builder.RegisterType<ModWatcher>()
-            .As<IModWatcher>();
-
-        builder.RegisterType<SkyrimModInfoProvider>()
-            .As<IModInfoProvider>();
-
-        builder.RegisterType<SettingsService>()
-            .As<ISettingsService>()
-            .SingleInstance();
-
-        builder.RegisterType<GuiSettingsService>()
-            .SingleInstance();
-
-        builder.RegisterType<SkyrimAnalyzerResultInfoFactory>();
-
-        // Register ViewModels
-        builder.RegisterType<MainVM>().SingleInstance();
-        builder.RegisterType<HomeVM>().SingleInstance();
-        builder.RegisterType<AnalyzerVM>();
-        builder.RegisterType<SettingsVM>();
-        builder.RegisterType<ModWatcherVM>();
+        // Register application services and view models by folder
+        builder.RegisterFolder<AnalyzerService>(RegistrationStyle.Singleton);
+        builder.RegisterFolder<ModWatcher>(RegistrationStyle.Transient);
+        builder.RegisterFolder<MainVM>(RegistrationStyle.Singleton);
+        builder.RegisterFolder<AnalyzerVM>(RegistrationStyle.Transient);
 
         return builder.Build();
     }

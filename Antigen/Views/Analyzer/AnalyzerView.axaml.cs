@@ -1,4 +1,4 @@
-using Antigen.ViewModels.Analyzer;
+using Antigen.ViewModels.Transient;
 using Avalonia.Controls;
 
 namespace Antigen.Views.Analyzer;

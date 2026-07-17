@@ -7,7 +7,7 @@ using Antigen.Models.Settings;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Plugins;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Singleton;
 
 public sealed class SettingsService : ISettingsService
 {

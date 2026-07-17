@@ -1,7 +1,7 @@
 using Antigen.Models.Analyzer;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Transient;
 
 public interface IModWatcher : IDisposable
 {

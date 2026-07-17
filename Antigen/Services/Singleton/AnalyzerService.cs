@@ -2,6 +2,7 @@ using System.IO.Abstractions;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using Antigen.Models.Analyzer;
+using Antigen.Services.Game;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers;
 using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
@@ -13,7 +14,7 @@ using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Order.DI;
 using Noggog;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Singleton;
 
 public sealed class AnalyzerService(
     IFileSystem fileSystem,

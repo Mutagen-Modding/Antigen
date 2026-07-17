@@ -3,8 +3,8 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Antigen.Models.Settings;
-using Antigen.Services;
-using Antigen.ViewModels.Settings;
+using Antigen.Services.Singleton;
+using Antigen.ViewModels.Analyzer;
 using Antigen.Views;
 using DynamicData;
 using DynamicData.Binding;
@@ -16,7 +16,7 @@ using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using SettingsWindow = Antigen.Views.Settings.SettingsWindow;
 
-namespace Antigen.ViewModels.Analyzer;
+namespace Antigen.ViewModels.Transient;
 
 public sealed partial class AnalyzerVM : ResizablePanelVM
 {

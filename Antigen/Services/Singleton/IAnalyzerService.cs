@@ -2,7 +2,7 @@ using Antigen.Models.Analyzer;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Singleton;
 
 public interface IAnalyzerService
 {

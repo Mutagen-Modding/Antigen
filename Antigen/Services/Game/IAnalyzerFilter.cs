@@ -1,6 +1,6 @@
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Game;
 
 public interface IAnalyzerFilter
 {

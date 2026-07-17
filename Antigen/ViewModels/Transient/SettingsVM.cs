@@ -1,10 +1,10 @@
 using Antigen.Models.Settings;
-using Antigen.Services;
+using Antigen.Services.Singleton;
 using DynamicData.Binding;
 using Mutagen.Bethesda.Plugins;
 using ReactiveUI.SourceGenerators;
 
-namespace Antigen.ViewModels.Settings;
+namespace Antigen.ViewModels.Transient;
 
 public sealed partial class SettingsVM : ViewModel
 {

@@ -10,7 +10,7 @@ using Noggog;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
-namespace Antigen.ViewModels;
+namespace Antigen.ViewModels.Singleton;
 
 public sealed partial class HomeVM : ResizablePanelVM
 {

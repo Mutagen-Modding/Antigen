@@ -1,4 +1,4 @@
-﻿using Antigen.Services;
+﻿using Antigen.Services.Singleton;
 using Avalonia;
 using ReactiveUI.Avalonia;
 

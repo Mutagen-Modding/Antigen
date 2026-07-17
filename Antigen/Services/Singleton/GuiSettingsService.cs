@@ -3,7 +3,7 @@ using System.Text.Json;
 using Antigen.Models.Settings;
 using Microsoft.Extensions.Logging;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Singleton;
 
 public sealed class GuiSettingsService
 {

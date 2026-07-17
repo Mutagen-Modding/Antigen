@@ -2,7 +2,7 @@ using Antigen.Models.Analyzer;
 using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 using Mutagen.Bethesda.Plugins.Cache;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Game;
 
 /// <summary>
 ///     Factory for creating enriched analyzer result info objects.

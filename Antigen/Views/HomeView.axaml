@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:plugins="clr-namespace:Mutagen.Bethesda.Plugins;assembly=Mutagen.Bethesda.Kernel"
-             xmlns:viewModels="clr-namespace:Antigen.ViewModels"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels.Singleton"
              mc:Ignorable="d"
              d:DesignWidth="600"
              d:DesignHeight="400"

@@ -3,7 +3,7 @@ using Antigen.Models.Analyzer;
 using Antigen.Models.Settings;
 using Mutagen.Bethesda.Plugins;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Singleton;
 
 public interface ISettingsService
 {
