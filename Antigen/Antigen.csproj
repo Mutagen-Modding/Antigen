@@ -64,18 +64,6 @@
         <Compile Update="Services\CrashLoggingService.cs">
             <DependentUpon>ICrashLoggingService.cs</DependentUpon>
         </Compile>
-        <Compile Update="Views\Settings\SettingsWindow.axaml.cs">
-            <DependentUpon>SettingsWindow.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Analyzer\AnalyzerResultView.axaml.cs">
-            <DependentUpon>AnalyzerResultView.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
-        <Compile Update="Views\Analyzer\AnalyzerWindow.axaml.cs">
-            <DependentUpon>ModAnalyzerWindow.axaml</DependentUpon>
-            <SubType>Code</SubType>
-        </Compile>
         <Compile Update="ViewModels\Analyzer\DesignAnalyzerResultVM.cs">
             <DependentUpon>AnalyzerResultVM.cs</DependentUpon>
         </Compile>
