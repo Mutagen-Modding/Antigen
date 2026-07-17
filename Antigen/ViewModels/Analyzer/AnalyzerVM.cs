@@ -18,15 +18,8 @@ using SettingsWindow = Antigen.Views.Settings.SettingsWindow;
 
 namespace Antigen.ViewModels.Analyzer;
 
-public enum ExpandableViewState
+public sealed partial class AnalyzerVM : ResizablePanelVM
 {
-    Collapsed = 0,
-    Expanded = 1,
-    Custom = 2
-}
-public sealed partial class AnalyzerVM : ViewModel, IMainPanel
-{
-    private const double CollapsedHeight = 40.0;
     private readonly Subject<Unit> _returnTrigger = new();
 
     private readonly Func<ModKey, SettingsVM> _settingsVMFactory;
@@ -86,11 +79,6 @@ public sealed partial class AnalyzerVM : ViewModel, IMainPanel
             .DisposeWith(this);
 
         FilteredResults = readOnlyObservableCollection;
-
-        // Update window height when view state or expanded height changes
-        this.WhenAnyValue(x => x.ViewState, x => x.ExpandedViewHeight)
-            .Subscribe(UpdateWindowState)
-            .DisposeWith(this);
     }
 
     public IObservable<Unit> ReturnRequested => _returnTrigger;
@@ -99,17 +87,8 @@ public sealed partial class AnalyzerVM : ViewModel, IMainPanel
     public ObservableCollectionExtended<Severity> EnabledSeverities { get; } = new(Enum.GetValues<Severity>());
     public ReadOnlyObservableCollection<AnalyzerResultVM> FilteredResults { get; }
 
-    [Reactive] public partial bool ShowDetails { get; set; }
     [Reactive] public partial string SearchText { get; set; } = string.Empty;
     [Reactive] public partial AnalyzerResultVM? CurrentSettingsViewResult { get; set; }
-    [Reactive] public partial ExpandableViewState ViewState { get; set; } = ExpandableViewState.Collapsed;
-    [Reactive] public partial double ExpandedViewHeight { get; set; } = 500.0;
-    [Reactive] public partial double CurrentWindowHeight { get; set; } = CollapsedHeight;
-
-    private void UpdateWindowState()
-    {
-        CurrentWindowHeight = ViewState == ExpandableViewState.Collapsed ? CollapsedHeight : ExpandedViewHeight;
-    }
 
     [ReactiveCommand]
     private void ToggleSeverity(Severity severity)
@@ -118,25 +97,6 @@ public sealed partial class AnalyzerVM : ViewModel, IMainPanel
         {
             EnabledSeverities.Add(severity);
         }
-    }
-
-    [ReactiveCommand]
-    private void ToggleDetails()
-    {
-        ShowDetails = !ShowDetails;
-        ViewState = ViewState == ExpandableViewState.Collapsed
-            ? ExpandableViewState.Expanded
-            : ExpandableViewState.Collapsed;
-        UpdateWindowState();
-    }
-
-    [ReactiveCommand]
-    private void SetCustomHeight(double height)
-    {
-        if (height < 40) height = 40; // Minimum height
-        ExpandedViewHeight = height;
-        ViewState = ExpandableViewState.Custom;
-        UpdateWindowState();
     }
 
     [ReactiveCommand]

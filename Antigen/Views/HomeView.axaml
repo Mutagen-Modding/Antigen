@@ -4,59 +4,61 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:plugins="clr-namespace:Mutagen.Bethesda.Plugins;assembly=Mutagen.Bethesda.Kernel"
              xmlns:viewModels="clr-namespace:Antigen.ViewModels"
-             xmlns:behavior="clr-namespace:Antigen.Resources.Behavior"
              mc:Ignorable="d"
              d:DesignWidth="600"
-             d:DesignHeight="40"
+             d:DesignHeight="400"
              x:Class="Antigen.Views.HomeView"
-             x:DataType="viewModels:HomeVM">
-    <Border x:Name="Bar"
-            CornerRadius="8"
+             x:DataType="viewModels:HomeVM"
+             x:Name="Root">
+    <Border CornerRadius="8"
             Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
-        <Grid ColumnDefinitions="Auto,8,*,8,Auto"
-              Margin="4">
-            <Button Grid.Column="0"
-                    Command="{Binding StartWatchingCommand}"
-                    IsEnabled="{Binding SelectedMod, Converter={x:Static ObjectConverters.IsNotNull}}"
-                    Padding="11,7"
-                    Content="⯈"
-                    Foreground="ForestGreen"
-                    Background="Transparent"
-                    BorderThickness="0" />
+        <Grid RowDefinitions="40,*">
+            <Grid Grid.Row="0"
+                  x:Name="Bar"
+                  ColumnDefinitions="*,Auto"
+                  Margin="4">
+                <TextBox Grid.Column="0"
+                         VerticalAlignment="Center"
+                         Text="{Binding SearchText, Delay=150}"
+                         PlaceholderText="Filter mods..." />
 
-            <!-- Mod Selection -->
-            <AutoCompleteBox Grid.Column="2"
-                             VerticalAlignment="Center"
-                             HorizontalAlignment="Stretch"
-                             FilterMode="ContainsOrdinal"
-                             IsTextCompletionEnabled="True"
-                             MinimumPrefixLength="0"
-                             PlaceholderText="Select a mod to monitor..."
-                             ItemsSource="{Binding ModKeys}"
-                             ValueMemberBinding="{Binding FileName, x:DataType=plugins:ModKey}"
-                             SelectedItem="{Binding SelectedMod}">
-                <Interaction.Behaviors>
-                    <behavior:AutoCompleteZeroMinimumPrefixLengthDropdownBehaviour />
-                </Interaction.Behaviors>
-            </AutoCompleteBox>
+                <!-- Close Button -->
+                <Button Grid.Column="1"
+                        Content="✕"
+                        Command="{Binding CloseCommand}"
+                        Background="Transparent"
+                        Padding="11,7"
+                        BorderThickness="0"
+                        FontWeight="Bold"
+                        ToolTip.Tip="Close">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background"
+                                    Value="IndianRed" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </Grid>
 
-            <!-- Close Button -->
-            <Button Grid.Column="4"
-                    Content="✕"
-                    Command="{Binding CloseCommand}"
-                    Background="Transparent"
-                    Padding="11,7"
-                    BorderThickness="0"
-                    FontWeight="Bold"
-                    ToolTip.Tip="Close">
-                <Button.Styles>
-                    <!-- Red Background When Mouse Over -->
-                    <Style Selector="Button:pointerover /template/ ContentPresenter">
-                        <Setter Property="Background"
-                                Value="IndianRed" />
-                    </Style>
-                </Button.Styles>
-            </Button>
+            <!-- Mod List -->
+            <ScrollViewer Grid.Row="1"
+                          Margin="8,0,8,8"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding FilteredModKeys}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="plugins:ModKey">
+                            <Button Content="{Binding FileName}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Left"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="8,6"
+                                    Command="{Binding #Root.ViewModel.StartWatchingCommand}"
+                                    CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
         </Grid>
     </Border>
 </UserControl>

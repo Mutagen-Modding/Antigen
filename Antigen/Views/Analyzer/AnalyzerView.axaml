@@ -102,7 +102,7 @@
 
                 <!-- Expand Button -->
                 <Button Grid.Column="2"
-                        Command="{Binding ToggleDetailsCommand}"
+                        Command="{Binding ToggleExpandedCommand}"
                         VerticalAlignment="Stretch"
                         Background="Transparent"
                         BorderThickness="0"
@@ -110,10 +110,10 @@
                     <Button.Content>
                         <Grid>
                             <TextBlock Text="▲"
-                                       IsVisible="{Binding ShowDetails}"
+                                       IsVisible="{Binding IsExpanded}"
                                        Foreground="{DynamicResource SystemColorGrayTextColor}" />
                             <TextBlock Text="▼"
-                                       IsVisible="{Binding !ShowDetails}"
+                                       IsVisible="{Binding !IsExpanded}"
                                        Foreground="{DynamicResource SystemColorGrayTextColor}" />
                         </Grid>
                     </Button.Content>
@@ -159,7 +159,7 @@
 
             <!-- Results List -->
             <Grid Grid.Row="1"
-                  IsVisible="{Binding ShowDetails}"
+                  IsVisible="{Binding IsExpanded}"
                   RowDefinitions="Auto,*"
                   Margin="10,5,10,10">
                 <!-- Results Filtering -->
@@ -275,19 +275,6 @@
                     </StackPanel>
                 </Grid>
             </Grid>
-
-            <!-- Resize Grip at bottom -->
-            <Border Grid.Row="1"
-                    x:Name="ResizeGrip"
-                    Height="12"
-                    VerticalAlignment="Bottom"
-                    Background="Transparent"
-                    BorderThickness="0"
-                    Cursor="SizeNorthSouth"
-                    ToolTip.Tip="Drag to resize"
-                    PointerPressed="ResizeGrip_PointerPressed"
-                    PointerMoved="ResizeGrip_PointerMoved"
-                    PointerReleased="ResizeGrip_PointerReleased" />
         </Grid>
     </Border>
 </UserControl>

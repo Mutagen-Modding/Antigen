@@ -18,14 +18,27 @@
         Topmost="True"
         WindowDecorations="None"
         WindowStartupLocation="Manual">
-    <ContentControl Content="{Binding ActivePanel}">
-        <ContentControl.DataTemplates>
-            <DataTemplate DataType="viewModels:HomeVM">
-                <views:HomeView />
-            </DataTemplate>
-            <DataTemplate DataType="analyzerVm:AnalyzerVM">
-                <analyzerViews:AnalyzerView />
-            </DataTemplate>
-        </ContentControl.DataTemplates>
-    </ContentControl>
+    <Panel>
+        <ContentControl Content="{Binding ActivePanel}">
+            <ContentControl.DataTemplates>
+                <DataTemplate DataType="viewModels:HomeVM">
+                    <views:HomeView />
+                </DataTemplate>
+                <DataTemplate DataType="analyzerVm:AnalyzerVM">
+                    <analyzerViews:AnalyzerView />
+                </DataTemplate>
+            </ContentControl.DataTemplates>
+        </ContentControl>
+
+        <Border x:Name="ResizeGrip"
+                Height="10"
+                VerticalAlignment="Bottom"
+                Background="Transparent"
+                Cursor="SizeNorthSouth"
+                IsVisible="{Binding ActivePanel.IsExpanded, FallbackValue=False}"
+                ToolTip.Tip="Drag to resize"
+                PointerPressed="ResizeGrip_PointerPressed"
+                PointerMoved="ResizeGrip_PointerMoved"
+                PointerReleased="ResizeGrip_PointerReleased" />
+    </Panel>
 </Window>

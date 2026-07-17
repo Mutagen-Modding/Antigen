@@ -36,7 +36,7 @@ public sealed partial class MainVM : ViewModel
 
     public static Severity[] SeverityValues { get; } = Enum.GetValues<Severity>();
 
-    [Reactive] public partial IMainPanel? ActivePanel { get; set; }
+    [Reactive] public partial IResizablePanel? ActivePanel { get; set; }
 
     private void StartWatching(ModKey modKey)
     {
