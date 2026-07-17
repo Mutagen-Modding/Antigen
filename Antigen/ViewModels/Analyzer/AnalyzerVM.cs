@@ -26,9 +26,24 @@ public enum ExpandableViewState
 public sealed partial class AnalyzerVM : ViewModel
 {
     private const double CollapsedHeight = 40.0;
-    private readonly Subject<Unit> _returnTrigger = new();
 
+    private readonly Subject<Unit> _returnTrigger = new();
     private readonly Func<ModKey, SettingsVM> _settingsVMFactory;
+
+    private AnalyzerDashboard? _dashboardWindow;
+
+    public IObservable<Unit> ReturnRequested => _returnTrigger;
+    public ISettingsService SettingsService { get; }
+    public ModWatcherVM ModWatcher { get; }
+    public ObservableCollectionExtended<Severity> EnabledSeverities { get; } = new(Enum.GetValues<Severity>());
+    public ReadOnlyObservableCollection<AnalyzerResultVM> FilteredResults { get; }
+
+    [Reactive] public partial bool ShowDetails { get; set; }
+    [Reactive] public partial string SearchText { get; set; } = string.Empty;
+    [Reactive] public partial AnalyzerResultVM? CurrentSettingsViewResult { get; set; }
+    [Reactive] public partial ExpandableViewState ViewState { get; set; } = ExpandableViewState.Collapsed;
+    [Reactive] public partial double ExpandedViewHeight { get; set; } = 500.0;
+    [Reactive] public partial double CurrentWindowHeight { get; set; } = CollapsedHeight;
 
     public AnalyzerVM(
         Func<ModKey, SettingsVM> settingsVMFactory,
@@ -88,19 +103,6 @@ public sealed partial class AnalyzerVM : ViewModel
             .Subscribe(UpdateWindowState)
             .DisposeWith(this);
     }
-
-    public IObservable<Unit> ReturnRequested => _returnTrigger;
-    public ISettingsService SettingsService { get; }
-    public ModWatcherVM ModWatcher { get; }
-    public ObservableCollectionExtended<Severity> EnabledSeverities { get; } = new(Enum.GetValues<Severity>());
-    public ReadOnlyObservableCollection<AnalyzerResultVM> FilteredResults { get; }
-
-    [Reactive] public partial bool ShowDetails { get; set; }
-    [Reactive] public partial string SearchText { get; set; } = string.Empty;
-    [Reactive] public partial AnalyzerResultVM? CurrentSettingsViewResult { get; set; }
-    [Reactive] public partial ExpandableViewState ViewState { get; set; } = ExpandableViewState.Collapsed;
-    [Reactive] public partial double ExpandedViewHeight { get; set; } = 500.0;
-    [Reactive] public partial double CurrentWindowHeight { get; set; } = CollapsedHeight;
 
     private void UpdateWindowState()
     {
