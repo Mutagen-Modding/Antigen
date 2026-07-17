@@ -71,11 +71,13 @@ public sealed partial class MainVM : ViewModel
         App.MainAppWindow.Hide();
 
         // Re-open main window after analyzer window is closed
-        AnalyzerVM.ReturnRequested.Subscribe(_ =>
-        {
-            App.MainAppWindow.Position = modAnalyzerWindow.Position;
-            App.MainAppWindow.Show();
-            modAnalyzerWindow.Close();
-        });
+        AnalyzerVM.ReturnRequested
+            .Subscribe(_ =>
+            {
+                App.MainAppWindow.Position = modAnalyzerWindow.Position;
+                App.MainAppWindow.Show();
+                modAnalyzerWindow.Close();
+            })
+            .DisposeWith(this);
     }
 }

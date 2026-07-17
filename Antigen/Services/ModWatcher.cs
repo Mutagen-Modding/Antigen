@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
+using Noggog;
 using ReactiveMarbles.ObservableEvents;
 using ReactiveUI;
 
@@ -20,7 +21,7 @@ public sealed class ModWatcher(
     ILogger<ModWatcher> logger)
     : IModWatcher
 {
-
+    private readonly DisposableBucket _disposables = new();
     private readonly Subject<IObservable<AnalyzerResultInfo>> _analysisCompleted = new();
     private readonly string _filePath = fileSystem.Path.Combine(dataDirectoryProvider.Path, modKey.FileName);
     private readonly IFileSystemWatcher _fileSystemWatcher = fileSystem.FileSystemWatcher.New(dataDirectoryProvider.Path, modKey.FileName);
@@ -49,13 +50,14 @@ public sealed class ModWatcher(
 
                 _lastWriteTime = currentLastWriteTime;
                 _ = OnFileChanged();
-            }, exception => logger.LogError(exception, "Error occurred in polling interval"));
+            })
+            .DisposeWith(_disposables);
 
-        _subscription = _fileSystemWatcher.Events()
-            .Changed
-            .Throttle(TimeSpan.FromMilliseconds(500), RxSchedulers.TaskpoolScheduler)
-            .ObserveOn(RxSchedulers.TaskpoolScheduler)
-            .Subscribe(x => _ = OnFileChanged(), exception => logger.LogError(exception, "Error occurred in file watcher"));
+        _subscription = ObservableExtensions.Subscribe(_fileSystemWatcher.Events()
+                .Changed
+                .Throttle(TimeSpan.FromMilliseconds(500), RxSchedulers.TaskpoolScheduler)
+                .ObserveOn(RxSchedulers.TaskpoolScheduler), x => _ = OnFileChanged())
+            .DisposeWith(_disposables);
 
         _fileSystemWatcher.EnableRaisingEvents = true;
 
@@ -83,6 +85,7 @@ public sealed class ModWatcher(
     {
         Stop();
         _fileSystemWatcher.Dispose();
+        _disposables.Dispose();
     }
 
     private async Task OnFileChanged()
