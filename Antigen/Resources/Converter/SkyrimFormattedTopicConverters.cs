@@ -22,10 +22,10 @@ public sealed partial class SkyrimFormattedTopicConverters : IFormattedTopicConv
     [GeneratedRegex(@"\{\d+\}")]
     private static partial Regex PlaceholderRegex { get; }
 
-    public IValueConverter ExtractMessage { get; } = new FuncValueConverter<IFormattedTopicDefinition?, object>(ExtractTopicFormat);
-    private static TextBlock ExtractTopicFormat(IFormattedTopicDefinition? formattedTopicDefinition)
+    public IValueConverter ExtractMessage { get; } = new FuncValueConverter<IFormattedTopicDefinition?, object?>(ExtractTopicFormat);
+    private static TextBlock? ExtractTopicFormat(IFormattedTopicDefinition? formattedTopicDefinition)
     {
-        if (formattedTopicDefinition is null) return new TextBlock { Text = "Result is null!" };
+        if (formattedTopicDefinition is null) return null;
 
         var textBlock = new TextBlock
         {

@@ -1,6 +1,6 @@
-using System.Collections.ObjectModel;
 using Antigen.Models.Settings;
 using Antigen.Services;
+using DynamicData.Binding;
 using Mutagen.Bethesda.Plugins;
 using ReactiveUI.SourceGenerators;
 
@@ -16,7 +16,7 @@ public sealed partial class SettingsVM : ViewModel
 
         LoadRules();
     }
-    [Reactive] public partial ObservableCollection<IgnoreRuleItem> Rules { get; set; } = [];
+    [Reactive] public partial ObservableCollectionExtended<IgnoreRuleItem> Rules { get; set; } = [];
     [Reactive] public partial int SelectedIndex { get; set; } = -1;
 
     public ISettingsService SettingsService { get; }
