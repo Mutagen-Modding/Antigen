@@ -148,7 +148,7 @@ public sealed partial class AnalyzerVM : ViewModel
     }
 
     [ReactiveCommand]
-    private void LeaveIgnoreMode()
+    private void LeaveConfigureMode()
     {
         CurrentSettingsViewResult = null;
     }
@@ -157,21 +157,21 @@ public sealed partial class AnalyzerVM : ViewModel
     private void IgnoreInstance(AnalyzerResultVM resultVM)
     {
         ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Instance);
-        LeaveIgnoreMode();
+        LeaveConfigureMode();
     }
 
     [ReactiveCommand]
     private void IgnoreTopicType(AnalyzerResultVM resultVM)
     {
         ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Topic);
-        LeaveIgnoreMode();
+        LeaveConfigureMode();
     }
 
     [ReactiveCommand]
     private void IgnoreRecord(AnalyzerResultVM resultVM)
     {
         ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Record);
-        LeaveIgnoreMode();
+        LeaveConfigureMode();
     }
 
     [ReactiveCommand]

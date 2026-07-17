@@ -261,7 +261,7 @@
 
                         <Button Content="Cancel"
                                 HorizontalAlignment="Center"
-                                Command="{Binding #Window.ViewModel?.LeaveIgnoreModeCommand}" />
+                                Command="{Binding #Window.ViewModel?.LeaveConfigureModeCommand}" />
                     </StackPanel>
                 </Grid>
             </Grid>
