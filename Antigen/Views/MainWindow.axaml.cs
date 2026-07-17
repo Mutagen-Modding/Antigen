@@ -1,4 +1,5 @@
 using Antigen.ViewModels;
+using Avalonia.Controls;
 using Avalonia.Input;
 
 namespace Antigen.Views;
@@ -12,6 +13,15 @@ public partial class MainWindow : PinnedWindow, IMainWindow
     public MainWindow()
     {
         InitializeComponent();
+        PositionChanged += OnPositionChanged;
+    }
+
+    private void OnPositionChanged(object? sender, PixelPointEventArgs e)
+    {
+        if (DataContext is not MainVM vm) return;
+
+        vm.WindowX = e.Point.X;
+        vm.WindowY = e.Point.Y;
     }
 
     private IResizablePanel? Panel => (DataContext as MainVM)?.ActivePanel;

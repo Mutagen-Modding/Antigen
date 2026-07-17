@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using Antigen.Models.Settings;
 using Antigen.Modules;
 using Antigen.Services;
 using Antigen.ViewModels;
@@ -34,22 +35,33 @@ public sealed class App : Application
             var window = new MainWindow();
             Container = SetupServices(window);
 
-            window.DataContext = Container.Resolve<MainVM>();
+            var mainVM = Container.Resolve<MainVM>();
+            window.DataContext = mainVM;
 
-            var screen = window.Screens.Primary;
-            if (screen is not null)
-            {
-                const int offset = 25;
-                window.Position = new PixelPoint(
-                    screen.WorkingArea.Right - (int)window.Width - offset,
-                    offset
-                );
-            }
+            RestorePosition(window, mainVM.SavedSettings);
 
             desktop.MainWindow = window;
+            desktop.Exit += (_, _) => mainVM.SaveGuiSettings();
         }
 
         base.OnFrameworkInitializationCompleted();
+    }
+
+    private static void RestorePosition(MainWindow window, GuiSettings? saved)
+    {
+        if (saved is not null && window.Screens.All.Any(s => s.Bounds.Contains(new PixelPoint(saved.WindowX, saved.WindowY))))
+        {
+            window.Position = new PixelPoint(saved.WindowX, saved.WindowY);
+            return;
+        }
+
+        if (window.Screens.Primary is { } screen)
+        {
+            window.Position = new PixelPoint(
+                screen.WorkingArea.X + (screen.WorkingArea.Width - (int)window.Width) / 2,
+                screen.WorkingArea.Y + (screen.WorkingArea.Height - (int)window.Height) / 2
+            );
+        }
     }
 
     private static IContainer SetupServices(MainWindow window)
@@ -110,6 +122,9 @@ public sealed class App : Application
 
         builder.RegisterType<SettingsService>()
             .As<ISettingsService>()
+            .SingleInstance();
+
+        builder.RegisterType<GuiSettingsService>()
             .SingleInstance();
 
         builder.RegisterType<SkyrimAnalyzerResultInfoFactory>();
