@@ -3,6 +3,12 @@ using System.Text;
 
 namespace Antigen.Services.Singleton;
 
+public interface ICrashLoggingService
+{
+    void LogCrash(Exception exception);
+    string GetCrashLogsDirectory();
+}
+
 public sealed class CrashLoggingService : ICrashLoggingService
 {
     private readonly string _crashLogsDirectory = Path.Combine(

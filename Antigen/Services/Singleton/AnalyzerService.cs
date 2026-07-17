@@ -16,6 +16,13 @@ using Noggog;
 
 namespace Antigen.Services.Singleton;
 
+public interface IAnalyzerService
+{
+    IObservable<StatusUpdate> StatusUpdates { get; }
+    Severity MinimumSeverity { get; set; }
+    IAsyncEnumerable<AnalyzerResultInfo> AnalyzeAsync(ModKey modKey, CancellationToken cancellationToken = default);
+}
+
 public sealed class AnalyzerService(
     IFileSystem fileSystem,
     IDataDirectoryProvider dataDirectoryProvider,

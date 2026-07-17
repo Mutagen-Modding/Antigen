@@ -13,6 +13,15 @@ using ReactiveUI;
 
 namespace Antigen.Services.Transient;
 
+public interface IModWatcher : IDisposable
+{
+    IObservable<IObservable<AnalyzerResultInfo>> AnalysisCompleted { get; }
+    IObservable<StatusUpdate> StatusUpdates { get; }
+    Severity MinimumSeverity { get; set; }
+    void Start();
+    void Stop();
+}
+
 public sealed class ModWatcher(
     IFileSystem fileSystem,
     IDataDirectoryProvider dataDirectoryProvider,
