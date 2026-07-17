@@ -17,17 +17,34 @@ public sealed class SeverityToBrushConverter : IValueConverter
     {
         if (value is Severity severity)
         {
-            return severity switch
-            {
-                Severity.CTD => CTDBrush,
-                Severity.Error => ErrorBrush,
-                Severity.Warning => WarningBrush,
-                Severity.Suggestion => SuggestionBrush,
-                _ => InfoBrush
-            };
+            return Convert(severity, CTDBrush, ErrorBrush, WarningBrush, SuggestionBrush, InfoBrush);
         }
 
         return null;
+    }
+
+    public static IBrush Convert(Severity severity, IBrush ctdBrush, IBrush errorBrush, IBrush warningBrush, IBrush suggestionBrush, IBrush infoBrush)
+    {
+        return severity switch
+        {
+            Severity.CTD => ctdBrush,
+            Severity.Error => errorBrush,
+            Severity.Warning => warningBrush,
+            Severity.Suggestion => suggestionBrush,
+            _ => infoBrush
+        };
+    }
+
+    public static IBrush Convert(Severity severity)
+    {
+        return severity switch
+        {
+            Severity.CTD => Brushes.IndianRed,
+            Severity.Error => Brushes.Orange,
+            Severity.Warning => Brushes.Gold,
+            Severity.Suggestion => Brushes.CornflowerBlue,
+            _ => Brushes.ForestGreen
+        };
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)
