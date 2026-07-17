@@ -10,7 +10,6 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.Skyrim;
 using Mutagen.Bethesda.Autofac;
 using Mutagen.Bethesda.Environments.DI;
@@ -60,31 +59,12 @@ public sealed class App : Application
     {
         var builder = new ContainerBuilder();
 
-        // Register logger factory and loggers using Microsoft.Extensions.Logging
-        var loggerFactory = LoggerFactory.Create(logging =>
-        {
-            logging.AddConsole();
-            logging.SetMinimumLevel(LogLevel.Debug);
-        });
-
-        builder.RegisterInstance(loggerFactory)
-            .As<ILoggerFactory>()
-            .SingleInstance();
-
-        // Register generic ILogger<T>
-        builder.RegisterGeneric(typeof(Logger<>))
-            .As(typeof(ILogger<>))
-            .SingleInstance();
-
-        // Register crash logging service
-        builder.RegisterType<CrashLoggingService>()
-            .As<ICrashLoggingService>()
-            .SingleInstance();
-
         // Register base services
         builder.RegisterType<FileSystem>()
             .As<IFileSystem>()
             .SingleInstance();
+
+        builder.RegisterModule<LoggingModule>();
 
         builder.RegisterModule<MutagenModule>();
 
