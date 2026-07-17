@@ -15,12 +15,10 @@ public sealed class GuiSettingsService
     {
         _fileSystem = fileSystem;
         _logger = logger;
-        var settingsFolder = _fileSystem.Path.Combine(
+        _filePath = _fileSystem.Path.Combine(
             AppDomain.CurrentDomain.BaseDirectory,
-            "Settings"
+            "GuiSettings.json"
         );
-        _fileSystem.Directory.CreateDirectory(settingsFolder);
-        _filePath = _fileSystem.Path.Combine(settingsFolder, "GuiSettings.json");
     }
 
     public GuiSettings? Load()
