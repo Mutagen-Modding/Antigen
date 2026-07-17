@@ -29,6 +29,7 @@ public sealed partial class AnalyzerVM : ViewModel
 
     private readonly Subject<Unit> _returnTrigger = new();
     private readonly Func<ModKey, SettingsVM> _settingsVMFactory;
+    private readonly Func<AnalyzerVM, DashboardVM> _dashboardVMFactory;
 
     private AnalyzerDashboard? _dashboardWindow;
 
@@ -70,15 +71,15 @@ public sealed partial class AnalyzerVM : ViewModel
                 return vm;
             })
             .Filter(EnabledSeverities.ObserveCollectionChanges()
-                .Select(_ => Unit.Default)
+                .Unit()
                 .StartWith(Unit.Default)
                 .Select(_ => new Func<AnalyzerResultVM, bool>(result => EnabledSeverities.Contains(result.Result.Topic.Severity))))
             .Filter(SettingsService.RulesChanged
-                .Select(_ => Unit.Default)
+                .Unit()
                 .StartWith(Unit.Default)
                 .Select(_ => new Func<AnalyzerResultVM, bool>(result => !SettingsService.IsIgnored(ModWatcher.ModKey, result.Info))))
             .Filter(this.WhenAnyValue(x => x.SearchText)
-                .Select(_ => Unit.Default)
+                .Unit()
                 .StartWith(Unit.Default)
                 .Select(_ => new Func<AnalyzerResultVM, bool>(result =>
                 {
