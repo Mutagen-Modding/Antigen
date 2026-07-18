@@ -31,13 +31,21 @@ public sealed partial class AnalyzerVM : ResizablePanelVM
 
     private AnalyzerDashboard? _dashboardWindow;
 
+    public IObservable<Unit> ReturnRequested => _returnTrigger;
+    public ISettingsService SettingsService { get; }
+    public ModWatcherVM ModWatcher { get; }
+    public ObservableCollectionExtended<Severity> EnabledSeverities { get; } = new(Enum.GetValues<Severity>());
+    public ReadOnlyObservableCollection<AnalyzerResultVM> FilteredResults { get; }
+
+    [Reactive] public partial string SearchText { get; set; } = string.Empty;
+    [Reactive] public partial AnalyzerResultVM? CurrentSettingsViewResult { get; set; }
+
     public AnalyzerVM(
         Func<ModKey, SettingsVM> settingsVMFactory,
         ISettingsService settingsService,
         ModWatcherVM modWatcher,
         IMainWindow mainWindow,
-        Func<AnalyzerVM, DashboardVM> dashboardVMFactory,
-        ILogger<AnalyzerVM> logger)
+        Func<AnalyzerVM, DashboardVM> dashboardVMFactory)
     {
         _settingsVMFactory = settingsVMFactory;
         _mainWindow = mainWindow;
@@ -60,15 +68,15 @@ public sealed partial class AnalyzerVM : ResizablePanelVM
                 return vm;
             })
             .Filter(EnabledSeverities.ObserveCollectionChanges()
-                .Select(_ => Unit.Default)
+                .Unit()
                 .StartWith(Unit.Default)
                 .Select(_ => new Func<AnalyzerResultVM, bool>(result => EnabledSeverities.Contains(result.Result.Topic.Severity))))
             .Filter(SettingsService.RulesChanged
-                .Select(_ => Unit.Default)
+                .Unit()
                 .StartWith(Unit.Default)
                 .Select(_ => new Func<AnalyzerResultVM, bool>(result => !SettingsService.IsIgnored(ModWatcher.ModKey, result.Info))))
             .Filter(this.WhenAnyValue(x => x.SearchText)
-                .Select(_ => Unit.Default)
+                .Unit()
                 .StartWith(Unit.Default)
                 .Select(_ => new Func<AnalyzerResultVM, bool>(result =>
                 {
@@ -86,15 +94,6 @@ public sealed partial class AnalyzerVM : ResizablePanelVM
 
         FilteredResults = readOnlyObservableCollection;
     }
-
-    public IObservable<Unit> ReturnRequested => _returnTrigger;
-    public ISettingsService SettingsService { get; }
-    public ModWatcherVM ModWatcher { get; }
-    public ObservableCollectionExtended<Severity> EnabledSeverities { get; } = new(Enum.GetValues<Severity>());
-    public ReadOnlyObservableCollection<AnalyzerResultVM> FilteredResults { get; }
-
-    [Reactive] public partial string SearchText { get; set; } = string.Empty;
-    [Reactive] public partial AnalyzerResultVM? CurrentSettingsViewResult { get; set; }
 
     [ReactiveCommand]
     private void ToggleSeverity(Severity severity)
