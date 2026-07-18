@@ -1,0 +1,105 @@
+﻿<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+        xmlns:antigenControls="clr-namespace:Antigen.Controls;assembly=Antigen"
+        xmlns:viewModels="clr-namespace:Antigen.ViewModels.Transient;assembly=Antigen"
+        xmlns:sortable="clr-namespace:Sortable.Avalonia;assembly=Sortable.Avalonia"
+        xmlns:models="clr-namespace:Antigen.Models"
+        mc:Ignorable="d"
+        d:DesignWidth="1400"
+        d:DesignHeight="800"
+        x:Class="Antigen.Views.Analyzer.AnalyzerDashboard"
+        x:DataType="viewModels:DashboardVM"
+        x:Name="Dashboard"
+        MinHeight="300"
+        MinWidth="400"
+        Title="Dashboard">
+    <Grid RowDefinitions="Auto,8,Auto,8,*">
+        <!-- Grouping Toolbar -->
+        <Border Grid.Row="0"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}"
+                CornerRadius="4"
+                Padding="8,6">
+            <Grid ColumnDefinitions="Auto,4,Auto,4,*">
+                <!-- Add Grouping Button -->
+                <Button Grid.Column="0"
+                        Padding="8,4"
+                        IsVisible="{Binding !!InactiveGroupings.Count}"
+                        ToolTip.Tip="Group by:">
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="4">
+                        <TextBlock Text="Group by" />
+                        <controls:FASymbolIcon Symbol="ChevronDown" />
+                    </StackPanel>
+
+                    <Button.Flyout>
+                        <MenuFlyout Placement="Bottom">
+                            <MenuFlyout.Items>
+                                <ItemsControl ItemsSource="{Binding InactiveGroupings}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <MenuItem Header="{Binding Name}"
+                                                      Command="{Binding #Dashboard.ViewModel?.AddGroupingCommand}"
+                                                      CommandParameter="{Binding}" />
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </MenuFlyout.Items>
+                        </MenuFlyout>
+                    </Button.Flyout>
+                </Button>
+
+                <!-- Clear All Button -->
+                <Button Grid.Column="2"
+                        Padding="8,4"
+                        IsVisible="{Binding ActiveGroupings.Count}"
+                        ToolTip.Tip="Clear all groupings"
+                        Command="{Binding ClearAllGroupingCommand}">
+                    <TextBlock Text="🞩" />
+                </Button>
+
+                <!-- Active Grouping Chips -->
+                <ScrollViewer Grid.Column="4"
+                              CornerRadius="8"
+                              HorizontalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding ActiveGroupings}"
+                                  sortable:Sortable.Sortable="True"
+                                  sortable:Sortable.Droppable="True"
+                                  sortable:Sortable.UpdateCommand="{Binding UpdateCommand}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <StackPanel Orientation="Horizontal" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="models:IGrouping">
+                                <antigenControls:GroupChip Label="{Binding Name}"
+                                                           sortable:Sortable.IsSortable="True"
+                                                           Cursor="Hand"
+                                                           RemoveCommand="{Binding #Dashboard.ViewModel?.RemoveGroupingCommand}" />
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+
+        <!-- Results Toolbar -->
+        <StackPanel Grid.Row="2"
+                    Orientation="Horizontal"
+                    Spacing="12">
+            <!-- Search Box -->
+            <TextBox MinWidth="280"
+                     Text="{Binding AnalyzerVM.SearchText, Delay=200}"
+                     PlaceholderText="Search results..."
+                     Padding="12,8"
+                     CornerRadius="6" />
+        </StackPanel>
+
+        <!-- Results Tree -->
+        <TreeDataGrid Grid.Row="4"
+                      Source="{Binding ResultsTreeSource}" />
+    </Grid>
+</Window>

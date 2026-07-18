@@ -3,9 +3,12 @@ using System.Reactive;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Antigen.Models.Settings;
+using Antigen.Services;
 using Antigen.Services.Singleton;
 using Antigen.ViewModels.Analyzer;
 using Antigen.Views;
+using Antigen.Views.Analyzer;
+using Avalonia.Controls;
 using DynamicData;
 using DynamicData.Binding;
 using Microsoft.Extensions.Logging;
@@ -23,19 +26,24 @@ public sealed partial class AnalyzerVM : ResizablePanelVM
     private readonly Subject<Unit> _returnTrigger = new();
 
     private readonly Func<ModKey, SettingsVM> _settingsVMFactory;
+    private readonly Func<AnalyzerVM, DashboardVM> _dashboardVMFactory;
     private readonly IMainWindow _mainWindow;
+
+    private AnalyzerDashboard? _dashboardWindow;
 
     public AnalyzerVM(
         Func<ModKey, SettingsVM> settingsVMFactory,
         ISettingsService settingsService,
         ModWatcherVM modWatcher,
         IMainWindow mainWindow,
+        Func<AnalyzerVM, DashboardVM> dashboardVMFactory,
         ILogger<AnalyzerVM> logger)
     {
         _settingsVMFactory = settingsVMFactory;
         _mainWindow = mainWindow;
         SettingsService = settingsService;
         ModWatcher = modWatcher;
+        _dashboardVMFactory = dashboardVMFactory;
 
         // Transform to vms and apply filters
         ModWatcher.AllResults
@@ -73,9 +81,7 @@ public sealed partial class AnalyzerVM : ResizablePanelVM
                 })))
             .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Bind(out var readOnlyObservableCollection)
-            .Subscribe(
-                _ => {},
-                ex => logger.LogError(ex, "Error in reactive filter chain"))
+            .Subscribe(_ => {})
             .DisposeWith(this);
 
         FilteredResults = readOnlyObservableCollection;
@@ -109,6 +115,23 @@ public sealed partial class AnalyzerVM : ResizablePanelVM
     private void Close()
     {
         _mainWindow.Close();
+    }
+
+    [ReactiveCommand]
+    private void OpenDashboard()
+    {
+        if (_dashboardWindow?.PlatformImpl is null)
+        {
+            _dashboardWindow = new AnalyzerDashboard(_dashboardVMFactory(this));
+        }
+
+        if (_dashboardWindow.WindowState == WindowState.Minimized)
+        {
+            _dashboardWindow.WindowState = WindowState.Normal;
+        }
+        _dashboardWindow.Topmost = true;
+        _dashboardWindow.Show();
+        _dashboardWindow.Topmost = false;
     }
 
     [ReactiveCommand]

@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:models="clr-namespace:Antigen.Models"
+             mc:Ignorable="d"
+             d:DesignWidth="200"
+             d:DesignHeight="40"
+             x:Class="Antigen.Controls.GroupChip"
+             x:DataType="models:IGrouping"
+             x:Name="Chip">
+    <Border x:Name="RootBorder"
+            Background="{DynamicResource SystemControlBackgroundListLowBrush}"
+            CornerRadius="4"
+            Padding="8,4"
+            Margin="2,0">
+        <StackPanel Orientation="Horizontal"
+                    Spacing="6"
+                    VerticalAlignment="Center">
+            <!-- Drag Handle -->
+            <TextBlock Text="⠿"
+                       VerticalAlignment="Center" />
+
+            <!-- Label -->
+            <TextBlock x:Name="LabelTextBlock"
+                       VerticalAlignment="Center"
+                       FontWeight="SemiBold"
+                       Text="{Binding #Chip.Label, FallbackValue='Group'}" />
+
+            <!-- Remove Button -->
+            <Button x:Name="RemoveButton"
+                    Content="✕"
+                    Background="Transparent"
+                    BorderThickness="0"
+                    Padding="2"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    Command="{Binding #Chip.RemoveCommand}"
+                    CommandParameter="{Binding}"
+                    ToolTip.Tip="Remove this group" />
+        </StackPanel>
+    </Border>
+</UserControl>

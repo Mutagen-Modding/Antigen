@@ -1,6 +1,9 @@
-﻿using Antigen.Services.Singleton;
+﻿using Antigen.Services;
+using Antigen.Services.Singleton;
 using Avalonia;
+using Microsoft.Extensions.Logging;
 using ReactiveUI.Avalonia;
+using Serilog;
 
 namespace Antigen;
 
@@ -49,6 +52,11 @@ internal sealed class Program
             .UsePlatformDetect()
             .WithDeveloperTools()
             .LogToTrace()
-            .UseReactiveUI(_ => {});
+            .UseReactiveUI(rxBuilder =>
+            {
+                var loggerFactory = LoggerFactory.Create(logging => logging.AddSerilog(Logging.Log.Logger, dispose: true));
+                var logger = loggerFactory.CreateLogger<ObservableExceptionHandler>();
+                rxBuilder.WithExceptionHandler(new ObservableExceptionHandler(logger));
+            });
     }
 }

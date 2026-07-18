@@ -130,15 +130,15 @@
                     <controls:FASymbolIcon Symbol="SettingsFilled" />
                 </Button>
 
-                <!-- Return Button -->
+                <!-- Dashboard Button -->
                 <Button Grid.Column="4"
-                        Content="←"
-                        Command="{Binding ReturnCommand}"
+                        Command="{Binding OpenDashboardCommand}"
                         VerticalAlignment="Stretch"
                         Background="Transparent"
                         BorderThickness="0"
-                        FontWeight="Bold"
-                        ToolTip.Tip="Back to home" />
+                        ToolTip.Tip="Settings">
+                    <controls:FASymbolIcon Symbol="BookmarkFilled" />
+                </Button>
 
                 <!-- Close Button -->
                 <Button Grid.Column="5"
