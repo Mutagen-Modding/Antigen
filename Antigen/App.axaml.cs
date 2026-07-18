@@ -16,6 +16,7 @@ using Mutagen.Bethesda.Analyzers.Skyrim;
 using Mutagen.Bethesda.Autofac;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins.Meta;
+using Serilog;
 
 namespace Antigen;
 
@@ -34,6 +35,8 @@ public sealed class App : Application
         {
             var window = new MainWindow();
             Container = SetupServices(window);
+
+            Container.Resolve<ILogger<App>>().LogInformation("Antigen starting");
 
             var mainVM = Container.Resolve<MainVM>();
             window.DataContext = mainVM;
@@ -71,12 +74,8 @@ public sealed class App : Application
         builder.RegisterInstance(window)
             .As<IMainWindow>();
 
-        // Register logger factory and loggers using Microsoft.Extensions.Logging
-        var loggerFactory = LoggerFactory.Create(logging =>
-        {
-            logging.AddConsole();
-            logging.SetMinimumLevel(LogLevel.Debug);
-        });
+        // Register logger factory
+        var loggerFactory = LoggerFactory.Create(logging => logging.AddSerilog(Logging.Log.Logger, dispose: true));
 
         builder.RegisterInstance(loggerFactory)
             .As<ILoggerFactory>()
