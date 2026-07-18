@@ -9,6 +9,9 @@ namespace Antigen;
 
 internal sealed class Program
 {
+    private static readonly ILoggerFactory LoggerFactory =
+        Microsoft.Extensions.Logging.LoggerFactory.Create(logging => logging.AddSerilog(Logging.Log.Logger, dispose: true));
+
     private static ICrashLoggingService? _crashLoggingService;
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
@@ -17,7 +20,7 @@ internal sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        _crashLoggingService = new CrashLoggingService();
+        _crashLoggingService = new CrashLoggingService(LoggerFactory.CreateLogger<CrashLoggingService>());
 
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
@@ -54,8 +57,7 @@ internal sealed class Program
             .LogToTrace()
             .UseReactiveUI(rxBuilder =>
             {
-                var loggerFactory = LoggerFactory.Create(logging => logging.AddSerilog(Logging.Log.Logger, dispose: true));
-                var logger = loggerFactory.CreateLogger<ObservableExceptionHandler>();
+                var logger = LoggerFactory.CreateLogger<ObservableExceptionHandler>();
                 rxBuilder.WithExceptionHandler(new ObservableExceptionHandler(logger));
             });
     }
