@@ -92,9 +92,7 @@ public sealed partial class AnalyzerVM : ViewModel
                 })))
             .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Bind(out var readOnlyObservableCollection)
-            .Subscribe(
-                _ => {},
-                ex => logger.LogError(ex, "Error in reactive filter chain"))
+            .Subscribe(_ => {})
             .DisposeWith(this);
 
         FilteredResults = readOnlyObservableCollection;
