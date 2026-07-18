@@ -99,6 +99,7 @@ public sealed class App : Application
         builder.RegisterType<MainVM>().SingleInstance();
         builder.RegisterType<AnalyzerVM>();
         builder.RegisterType<SettingsVM>();
+        builder.RegisterType<DashboardVM>();
         builder.RegisterType<ModWatcherVM>();
 
         return builder.Build();

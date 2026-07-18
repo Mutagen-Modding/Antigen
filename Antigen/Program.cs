@@ -1,5 +1,9 @@
-﻿using Antigen.Services;
+﻿using System.IO.Abstractions;
+using Antigen.Modules;
+using Antigen.Services;
+using Autofac;
 using Avalonia;
+using Microsoft.Extensions.Logging;
 using ReactiveUI.Avalonia;
 
 namespace Antigen;
@@ -49,6 +53,14 @@ internal sealed class Program
             .UsePlatformDetect()
             .WithDeveloperTools()
             .LogToTrace()
-            .UseReactiveUI(_ => {});
+            .UseReactiveUI(rxBuilder =>
+            {
+                var builder = new ContainerBuilder();
+                builder.RegisterInstance(new FileSystem()).As<IFileSystem>().SingleInstance();
+                builder.RegisterModule<LoggingModule>();
+                var container = builder.Build();
+                var logger = container.Resolve<ILogger<ObservableExceptionHandler>>();
+                rxBuilder.WithExceptionHandler(new ObservableExceptionHandler(logger));
+            });
     }
 }

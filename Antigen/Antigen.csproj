@@ -38,7 +38,9 @@
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
         </PackageReference>
+        <PackageReference Include="Sortable.Avalonia"/>
         <PackageReference Include="System.Interactive.Async"/>
+        <PackageReference Include="TreeDataGrid.Avalonia"/>
         <PackageReference Include="Xaml.Behaviors.Interactivity"/>
     </ItemGroup>
 

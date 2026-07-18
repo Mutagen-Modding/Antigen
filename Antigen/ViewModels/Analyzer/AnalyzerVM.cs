@@ -5,6 +5,8 @@ using System.Reactive.Subjects;
 using Antigen.Models.Settings;
 using Antigen.Services;
 using Antigen.ViewModels.Settings;
+using Antigen.Views.Analyzer;
+using Avalonia.Controls;
 using DynamicData;
 using DynamicData.Binding;
 using Microsoft.Extensions.Logging;
@@ -50,11 +52,13 @@ public sealed partial class AnalyzerVM : ViewModel
         Func<ModKey, SettingsVM> settingsVMFactory,
         ISettingsService settingsService,
         ModWatcherVM modWatcher,
+        Func<AnalyzerVM, DashboardVM> dashboardVMFactory,
         ILogger<AnalyzerVM> logger)
     {
         _settingsVMFactory = settingsVMFactory;
         SettingsService = settingsService;
         ModWatcher = modWatcher;
+        _dashboardVMFactory = dashboardVMFactory;
 
         // Transform to vms and apply filters
         ModWatcher.AllResults
@@ -140,6 +144,23 @@ public sealed partial class AnalyzerVM : ViewModel
     private void Return()
     {
         _returnTrigger.OnNext(Unit.Default);
+    }
+
+    [ReactiveCommand]
+    private void OpenDashboard()
+    {
+        if (_dashboardWindow?.PlatformImpl is null)
+        {
+            _dashboardWindow = new AnalyzerDashboard(_dashboardVMFactory(this));
+        }
+
+        if (_dashboardWindow.WindowState == WindowState.Minimized)
+        {
+            _dashboardWindow.WindowState = WindowState.Normal;
+        }
+        _dashboardWindow.Topmost = true;
+        _dashboardWindow.Show();
+        _dashboardWindow.Topmost = false;
     }
 
     [ReactiveCommand]
