@@ -1,0 +1,76 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:settings="clr-namespace:Antigen.ViewModels.Singleton"
+        mc:Ignorable="d"
+        d:DesignWidth="420"
+        d:DesignHeight="200"
+        x:Class="Antigen.Views.Settings.GlobalSettingsWindow"
+        x:DataType="settings:GlobalSettingsVM"
+        Title="Settings"
+        Background="Transparent"
+        Width="420"
+        Height="200"
+        WindowStartupLocation="CenterOwner">
+    <Border CornerRadius="8"
+            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+        <Grid RowDefinitions="32,*">
+            <Grid Grid.Row="0"
+                  x:Name="TitleBar"
+                  ColumnDefinitions="*,Auto"
+                  Margin="12,0,4,0">
+                <TextBlock Grid.Column="0"
+                           Text="SETTINGS"
+                           FontWeight="Bold"
+                           FontSize="13"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemColorGrayTextColor}" />
+
+                <!-- Close Button -->
+                <Button Grid.Column="1"
+                        Content="✕"
+                        Click="Close_Click"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Padding="10,4"
+                        FontWeight="Bold"
+                        ToolTip.Tip="Close">
+                    <Button.Styles>
+                        <Style Selector="Button:pointerover /template/ ContentPresenter">
+                            <Setter Property="Background"
+                                    Value="IndianRed" />
+                        </Style>
+                    </Button.Styles>
+                </Button>
+            </Grid>
+
+            <StackPanel Grid.Row="1"
+                        Orientation="Vertical"
+                        Margin="15,5,15,15">
+                <TextBlock Text="Processing"
+                           FontSize="16"
+                           FontWeight="Bold" />
+                <StackPanel Orientation="Vertical"
+                            Margin="12,10,0,0"
+                            Spacing="6">
+                    <TextBlock Text="Worker Threads" />
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="12"
+                                VerticalAlignment="Center">
+                        <Slider Width="240"
+                                VerticalAlignment="Center"
+                                Minimum="0"
+                                Maximum="1"
+                                Value="{Binding CorePercentage}"
+                                ToolTip.Tip="Percentage of your processors to use while analyzing" />
+                        <TextBlock VerticalAlignment="Center"
+                                   MinWidth="70"
+                                   Foreground="{DynamicResource SystemColorGrayTextColor}"
+                                   Text="{Binding WorkerThreads, StringFormat='{}{0} threads'}" />
+                    </StackPanel>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Border>
+</Window>

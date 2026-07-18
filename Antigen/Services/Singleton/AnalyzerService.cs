@@ -13,6 +13,7 @@ using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Order.DI;
 using Noggog;
+using Noggog.WorkEngine;
 
 namespace Antigen.Services.Singleton;
 
@@ -32,6 +33,7 @@ public sealed class AnalyzerService(
     IGameReleaseContext gameReleaseContext,
     IAnalyzerFilter analyzerFilter,
     IAnalyzerResultInfoFactory infoFactory,
+    INumWorkThreadsController numWorkThreads,
     ILogger<AnalyzerService> logger) : IAnalyzerService
 {
     private readonly Subject<StatusUpdate> _statusSubject = new();
@@ -97,6 +99,7 @@ public sealed class AnalyzerService(
                 // Create analyzer with all built-in analyzers
                 var analyzer = AnalyzerRunnerBuilder.Create(gameReleaseContext.Release)
                     .WithLinkCache(env.LinkCache)
+                    .WithThreads(numWorkThreads.NumDesiredThreads)
                     .WithAnalyzers(analyzers.Where(analyzerFilter.ShouldAnalyze))
                     .WithBlacklistedMods(notSelectedMods)
                     .WithMinimumSeverity(MinimumSeverity)

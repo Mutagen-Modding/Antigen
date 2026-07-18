@@ -17,6 +17,11 @@ public partial class MainWindow : PinnedWindow, IMainWindow
         PositionChanged += OnPositionChanged;
     }
 
+    public void Minimize() => WindowState = WindowState.Minimized;
+
+    public void ToggleMaximize() =>
+        WindowState = WindowState == WindowState.Maximized ? WindowState.Normal : WindowState.Maximized;
+
     private void OnPositionChanged(object? sender, PixelPointEventArgs e)
     {
         if (DataContext is not MainVM vm) return;

@@ -16,6 +16,7 @@ public sealed partial class MainVM : ViewModel
     private readonly Func<ModWatcherVM, AnalyzerVM> _analyzerVMFactory;
     private readonly HomeVM _homeVM;
     private readonly GuiSettingsService _guiSettings;
+    private readonly GlobalSettingsVM _globalSettings;
 
     private ModWatcherVM? _currentWatcher;
     private IDisposable? _returnSubscription;
@@ -24,11 +25,13 @@ public sealed partial class MainVM : ViewModel
     public MainVM(
         HomeVM homeVM,
         GuiSettingsService guiSettings,
+        GlobalSettingsVM globalSettings,
         Func<ModKey, ModWatcherVM> modWatcherVMFactory,
         Func<ModWatcherVM, AnalyzerVM> analyzerVMFactory)
     {
         _homeVM = homeVM;
         _guiSettings = guiSettings;
+        _globalSettings = globalSettings;
         _modWatcherVMFactory = modWatcherVMFactory;
         _analyzerVMFactory = analyzerVMFactory;
 
@@ -62,7 +65,8 @@ public sealed partial class MainVM : ViewModel
         {
             WindowX = WindowX,
             WindowY = WindowY,
-            ExpandedHeight = ActivePanel?.ExpandedHeight ?? _expandedHeight
+            ExpandedHeight = ActivePanel?.ExpandedHeight ?? _expandedHeight,
+            WorkerThreadPercentage = _globalSettings.CorePercentage
         };
         _guiSettings.Save(settings);
     }
