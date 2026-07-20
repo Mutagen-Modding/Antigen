@@ -67,7 +67,7 @@
                         <TextBlock VerticalAlignment="Center"
                                    MinWidth="70"
                                    Foreground="{DynamicResource SystemColorGrayTextColor}"
-                                   Text="{Binding WorkerThreads, StringFormat='{}{0} threads'}" />
+                                   Text="{Binding WorkerThreadsProperty, StringFormat='{}{0} threads'}" />
                     </StackPanel>
                 </StackPanel>
             </StackPanel>

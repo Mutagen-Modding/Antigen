@@ -18,15 +18,19 @@ public sealed partial class HomeVM : ResizablePanelVM
     private readonly IMainWindow _mainWindow;
     private readonly GlobalSettingsVM _globalSettings;
     private readonly Subject<ModKey> _startRequested = new();
-    private readonly ObservableAsPropertyHelper<IEnumerable<ModKey>> _filteredModKeys;
 
     public override double MinResizeHeight => 100.0;
 
     public IObservable<ModKey> StartRequested => _startRequested;
-    public IEnumerable<ModKey> FilteredModKeys => _filteredModKeys.Value;
 
     [Reactive] public partial ModKey[] ModKeys { get; set; } = [];
     [Reactive] public partial string SearchText { get; set; } = string.Empty;
+
+    [ObservableAsProperty(PropertyName = "FilteredModKeys", InitialValue = "[]")]
+    private IObservable<IEnumerable<ModKey>> FilteredModKeysObservable() =>
+        this.WhenAnyValue(x => x.ModKeys, x => x.SearchText)
+            .Select(t => Filter(t.Item1, t.Item2))
+            .ObserveOn(RxSchedulers.MainThreadScheduler);
 
     public HomeVM(
         IMainWindow mainWindow,
@@ -41,10 +45,7 @@ public sealed partial class HomeVM : ResizablePanelVM
         IsExpanded = true;
         ExpandedHeight = 400.0;
 
-        _filteredModKeys = this.WhenAnyValue(x => x.ModKeys, x => x.SearchText)
-            .Select(t => Filter(t.Item1, t.Item2))
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
-            .ToProperty(this, nameof(FilteredModKeys));
+        InitializeOAPH();
 
         Task.Run(() => LoadModKeys(fileSystem, dataDirectoryProvider, loadOrderListingsProvider))
             .FireAndForget(ex => logger.LogError(ex, "Error loading mod keys"));

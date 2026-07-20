@@ -10,11 +10,11 @@ public sealed partial class GlobalSettingsVM : ViewModel, INumWorkThreadsControl
 {
     public const double DefaultPercentage = 0.5;
 
-    private readonly ObservableAsPropertyHelper<int> _workerThreads;
-
     [Reactive] public partial double CorePercentage { get; set; }
 
-    public int WorkerThreads => _workerThreads.Value;
+    [ObservableAsProperty]
+    private IObservable<int> WorkerThreads() =>
+        this.WhenAnyValue(x => x.CorePercentage).Select(ToThreadCount);
 
     public IObservable<int?> NumDesiredThreads =>
         this.WhenAnyValue(x => x.CorePercentage).Select(p => (int?)ToThreadCount(p));
@@ -24,9 +24,7 @@ public sealed partial class GlobalSettingsVM : ViewModel, INumWorkThreadsControl
         var saved = guiSettings.Load()?.WorkerThreadPercentage ?? DefaultPercentage;
         CorePercentage = Math.Clamp(saved, 0, 1);
 
-        _workerThreads = this.WhenAnyValue(x => x.CorePercentage)
-            .Select(ToThreadCount)
-            .ToProperty(this, nameof(WorkerThreads));
+        InitializeOAPH();
     }
 
     private static int ToThreadCount(double percentage) =>
