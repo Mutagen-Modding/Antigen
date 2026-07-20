@@ -165,16 +165,10 @@
                   Margin="10,5,10,10">
                 <!-- Results Filtering -->
                 <Grid Grid.Row="0"
-                      ColumnDefinitions="*,4,Auto"
+                      ColumnDefinitions="Auto,4,*"
                       Margin="4, 0, 12, 0">
-                    <!-- Search Bar -->
-                    <TextBox Grid.Column="0"
-                             x:Name="SearchBox"
-                             Text="{Binding SearchText, Delay=200}"
-                             PlaceholderText="Search results..." />
-
                     <!-- Filter Severies Flyout -->
-                    <Button Grid.Column="2"
+                    <Button Grid.Column="0"
                             VerticalAlignment="Stretch"
                             Background="Transparent"
                             BorderThickness="0"
@@ -210,6 +204,12 @@
 
                         <controls:FASymbolIcon Symbol="Filter" />
                     </Button>
+
+                    <!-- Search Bar -->
+                    <TextBox Grid.Column="2"
+                             x:Name="SearchBox"
+                             Text="{Binding SearchText, Delay=200}"
+                             PlaceholderText="Search results..." />
                 </Grid>
 
                 <ScrollViewer Grid.Row="1"
