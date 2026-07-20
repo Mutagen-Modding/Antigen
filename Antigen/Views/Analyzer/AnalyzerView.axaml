@@ -272,7 +272,7 @@
 
                         <Button Content="Cancel"
                                 HorizontalAlignment="Center"
-                                Command="{Binding LeaveIgnoreModeCommand}" />
+                                Command="{Binding LeaveConfigureModeCommand}" />
                     </StackPanel>
                 </Grid>
             </Grid>

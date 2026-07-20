@@ -140,7 +140,7 @@ public sealed partial class AnalyzerVM : ResizablePanelVM
     }
 
     [ReactiveCommand]
-    private void LeaveIgnoreMode()
+    private void LeaveConfigureMode()
     {
         CurrentSettingsViewResult = null;
     }
@@ -149,21 +149,21 @@ public sealed partial class AnalyzerVM : ResizablePanelVM
     private void IgnoreInstance(AnalyzerResultVM resultVM)
     {
         ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Instance);
-        LeaveIgnoreMode();
+        LeaveConfigureMode();
     }
 
     [ReactiveCommand]
     private void IgnoreTopicType(AnalyzerResultVM resultVM)
     {
         ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Topic);
-        LeaveIgnoreMode();
+        LeaveConfigureMode();
     }
 
     [ReactiveCommand]
     private void IgnoreRecord(AnalyzerResultVM resultVM)
     {
         ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Record);
-        LeaveIgnoreMode();
+        LeaveConfigureMode();
     }
 
     [ReactiveCommand]
