@@ -29,6 +29,8 @@ public sealed class SettingsService : ISettingsService
     private readonly Subject<ImmutableArray<IgnoreRule>> _rulesChanged = new();
     private readonly string _storageFolder;
 
+    public IObservable<ImmutableArray<IgnoreRule>> RulesChanged => _rulesChanged;
+
     public SettingsService(IFileSystem fileSystem, ILogger<SettingsService> logger)
     {
         _fileSystem = fileSystem;
@@ -42,7 +44,6 @@ public sealed class SettingsService : ISettingsService
 
         LoadAllRules();
     }
-    public IObservable<ImmutableArray<IgnoreRule>> RulesChanged => _rulesChanged;
 
     public bool IsIgnored(ModKey modKey, AnalyzerResultInfo resultInfo)
     {

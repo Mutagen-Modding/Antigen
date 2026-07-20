@@ -21,6 +21,18 @@ public sealed partial class ModWatcherVM : ViewModel
 
     private string[] _previousResultHashes = [];
 
+    [Reactive] public partial bool IsAnalyzing { get; set; }
+    [Reactive] public partial string Status { get; set; }
+    [Reactive] public partial AnalyzerStatus AnalyzerStatus { get; set; }
+    [Reactive] public partial Severity MinimumSeverity { get; set; } = Severity.None;
+    [Reactive] public partial int TotalResults { get; set; }
+    [Reactive] public partial int NewResultsCount { get; set; }
+    [Reactive] public partial int ResolvedResults { get; set; }
+    [Reactive] public partial ObservableCollectionExtended<AnalyzerResultInfo> AllResults { get; set; }
+    [Reactive] public partial ObservableCollectionExtended<AnalyzerResultInfo> NewResults { get; set; }
+
+    public ModKey ModKey { get; }
+
     public ModWatcherVM(
         ModKey modKey,
         Func<ModKey, IModWatcher> modWatcherFactory,
@@ -77,18 +89,6 @@ public sealed partial class ModWatcherVM : ViewModel
 
         Status = $"Watching {modKey.FileName}...";
     }
-
-    [Reactive] public partial bool IsAnalyzing { get; set; }
-    [Reactive] public partial string Status { get; set; }
-    [Reactive] public partial AnalyzerStatus AnalyzerStatus { get; set; }
-    [Reactive] public partial Severity MinimumSeverity { get; set; } = Severity.None;
-    [Reactive] public partial int TotalResults { get; set; }
-    [Reactive] public partial int NewResultsCount { get; set; }
-    [Reactive] public partial int ResolvedResults { get; set; }
-    [Reactive] public partial ObservableCollectionExtended<AnalyzerResultInfo> AllResults { get; set; }
-    [Reactive] public partial ObservableCollectionExtended<AnalyzerResultInfo> NewResults { get; set; }
-
-    public ModKey ModKey { get; }
 
     private void UpdateResults(IList<AnalyzerResultInfo> incomingResults)
     {

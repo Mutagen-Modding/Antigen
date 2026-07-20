@@ -22,6 +22,14 @@ public sealed partial class MainVM : ViewModel
     private IDisposable? _returnSubscription;
     private double _expandedHeight;
 
+    public static Severity[] SeverityValues { get; } = Enum.GetValues<Severity>();
+
+    [Reactive] public partial IResizablePanel? ActivePanel { get; set; }
+    [Reactive] public partial int WindowX { get; set; }
+    [Reactive] public partial int WindowY { get; set; }
+
+    public GuiSettings? SavedSettings { get; }
+
     public MainVM(
         HomeVM homeVM,
         GuiSettingsService guiSettings,
@@ -50,14 +58,6 @@ public sealed partial class MainVM : ViewModel
             .Subscribe(StartWatching)
             .DisposeWith(this);
     }
-
-    public static Severity[] SeverityValues { get; } = Enum.GetValues<Severity>();
-
-    [Reactive] public partial IResizablePanel? ActivePanel { get; set; }
-    [Reactive] public partial int WindowX { get; set; }
-    [Reactive] public partial int WindowY { get; set; }
-
-    public GuiSettings? SavedSettings { get; }
 
     public void SaveGuiSettings()
     {

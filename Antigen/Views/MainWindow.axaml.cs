@@ -11,6 +11,8 @@ public partial class MainWindow : PinnedWindow, IMainWindow
     private double _dragStartY;
     private double _originalHeight;
 
+    private IResizablePanel? Panel => (DataContext as MainVM)?.ActivePanel;
+
     public MainWindow()
     {
         InitializeComponent();
@@ -29,8 +31,6 @@ public partial class MainWindow : PinnedWindow, IMainWindow
         vm.WindowX = e.Point.X;
         vm.WindowY = e.Point.Y;
     }
-
-    private IResizablePanel? Panel => (DataContext as MainVM)?.ActivePanel;
 
     private void ResizeGrip_PointerPressed(object? sender, PointerPressedEventArgs e)
     {

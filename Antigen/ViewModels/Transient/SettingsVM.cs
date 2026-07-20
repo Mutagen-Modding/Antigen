@@ -8,6 +8,11 @@ namespace Antigen.ViewModels.Transient;
 
 public sealed partial class SettingsVM : ViewModel
 {
+    [Reactive] public partial ObservableCollectionExtended<IgnoreRuleItem> Rules { get; set; } = [];
+    [Reactive] public partial int SelectedIndex { get; set; } = -1;
+
+    public ISettingsService SettingsService { get; }
+    public ModKey ModKey { get; }
 
     public SettingsVM(ISettingsService settingsService, ModKey modKey)
     {
@@ -16,11 +21,6 @@ public sealed partial class SettingsVM : ViewModel
 
         LoadRules();
     }
-    [Reactive] public partial ObservableCollectionExtended<IgnoreRuleItem> Rules { get; set; } = [];
-    [Reactive] public partial int SelectedIndex { get; set; } = -1;
-
-    public ISettingsService SettingsService { get; }
-    public ModKey ModKey { get; }
 
     [ReactiveCommand]
     private void LoadRules()

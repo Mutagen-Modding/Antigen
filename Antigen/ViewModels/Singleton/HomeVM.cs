@@ -20,6 +20,14 @@ public sealed partial class HomeVM : ResizablePanelVM
     private readonly Subject<ModKey> _startRequested = new();
     private readonly ObservableAsPropertyHelper<IEnumerable<ModKey>> _filteredModKeys;
 
+    public override double MinResizeHeight => 100.0;
+
+    public IObservable<ModKey> StartRequested => _startRequested;
+    public IEnumerable<ModKey> FilteredModKeys => _filteredModKeys.Value;
+
+    [Reactive] public partial ModKey[] ModKeys { get; set; } = [];
+    [Reactive] public partial string SearchText { get; set; } = string.Empty;
+
     public HomeVM(
         IMainWindow mainWindow,
         GlobalSettingsVM globalSettings,
@@ -41,14 +49,6 @@ public sealed partial class HomeVM : ResizablePanelVM
         Task.Run(() => LoadModKeys(fileSystem, dataDirectoryProvider, loadOrderListingsProvider))
             .FireAndForget(ex => logger.LogError(ex, "Error loading mod keys"));
     }
-
-    public override double MinResizeHeight => 100.0;
-
-    public IObservable<ModKey> StartRequested => _startRequested;
-    public IEnumerable<ModKey> FilteredModKeys => _filteredModKeys.Value;
-
-    [Reactive] public partial ModKey[] ModKeys { get; set; } = [];
-    [Reactive] public partial string SearchText { get; set; } = string.Empty;
 
     private static IEnumerable<ModKey> Filter(ModKey[] keys, string search) =>
         string.IsNullOrWhiteSpace(search)
