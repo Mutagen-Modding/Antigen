@@ -6,6 +6,7 @@ using Antigen.Models.Settings;
 using Antigen.Services.Singleton;
 using Antigen.Services.Transient;
 using DynamicData.Binding;
+using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Noggog;
@@ -18,6 +19,7 @@ public sealed partial class ModWatcherVM : ViewModel
 {
     private readonly IModWatcher _modWatcher;
     private readonly ISettingsService _settingsService;
+    private readonly ILogger<ModWatcherVM> _logger;
 
     private string[] _previousResultHashes = [];
 
@@ -36,10 +38,12 @@ public sealed partial class ModWatcherVM : ViewModel
     public ModWatcherVM(
         ModKey modKey,
         Func<ModKey, IModWatcher> modWatcherFactory,
-        ISettingsService settingsService)
+        ISettingsService settingsService,
+        ILogger<ModWatcherVM> logger)
     {
         ModKey = modKey;
         _settingsService = settingsService;
+        _logger = logger;
         _modWatcher = modWatcherFactory(modKey)
             .DisposeWith(this);
 
@@ -65,7 +69,7 @@ public sealed partial class ModWatcherVM : ViewModel
                 observable
                     .Buffer(TimeSpan.FromMilliseconds(1000), RxSchedulers.TaskpoolScheduler)
                     .ObserveOn(RxSchedulers.MainThreadScheduler)
-                    .Subscribe(UpdateResults, _ => {}, OnAnalysisCompleted);
+                    .Subscribe(UpdateResults, OnAnalysisFailed, OnAnalysisCompleted);
             })
             .DisposeWith(this);
 
@@ -104,6 +108,15 @@ public sealed partial class ModWatcherVM : ViewModel
 
         TotalResults = AllResults.Count(result => !_settingsService.IsIgnored(ModKey, result));
         NewResultsCount = NewResults.Count(result => !_settingsService.IsIgnored(ModKey, result));
+    }
+
+    private void OnAnalysisFailed(Exception exception)
+    {
+        _logger.LogError(exception, "Analysis of {ModKey} failed", ModKey);
+
+        AnalyzerStatus = AnalyzerStatus.Error;
+        Status = $"Analysis failed: {exception.Message}";
+        IsAnalyzing = false;
     }
 
     private void OnAnalysisCompleted()
