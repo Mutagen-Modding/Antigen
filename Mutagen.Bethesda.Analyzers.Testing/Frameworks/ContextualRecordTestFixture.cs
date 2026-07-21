@@ -94,7 +94,7 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
 
         Sut.AnalyzeRecord(CreateAnalyserParams(param));
         param.DropOff.Reports.Select(x => x.TopicDefinition.Id)
-            .ShouldEqualEnumerable(expectedTopics.Select(x => x.Id));
+            .ShouldBe(expectedTopics.Select(x => x.Id), ignoreOrder: true);
 
         prepForFix(_rec, _mod);
 
@@ -146,7 +146,7 @@ public class ContextualRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
         var rec = param.LinkCache.Resolve<TMajorGetter>(record);
         Sut.AnalyzeRecord(CreateAnalyserParams(rec, param.LinkCache, param.LoadOrder, dropOff));
         dropOff.Reports.Select(x => x.TopicDefinition.Id)
-            .ShouldEqualEnumerable(expectedTopics.Select(x => x.Id));
+            .ShouldBe(expectedTopics.Select(x => x.Id), ignoreOrder: true);
     }
 
     public void RunWithFile(

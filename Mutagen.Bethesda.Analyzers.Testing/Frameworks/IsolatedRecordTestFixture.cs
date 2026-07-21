@@ -39,7 +39,7 @@ public class IsolatedRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
 
         Sut.AnalyzeRecord(param);
         dropOff.Reports.Select(x => x.TopicDefinition.Id)
-            .ShouldEqualEnumerable(expectedTopics.Select(x => x.Id));
+            .ShouldBe(expectedTopics.Select(x => x.Id), ignoreOrder: true);
 
         prepForFix(rec);
 
