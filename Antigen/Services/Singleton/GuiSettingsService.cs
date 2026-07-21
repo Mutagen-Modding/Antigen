@@ -28,15 +28,8 @@ public sealed class GuiSettingsService
             return null;
         }
 
-        try
-        {
-            var json = _fileSystem.File.ReadAllText(_filePath);
-            return JsonSerializer.Deserialize<GuiSettings>(json);
-        }
-        catch (Exception)
-        {
-            return null;
-        }
+        var json = _fileSystem.File.ReadAllText(_filePath);
+        return JsonSerializer.Deserialize<GuiSettings>(json);
     }
 
     public void Save(GuiSettings settings)

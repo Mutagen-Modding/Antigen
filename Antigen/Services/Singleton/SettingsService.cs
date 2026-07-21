@@ -71,8 +71,9 @@ public sealed class SettingsService : ISettingsService
             _cache[modKey] = deserializedRules;
             return [..deserializedRules];
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to read ignore rules for {ModKey} from {FilePath}", modKey, filePath);
             return [];
         }
     }
@@ -172,8 +173,9 @@ public sealed class SettingsService : ISettingsService
             var deserializedRules = JsonSerializer.Deserialize<Settings>(json)?.Ignored ?? [];
             _cache[modKey] = deserializedRules;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to load ignore rules for {ModKey} from {FilePath}", modKey, filePath);
             _cache[modKey] = [];
         }
     }
@@ -186,5 +188,7 @@ public sealed class SettingsService : ISettingsService
             var modKey = ModKey.FromFileName(_fileSystem.Path.GetFileNameWithoutExtension(file));
             LoadRules(modKey);
         }
+
+        _logger.LogInformation("Loaded ignore rules for {ModCount} mods from {StorageFolder}", files.Length, _storageFolder);
     }
 }

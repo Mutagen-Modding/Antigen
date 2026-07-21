@@ -2,6 +2,7 @@ using System.Reactive.Linq;
 using Antigen.Models.Settings;
 using Antigen.Services.Singleton;
 using Antigen.ViewModels.Transient;
+using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Noggog;
@@ -17,6 +18,7 @@ public sealed partial class MainVM : ViewModel
     private readonly HomeVM _homeVM;
     private readonly GuiSettingsService _guiSettings;
     private readonly GlobalSettingsVM _globalSettings;
+    private readonly ILogger<MainVM> _logger;
 
     private ModWatcherVM? _currentWatcher;
     private IDisposable? _returnSubscription;
@@ -35,11 +37,13 @@ public sealed partial class MainVM : ViewModel
         GuiSettingsService guiSettings,
         GlobalSettingsVM globalSettings,
         Func<ModKey, ModWatcherVM> modWatcherVMFactory,
-        Func<ModWatcherVM, AnalyzerVM> analyzerVMFactory)
+        Func<ModWatcherVM, AnalyzerVM> analyzerVMFactory,
+        ILogger<MainVM> logger)
     {
         _homeVM = homeVM;
         _guiSettings = guiSettings;
         _globalSettings = globalSettings;
+        _logger = logger;
         _modWatcherVMFactory = modWatcherVMFactory;
         _analyzerVMFactory = analyzerVMFactory;
 
@@ -59,8 +63,10 @@ public sealed partial class MainVM : ViewModel
             .DisposeWith(this);
     }
 
-    public void SaveGuiSettings()
+    public void Exit()
     {
+        _logger.LogInformation("Exiting");
+
         var settings = (_guiSettings.Load() ?? new GuiSettings()) with
         {
             WindowX = WindowX,

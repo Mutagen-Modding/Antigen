@@ -1,4 +1,5 @@
 using System.IO.Abstractions;
+using System.Runtime.InteropServices;
 using Antigen.Models.Settings;
 using Antigen.Modules;
 using Antigen.Services.Singleton;
@@ -35,7 +36,12 @@ public sealed class App : Application
             var window = new MainWindow();
             Container = SetupServices(window);
 
-            Container.Resolve<ILogger<App>>().LogInformation("Antigen starting");
+            var logger = Container.Resolve<ILogger<App>>();
+            logger.LogInformation(
+                "Antigen starting - {Runtime} on {OS} with {ProcessorCount} processors",
+                RuntimeInformation.FrameworkDescription,
+                RuntimeInformation.OSDescription,
+                Environment.ProcessorCount);
 
             var mainVM = Container.Resolve<MainVM>();
             window.DataContext = mainVM;
@@ -43,7 +49,7 @@ public sealed class App : Application
             RestorePosition(window, mainVM.SavedSettings);
 
             desktop.MainWindow = window;
-            desktop.Exit += (_, _) => mainVM.SaveGuiSettings();
+            desktop.Exit += (_, _) => mainVM.Exit();
         }
 
         base.OnFrameworkInitializationCompleted();

@@ -71,6 +71,8 @@ public sealed class ModWatcher(
 
         _fileSystemWatcher.EnableRaisingEvents = true;
 
+        logger.LogInformation("Started watching {ModKey} at {FilePath}", modKey, _filePath);
+
         RxSchedulers.TaskpoolScheduler.Schedule(async void () =>
         {
             try
@@ -89,6 +91,8 @@ public sealed class ModWatcher(
         _fileSystemWatcher.EnableRaisingEvents = false;
         _subscription?.Dispose();
         _cancellationTokenSource.Cancel();
+
+        logger.LogInformation("Stopped watching {ModKey}", modKey);
     }
 
     public void Dispose()
@@ -100,6 +104,8 @@ public sealed class ModWatcher(
 
     private async Task OnFileChanged()
     {
+        logger.LogInformation("Change detected for {ModKey}.  Restarting analysis", modKey);
+
         await _cancellationTokenSource.CancelAsync();
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new CancellationTokenSource();
