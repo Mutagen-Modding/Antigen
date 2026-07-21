@@ -1,6 +1,23 @@
 bin/
 obj/
 /packages/
-riderModule.iml
-/_ReSharper.Caches/
+
+# User-specific files
+*.suo
+*.user
+*.userosscache
+*.userprefs
+
+# IDE / build caches
+.vs/
 .idea
+.vscode
+riderModule.iml
+*.sln.iml
+/_ReSharper.Caches/
+_ReSharper*/
+*.DotSettings.user
+
+# Misc
+*.orig
+*.bak

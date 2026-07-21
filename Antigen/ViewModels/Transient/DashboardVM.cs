@@ -6,6 +6,7 @@ using Antigen.Models;
 using Antigen.Resources.Command;
 using Antigen.Resources.Constants;
 using Antigen.Resources.Converter;
+using Antigen.ViewModels.Analyzer;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.Models.TreeDataGrid;
@@ -19,7 +20,7 @@ using Noggog;
 using ReactiveUI.SourceGenerators;
 using Sortable.Avalonia;
 
-namespace Antigen.ViewModels.Analyzer;
+namespace Antigen.ViewModels.Transient;
 
 public sealed partial class DashboardVM : ViewModel
 {

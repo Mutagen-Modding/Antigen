@@ -7,7 +7,18 @@ using Antigen.Models.Settings;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Plugins;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Singleton;
+
+public interface ISettingsService
+{
+    IObservable<ImmutableArray<IgnoreRule>> RulesChanged { get; }
+    ImmutableArray<IgnoreRule> GetRules(ModKey modKey);
+    void AddRule(ModKey modKey, IgnoreRule rule);
+    void AddRule(ModKey modKey, AnalyzerResultInfo resultInfo, IgnoreType ignoreType);
+    void RemoveRule(ModKey modKey, int index);
+    void ClearRules(ModKey modKey);
+    bool IsIgnored(ModKey modKey, AnalyzerResultInfo resultInfo);
+}
 
 public sealed class SettingsService : ISettingsService
 {
@@ -17,6 +28,8 @@ public sealed class SettingsService : ISettingsService
 
     private readonly Subject<ImmutableArray<IgnoreRule>> _rulesChanged = new();
     private readonly string _storageFolder;
+
+    public IObservable<ImmutableArray<IgnoreRule>> RulesChanged => _rulesChanged;
 
     public SettingsService(IFileSystem fileSystem, ILogger<SettingsService> logger)
     {
@@ -31,7 +44,6 @@ public sealed class SettingsService : ISettingsService
 
         LoadAllRules();
     }
-    public IObservable<ImmutableArray<IgnoreRule>> RulesChanged => _rulesChanged;
 
     public bool IsIgnored(ModKey modKey, AnalyzerResultInfo resultInfo)
     {
@@ -59,8 +71,9 @@ public sealed class SettingsService : ISettingsService
             _cache[modKey] = deserializedRules;
             return [..deserializedRules];
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to read ignore rules for {ModKey} from {FilePath}", modKey, filePath);
             return [];
         }
     }
@@ -160,8 +173,9 @@ public sealed class SettingsService : ISettingsService
             var deserializedRules = JsonSerializer.Deserialize<Settings>(json)?.Ignored ?? [];
             _cache[modKey] = deserializedRules;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            _logger.LogError(ex, "Failed to load ignore rules for {ModKey} from {FilePath}", modKey, filePath);
             _cache[modKey] = [];
         }
     }
@@ -174,5 +188,7 @@ public sealed class SettingsService : ISettingsService
             var modKey = ModKey.FromFileName(_fileSystem.Path.GetFileNameWithoutExtension(file));
             LoadRules(modKey);
         }
+
+        _logger.LogInformation("Loaded ignore rules for {ModCount} mods from {StorageFolder}", files.Length, _storageFolder);
     }
 }

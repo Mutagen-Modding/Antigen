@@ -1,15 +1,18 @@
 using System.IO.Abstractions;
+using System.Runtime.InteropServices;
+using Antigen.Models.Settings;
 using Antigen.Modules;
-using Antigen.Services;
-using Antigen.ViewModels;
-using Antigen.ViewModels.Analyzer;
-using Antigen.ViewModels.Settings;
+using Antigen.Services.Singleton;
+using Antigen.Services.Transient;
+using Antigen.ViewModels.Singleton;
+using Antigen.ViewModels.Transient;
 using Antigen.Views;
 using Autofac;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
+using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.Skyrim;
 using Mutagen.Bethesda.Autofac;
 using Mutagen.Bethesda.Environments.DI;
@@ -20,7 +23,6 @@ namespace Antigen;
 public sealed class App : Application
 {
     public static IContainer? Container { get; private set; }
-    public static Window? MainAppWindow { get; private set; }
 
     public override void Initialize()
     {
@@ -31,40 +33,58 @@ public sealed class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            // Setup dependency injection
-            Container = SetupServices();
+            var window = new MainWindow();
+            Container = SetupServices(window);
 
-            MainAppWindow = new MainWindow
-            {
-                DataContext = Container.Resolve<MainVM>()
-            };
+            var logger = Container.Resolve<ILogger<App>>();
+            logger.LogInformation(
+                "Antigen starting - {Runtime} on {OS} with {ProcessorCount} processors",
+                RuntimeInformation.FrameworkDescription,
+                RuntimeInformation.OSDescription,
+                Environment.ProcessorCount);
 
-            var screen = MainAppWindow.Screens.Primary;
-            if (screen is not null)
-            {
-                const int offset = 25;
-                MainAppWindow.Position = new PixelPoint(
-                    screen.WorkingArea.Right - (int)MainAppWindow.Width - offset,
-                    offset
-                );
-            }
+            var mainVM = Container.Resolve<MainVM>();
+            window.DataContext = mainVM;
 
-            desktop.MainWindow = MainAppWindow;
+            RestorePosition(window, mainVM.SavedSettings);
+
+            desktop.MainWindow = window;
+            desktop.Exit += (_, _) => mainVM.Exit();
         }
 
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static IContainer SetupServices()
+    private static void RestorePosition(MainWindow window, GuiSettings? saved)
+    {
+        if (saved is not null && window.Screens.All.Any(s => s.Bounds.Contains(new PixelPoint(saved.WindowX, saved.WindowY))))
+        {
+            window.Position = new PixelPoint(saved.WindowX, saved.WindowY);
+            return;
+        }
+
+        if (window.Screens.Primary is { } screen)
+        {
+            window.Position = new PixelPoint(
+                screen.WorkingArea.X + (screen.WorkingArea.Width - (int)window.Width) / 2,
+                screen.WorkingArea.Y + (screen.WorkingArea.Height - (int)window.Height) / 2
+            );
+        }
+    }
+
+    private static IContainer SetupServices(MainWindow window)
     {
         var builder = new ContainerBuilder();
+
+        builder.RegisterInstance(window)
+            .As<IMainWindow>();
+
+        builder.RegisterModule<LoggingModule>();
 
         // Register base services
         builder.RegisterType<FileSystem>()
             .As<IFileSystem>()
             .SingleInstance();
-
-        builder.RegisterModule<LoggingModule>();
 
         builder.RegisterModule<MutagenModule>();
 
@@ -78,29 +98,11 @@ public sealed class App : Application
             return GameConstants.Get(gameReleaseContext.Release);
         });
 
-        // Register application services
-        builder.RegisterType<AnalyzerService>()
-            .As<IAnalyzerService>()
-            .SingleInstance();
-
-        builder.RegisterType<ModWatcher>()
-            .As<IModWatcher>();
-
-        builder.RegisterType<SkyrimModInfoProvider>()
-            .As<IModInfoProvider>();
-
-        builder.RegisterType<SettingsService>()
-            .As<ISettingsService>()
-            .SingleInstance();
-
-        builder.RegisterType<SkyrimAnalyzerResultInfoFactory>();
-
-        // Register ViewModels
-        builder.RegisterType<MainVM>().SingleInstance();
-        builder.RegisterType<AnalyzerVM>();
-        builder.RegisterType<SettingsVM>();
-        builder.RegisterType<DashboardVM>();
-        builder.RegisterType<ModWatcherVM>();
+        // Register application services and view models by folder
+        builder.RegisterFolder<AnalyzerService>(RegistrationStyle.Singleton);
+        builder.RegisterFolder<ModWatcher>(RegistrationStyle.Transient);
+        builder.RegisterFolder<MainVM>(RegistrationStyle.Singleton);
+        builder.RegisterFolder<AnalyzerVM>(RegistrationStyle.Transient);
 
         return builder.Build();
     }

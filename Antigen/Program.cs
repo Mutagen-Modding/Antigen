@@ -1,16 +1,17 @@
-﻿using System.IO.Abstractions;
-using Antigen.Modules;
-using Antigen.Services;
-using Autofac;
+﻿using Antigen.Services;
 using Avalonia;
 using Microsoft.Extensions.Logging;
 using ReactiveUI.Avalonia;
+using Serilog;
 
 namespace Antigen;
 
 internal sealed class Program
 {
-    private static ICrashLoggingService? _crashLoggingService;
+    private static readonly ILoggerFactory LoggerFactory =
+        Microsoft.Extensions.Logging.LoggerFactory.Create(logging => logging.AddSerilog(Logging.Log.Logger, dispose: true));
+
+    private static readonly ILogger<Program> Logger = LoggerFactory.CreateLogger<Program>();
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -18,19 +19,17 @@ internal sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
-        _crashLoggingService = new CrashLoggingService();
-
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
             if (e.ExceptionObject is Exception ex)
             {
-                _crashLoggingService.LogCrash(ex);
+                Logger.LogCritical(ex, "Unhandled exception");
             }
         };
 
         TaskScheduler.UnobservedTaskException += (_, e) =>
         {
-            _crashLoggingService.LogCrash(e.Exception);
+            Logger.LogCritical(e.Exception, "Unobserved task exception");
             e.SetObserved();
         };
 
@@ -41,7 +40,7 @@ internal sealed class Program
         }
         catch (Exception ex)
         {
-            _crashLoggingService.LogCrash(ex);
+            Logger.LogCritical(ex, "Unhandled exception");
             throw;
         }
     }
@@ -55,11 +54,7 @@ internal sealed class Program
             .LogToTrace()
             .UseReactiveUI(rxBuilder =>
             {
-                var builder = new ContainerBuilder();
-                builder.RegisterInstance(new FileSystem()).As<IFileSystem>().SingleInstance();
-                builder.RegisterModule<LoggingModule>();
-                var container = builder.Build();
-                var logger = container.Resolve<ILogger<ObservableExceptionHandler>>();
+                var logger = LoggerFactory.CreateLogger<ObservableExceptionHandler>();
                 rxBuilder.WithExceptionHandler(new ObservableExceptionHandler(logger));
             });
     }
