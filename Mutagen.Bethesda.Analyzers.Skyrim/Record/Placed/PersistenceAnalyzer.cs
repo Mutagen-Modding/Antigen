@@ -16,11 +16,11 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
             Severity.Warning)
         .WithoutFormatting("Placed record is persistent but does not need to be");
 
-    public static readonly TopicDefinition NotPersistent = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<string?> NotPersistent = MutagenTopicBuilder.FromDiscussion(
             286,
             "Not Persistent",
             Severity.Error)
-        .WithoutFormatting("Placed record is not persistent but needs to be");
+        .WithFormatting<string?>("Placed record is not persistent but needs to be due to {0}");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [UnnecessaryPersistence, NotPersistent];
 
@@ -34,7 +34,7 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
         Statics.XMarkerHeading.FormKey,
     ];
 
-    public bool RequiresPersistent(IPlacedGetter placed, ILinkCache linkCache, ILinkUsageCache usageCache)
+    public (bool expected, string? reason) RequiresPersistent(IPlacedGetter placed, ILinkCache linkCache, ILinkUsageCache usageCache)
     {
         // A record should be persistent if it is referenced by another record
         if (usageCache.GetUsagesOf(placed).UsageLinks
@@ -45,34 +45,33 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
             .Where(u => !u.TryResolve<IWorldspaceGetter>(linkCache, out var _))
             .Any())
         {
-            return true;
+            return (true, "referenced by another record");
         }
 
         if (placed.GetPersistLocation().Equals(FormKeys.SkyrimSE.Skyrim.Location.PersistAll))
-            return true;
+            return (true, "persist location is PersistAll");
 
         if (placed is IPlacedObjectGetter placedObject)
         {
             // Full LOD references need to be persistent. Lights are never full LOD and reuse the flag for never fades
             if (placedObject.SkyrimMajorRecordFlags.HasFlag((SkyrimMajorRecord.SkyrimMajorRecordFlag)PlacedObject.DefaultMajorFlag.IsFullLod))
                 if (!placedObject.Base.TryResolve<ILightGetter>(linkCache, out var _))
-                    return true;
+                    return (true, "full LOD");
 
             // The CK sets certain base objects as persistent
             if (AlwaysPersistentBases.Contains(placedObject.Base.FormKey))
-                return true;
+                return (true, "base object is marker");
 
             // The CK sets water activators as persistent
             if (placedObject.Base.TryResolve<IActivatorGetter>(linkCache, out var activator) && !activator.WaterType.IsNull)
-                return true;
+                return (true, "base object is water");
 
             // The CK sets decals as persistent
             if (placedObject.Base.TryResolve<ITextureSetGetter>(linkCache, out var _))
-                return true;
+                return (true, "base object is texture set");
         }
 
-
-        return false;
+        return (false, null);
     }
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedGetter> param)
@@ -80,7 +79,7 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
         var placed = param.Record;
 
         var persistent = placed.SkyrimMajorRecordFlags.HasFlag((SkyrimMajorRecord.SkyrimMajorRecordFlag)PlacedObject.DefaultMajorFlag.Persistent);
-        var expected = RequiresPersistent(placed, param.LinkCache, param.ResolveCache<ILinkUsageCache>());
+        var (expected, reason) = RequiresPersistent(placed, param.LinkCache, param.ResolveCache<ILinkUsageCache>());
 
         if (persistent && !expected)
         {
@@ -88,7 +87,7 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
         }
         else if (!persistent && expected)
         {
-            param.AddTopic(NotPersistent.Format());
+            param.AddTopic(NotPersistent.Format(reason));
         }
     }
 
