@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
@@ -13,7 +13,13 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
             Severity.Warning)
         .WithoutFormatting("Placed record is persistent but does not need to be");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [UnnecessaryPersistence];
+    public static readonly TopicDefinition NotPersistent = MutagenTopicBuilder.FromDiscussion(
+            286,
+            "Not Persistent",
+            Severity.Error)
+        .WithoutFormatting("Placed record is not persistent but needs to be");
+
+    public IEnumerable<TopicDefinition> Topics { get; } = [UnnecessaryPersistence, NotPersistent];
 
     private static readonly HashSet<FormKey> AllowedPersistentObjects =
     [
