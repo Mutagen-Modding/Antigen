@@ -12,7 +12,9 @@
     <PackageVersion Include="FluentAvaloniaUI" Version="3.0.2" />
     <PackageVersion Include="Microsoft.Extensions.Logging" Version="10.0.9" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.9" />
-    <PackageVersion Include="Microsoft.Extensions.Logging.Console" Version="10.0.9" />
+    <PackageVersion Include="Serilog" Version="4.3.1" />
+    <PackageVersion Include="Serilog.Extensions.Logging" Version="10.0.0" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
     <PackageVersion Include="Mutagen.Bethesda.Analyzers" Version="0.1.0-alpha.758" />
     <PackageVersion Include="Mutagen.Bethesda.Analyzers.Skyrim" Version="0.1.0-alpha.758" />
     <PackageVersion Include="Mutagen.Bethesda.Autofac" Version="0.55.0-alpha.7" />

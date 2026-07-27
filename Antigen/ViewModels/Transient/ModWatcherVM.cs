@@ -3,30 +3,47 @@ using System.Reactive.Linq;
 using Antigen.Extensions;
 using Antigen.Models.Analyzer;
 using Antigen.Models.Settings;
-using Antigen.Services;
+using Antigen.Services.Singleton;
+using Antigen.Services.Transient;
 using DynamicData.Binding;
+using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Noggog;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
-namespace Antigen.ViewModels.Analyzer;
+namespace Antigen.ViewModels.Transient;
 
 public sealed partial class ModWatcherVM : ViewModel
 {
     private readonly IModWatcher _modWatcher;
     private readonly ISettingsService _settingsService;
+    private readonly ILogger<ModWatcherVM> _logger;
 
     private string[] _previousResultHashes = [];
+
+    [Reactive] public partial bool IsAnalyzing { get; set; }
+    [Reactive] public partial string Status { get; set; }
+    [Reactive] public partial AnalyzerStatus AnalyzerStatus { get; set; }
+    [Reactive] public partial Severity MinimumSeverity { get; set; } = Severity.None;
+    [Reactive] public partial int TotalResults { get; set; }
+    [Reactive] public partial int NewResultsCount { get; set; }
+    [Reactive] public partial int ResolvedResults { get; set; }
+    [Reactive] public partial ObservableCollectionExtended<AnalyzerResultInfo> AllResults { get; set; }
+    [Reactive] public partial ObservableCollectionExtended<AnalyzerResultInfo> NewResults { get; set; }
+
+    public ModKey ModKey { get; }
 
     public ModWatcherVM(
         ModKey modKey,
         Func<ModKey, IModWatcher> modWatcherFactory,
-        ISettingsService settingsService)
+        ISettingsService settingsService,
+        ILogger<ModWatcherVM> logger)
     {
         ModKey = modKey;
         _settingsService = settingsService;
+        _logger = logger;
         _modWatcher = modWatcherFactory(modKey)
             .DisposeWith(this);
 
@@ -52,7 +69,7 @@ public sealed partial class ModWatcherVM : ViewModel
                 observable
                     .Buffer(TimeSpan.FromMilliseconds(1000), RxSchedulers.TaskpoolScheduler)
                     .ObserveOn(RxSchedulers.MainThreadScheduler)
-                    .Subscribe(UpdateResults, _ => {}, OnAnalysisCompleted);
+                    .Subscribe(UpdateResults, OnAnalysisFailed, OnAnalysisCompleted);
             })
             .DisposeWith(this);
 
@@ -77,18 +94,6 @@ public sealed partial class ModWatcherVM : ViewModel
         Status = $"Watching {modKey.FileName}...";
     }
 
-    [Reactive] public partial bool IsAnalyzing { get; set; }
-    [Reactive] public partial string Status { get; set; }
-    [Reactive] public partial AnalyzerStatus AnalyzerStatus { get; set; }
-    [Reactive] public partial Severity MinimumSeverity { get; set; } = Severity.None;
-    [Reactive] public partial int TotalResults { get; set; }
-    [Reactive] public partial int NewResultsCount { get; set; }
-    [Reactive] public partial int ResolvedResults { get; set; }
-    [Reactive] public partial ObservableCollectionExtended<AnalyzerResultInfo> AllResults { get; set; }
-    [Reactive] public partial ObservableCollectionExtended<AnalyzerResultInfo> NewResults { get; set; }
-
-    public ModKey ModKey { get; }
-
     private void UpdateResults(IList<AnalyzerResultInfo> incomingResults)
     {
         var incomingResultsArray = incomingResults.ToArray();
@@ -103,6 +108,15 @@ public sealed partial class ModWatcherVM : ViewModel
 
         TotalResults = AllResults.Count(result => !_settingsService.IsIgnored(ModKey, result));
         NewResultsCount = NewResults.Count(result => !_settingsService.IsIgnored(ModKey, result));
+    }
+
+    private void OnAnalysisFailed(Exception exception)
+    {
+        _logger.LogError(exception, "Analysis of {ModKey} failed", ModKey);
+
+        AnalyzerStatus = AnalyzerStatus.Error;
+        Status = $"Analysis failed: {exception.Message}";
+        IsAnalyzing = false;
     }
 
     private void OnAnalysisCompleted()

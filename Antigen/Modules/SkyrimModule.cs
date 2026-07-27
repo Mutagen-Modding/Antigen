@@ -1,5 +1,5 @@
 ﻿using Antigen.Resources.Converter;
-using Antigen.Services;
+using Antigen.Services.Game;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Skyrim;
 

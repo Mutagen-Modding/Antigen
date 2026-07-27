@@ -1,7 +1,9 @@
+using System.Diagnostics;
 using System.IO.Abstractions;
 using System.Reactive.Subjects;
 using System.Runtime.CompilerServices;
 using Antigen.Models.Analyzer;
+using Antigen.Services.Game;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers;
 using Mutagen.Bethesda.Analyzers.Reporting.Handlers;
@@ -13,7 +15,14 @@ using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Order.DI;
 using Noggog;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Singleton;
+
+public interface IAnalyzerService
+{
+    IObservable<StatusUpdate> StatusUpdates { get; }
+    Severity MinimumSeverity { get; set; }
+    IAsyncEnumerable<AnalyzerResultInfo> AnalyzeAsync(ModKey modKey, CancellationToken cancellationToken = default);
+}
 
 public sealed class AnalyzerService(
     IFileSystem fileSystem,
@@ -36,6 +45,9 @@ public sealed class AnalyzerService(
     {
         IAsyncEnumerable<AnalyzerResult>? results = null;
 
+        logger.LogInformation("Starting analysis of {ModKey} with minimum severity {MinimumSeverity}", modKey, MinimumSeverity);
+        var stopwatch = Stopwatch.StartNew();
+
         var modInfos = loadOrderListingsProvider.Get()
             .Select(l => modInfoProvider.GetModInfo(fileSystem.Path.Combine(dataDirectoryProvider.Path, l.FileName), fileSystem, gameReleaseContext.Release))
             .WhereNotNull()
@@ -45,6 +57,8 @@ public sealed class AnalyzerService(
         var loadOrder = loadOrderListingsProvider.Get()
             .Where(l => l.ModKey == modKey || masterInfos.TryGetValue(modKey, out var masterInfo) && masterInfo.Masters.Contains(l.ModKey))
             .ToArray();
+
+        logger.LogInformation("Resolved {LoadOrderCount} of {ModCount} mods", loadOrder.Length, modInfos.Length);
 
         IGameEnvironment? env = null;
         try
@@ -60,16 +74,18 @@ public sealed class AnalyzerService(
                         .WithLoadOrder(loadOrder)
                         .Build();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
                     // We might get errors to create the environment if a mod file is currently being written to - Retry
                     retryCount++;
+                    logger.LogWarning(ex, "Failed to build game environment for {ModKey} (attempt {Attempt})", modKey, retryCount);
                 }
             }
 
             if (env is null)
             {
                 ReportStatus(new StatusUpdate(AnalyzerStatus.Error, "Failed to create game environment"));
+                logger.LogError("Giving up building the game environment for {ModKey} after {Attempts} attempts", modKey, retryCount);
                 yield break;
             }
 
@@ -87,13 +103,16 @@ public sealed class AnalyzerService(
                 ReportStatus(new StatusUpdate(AnalyzerStatus.Preparing, "Building analyzer..."));
 
                 // Create analyzer with all built-in analyzers
+                var enabledAnalyzers = analyzers.Where(analyzerFilter.ShouldAnalyze).ToArray();
                 var analyzer = AnalyzerRunnerBuilder.Create(gameReleaseContext.Release)
                     .WithLinkCache(env.LinkCache)
-                    .WithAnalyzers(analyzers.Where(analyzerFilter.ShouldAnalyze))
+                    .WithAnalyzers(enabledAnalyzers)
                     .WithBlacklistedMods(notSelectedMods)
                     .WithMinimumSeverity(MinimumSeverity)
                     .WithFileSystem(fileSystem)
                     .Build();
+
+                logger.LogInformation("Built analyzer with {AnalyzerCount} of {TotalAnalyzerCount} analyzers enabled", enabledAnalyzers.Length, analyzers.Count);
 
                 ReportStatus(new StatusUpdate(AnalyzerStatus.Analyzing, "Running analyzers..."));
 
@@ -107,7 +126,11 @@ public sealed class AnalyzerService(
                 logger.LogError(ex, "Analysis error");
             }
 
-            if (results is null) yield break;
+            if (results is null)
+            {
+                logger.LogWarning("Analysis of {ModKey} produced no runner - aborting", modKey);
+                yield break;
+            }
 
             var count = 0;
             await foreach (var result in results)
@@ -122,9 +145,15 @@ public sealed class AnalyzerService(
             }
 
             ReportStatus(new StatusUpdate(AnalyzerStatus.Completed, $"Analysis complete - {count} issues found"));
+            logger.LogInformation("Analysis of {ModKey} completed - {IssueCount} issues found in {ElapsedMs}ms", modKey, count, stopwatch.ElapsedMilliseconds);
         }
         finally
         {
+            if (cancellationToken.IsCancellationRequested)
+            {
+                logger.LogInformation("Analysis of {ModKey} was cancelled after {ElapsedMs}ms", modKey, stopwatch.ElapsedMilliseconds);
+            }
+
             env?.Dispose();
         }
     }

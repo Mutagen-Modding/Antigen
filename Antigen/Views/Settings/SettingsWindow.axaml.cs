@@ -1,4 +1,4 @@
-using Antigen.ViewModels.Settings;
+using Antigen.ViewModels.Transient;
 using Avalonia.Controls;
 
 namespace Antigen.Views.Settings;

@@ -8,7 +8,7 @@ using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Game;
 
 public record struct ModInfo(
     ModKey ModKey,

@@ -4,7 +4,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
         xmlns:antigenControls="clr-namespace:Antigen.Controls;assembly=Antigen"
-        xmlns:viewModels="clr-namespace:Antigen.ViewModels.Analyzer;assembly=Antigen"
+        xmlns:viewModels="clr-namespace:Antigen.ViewModels.Transient;assembly=Antigen"
         xmlns:sortable="clr-namespace:Sortable.Avalonia;assembly=Sortable.Avalonia"
         xmlns:models="clr-namespace:Antigen.Models"
         mc:Ignorable="d"

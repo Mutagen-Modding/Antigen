@@ -1,0 +1,104 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:plugins="clr-namespace:Mutagen.Bethesda.Plugins;assembly=Mutagen.Bethesda.Kernel"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels.Singleton"
+             mc:Ignorable="d"
+             d:DesignWidth="600"
+             d:DesignHeight="400"
+             x:Class="Antigen.Views.HomeView"
+             x:DataType="viewModels:HomeVM"
+             x:Name="Root">
+    <Border CornerRadius="8"
+            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
+        <Grid RowDefinitions="32,40,*">
+            <!-- Title Bar -->
+            <Grid Grid.Row="0"
+                  x:Name="TitleBar"
+                  ColumnDefinitions="*,Auto"
+                  Margin="12,0,4,0">
+                <TextBlock Grid.Column="0"
+                           Text="ANTIGEN"
+                           FontWeight="Bold"
+                           FontSize="13"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource SystemColorGrayTextColor}" />
+
+                <StackPanel Grid.Column="1"
+                            Orientation="Horizontal">
+                    <!-- Settings Button -->
+                    <Button Command="{Binding OpenSettingsCommand}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="8,4"
+                            ToolTip.Tip="Settings">
+                        <controls:FASymbolIcon Symbol="SettingsFilled" />
+                    </Button>
+
+                    <!-- Minimize Button -->
+                    <Button Content="—"
+                            Command="{Binding MinimizeCommand}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="10,4"
+                            ToolTip.Tip="Minimize" />
+
+                    <!-- Maximize Button -->
+                    <Button Content="▢"
+                            Command="{Binding ToggleMaximizeCommand}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="10,4"
+                            ToolTip.Tip="Maximize" />
+
+                    <!-- Close Button -->
+                    <Button Content="✕"
+                            Command="{Binding CloseCommand}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="10,4"
+                            FontWeight="Bold"
+                            ToolTip.Tip="Close">
+                        <Button.Styles>
+                            <Style Selector="Button:pointerover /template/ ContentPresenter">
+                                <Setter Property="Background"
+                                        Value="IndianRed" />
+                            </Style>
+                        </Button.Styles>
+                    </Button>
+                </StackPanel>
+            </Grid>
+
+            <Grid Grid.Row="1"
+                  x:Name="Bar"
+                  Margin="8,4">
+                <!-- Search Bar -->
+                <TextBox VerticalAlignment="Center"
+                         Text="{Binding SearchText, Delay=150}"
+                         PlaceholderText="Filter mods..." />
+            </Grid>
+
+            <!-- Mod List -->
+            <ScrollViewer Grid.Row="2"
+                          Margin="8,0,8,8"
+                          VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding FilteredModKeys}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate DataType="plugins:ModKey">
+                            <Button Content="{Binding FileName}"
+                                    HorizontalAlignment="Stretch"
+                                    HorizontalContentAlignment="Left"
+                                    Background="Transparent"
+                                    BorderThickness="0"
+                                    Padding="8,6"
+                                    Command="{Binding #Root.ViewModel.StartWatchingCommand}"
+                                    CommandParameter="{Binding}" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+        </Grid>
+    </Border>
+</UserControl>

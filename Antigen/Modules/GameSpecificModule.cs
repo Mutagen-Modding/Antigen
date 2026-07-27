@@ -1,5 +1,5 @@
 ﻿using Antigen.Resources.Converter;
-using Antigen.Services;
+using Antigen.Services.Game;
 using Autofac;
 using Autofac.Builder;
 using Mutagen.Bethesda;

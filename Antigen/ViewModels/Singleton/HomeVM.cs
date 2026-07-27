@@ -1,0 +1,102 @@
+using System.IO.Abstractions;
+using System.Reactive.Linq;
+using System.Reactive.Subjects;
+using Antigen.Views;
+using Antigen.Views.Settings;
+using Microsoft.Extensions.Logging;
+using Mutagen.Bethesda.Environments.DI;
+using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Order.DI;
+using Noggog;
+using ReactiveUI;
+using ReactiveUI.SourceGenerators;
+
+namespace Antigen.ViewModels.Singleton;
+
+public sealed partial class HomeVM : ResizablePanelVM
+{
+    private readonly IMainWindow _mainWindow;
+    private readonly GlobalSettingsVM _globalSettings;
+    private readonly Subject<ModKey> _startRequested = new();
+
+    public override double MinResizeHeight => 100.0;
+
+    public IObservable<ModKey> StartRequested => _startRequested;
+
+    [Reactive] public partial ModKey[] ModKeys { get; set; } = [];
+    [Reactive] public partial string SearchText { get; set; } = string.Empty;
+
+    [ObservableAsProperty(PropertyName = "FilteredModKeys", InitialValue = "[]")]
+    private IObservable<IEnumerable<ModKey>> FilteredModKeysObservable() =>
+        this.WhenAnyValue(x => x.ModKeys, x => x.SearchText)
+            .Select(t => Filter(t.Item1, t.Item2))
+            .ObserveOn(RxSchedulers.MainThreadScheduler);
+
+    public HomeVM(
+        IMainWindow mainWindow,
+        GlobalSettingsVM globalSettings,
+        IFileSystem fileSystem,
+        IDataDirectoryProvider dataDirectoryProvider,
+        ILoadOrderListingsProvider loadOrderListingsProvider,
+        ILogger<HomeVM> logger)
+    {
+        _mainWindow = mainWindow;
+        _globalSettings = globalSettings;
+        IsExpanded = true;
+        ExpandedHeight = 400.0;
+
+        InitializeOAPH();
+
+        Task.Run(() => LoadModKeys(fileSystem, dataDirectoryProvider, loadOrderListingsProvider))
+            .FireAndForget(ex => logger.LogError(ex, "Error loading mod keys"));
+    }
+
+    private static IEnumerable<ModKey> Filter(ModKey[] keys, string search) =>
+        string.IsNullOrWhiteSpace(search)
+            ? keys
+            : keys.Where(m => m.ToString().Contains(search, StringComparison.OrdinalIgnoreCase));
+
+    private void LoadModKeys(
+        IFileSystem fileSystem,
+        IDataDirectoryProvider dataDirectoryProvider,
+        ILoadOrderListingsProvider loadOrderListingsProvider)
+    {
+        ModKeys = loadOrderListingsProvider.Get()
+            .Where(l => fileSystem.File.Exists(fileSystem.Path.Combine(dataDirectoryProvider.Path, l.FileName)))
+            .Select(l => ModKey.FromFileName(l.FileName))
+            .ToArray();
+    }
+
+    [ReactiveCommand]
+    private void StartWatching(ModKey modKey)
+    {
+        if (modKey.IsNull) return;
+
+        _startRequested.OnNext(modKey);
+    }
+
+    [ReactiveCommand]
+    private void OpenSettings()
+    {
+        var window = new GlobalSettingsWindow(_globalSettings);
+        window.Show();
+    }
+
+    [ReactiveCommand]
+    private void Minimize()
+    {
+        _mainWindow.Minimize();
+    }
+
+    [ReactiveCommand]
+    private void ToggleMaximize()
+    {
+        _mainWindow.ToggleMaximize();
+    }
+
+    [ReactiveCommand]
+    private void Close()
+    {
+        _mainWindow.Close();
+    }
+}

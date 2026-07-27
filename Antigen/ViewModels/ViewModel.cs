@@ -10,6 +10,8 @@ public abstract class ViewModel : ReactiveObject, IActivatableViewModel, IDispos
     private readonly Lazy<CompositeDisposable> _compositeDisposable = new();
     protected readonly IDisposableBucket ActivatedDisposable = new DisposableBucket();
 
+    public ViewModelActivator Activator { get; } = new();
+
     protected ViewModel()
     {
         this.WhenActivated(disposable =>
@@ -21,7 +23,6 @@ public abstract class ViewModel : ReactiveObject, IActivatableViewModel, IDispos
             WhenActivated();
         });
     }
-    public ViewModelActivator Activator { get; } = new();
 
     public void Dispose()
     {

@@ -3,6 +3,7 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Antigen.Models.Analyzer;
+using Antigen.Services.Singleton;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;
@@ -11,7 +12,16 @@ using Noggog;
 using ReactiveMarbles.ObservableEvents;
 using ReactiveUI;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Transient;
+
+public interface IModWatcher : IDisposable
+{
+    IObservable<IObservable<AnalyzerResultInfo>> AnalysisCompleted { get; }
+    IObservable<StatusUpdate> StatusUpdates { get; }
+    Severity MinimumSeverity { get; set; }
+    void Start();
+    void Stop();
+}
 
 public sealed class ModWatcher(
     IFileSystem fileSystem,
@@ -61,6 +71,8 @@ public sealed class ModWatcher(
 
         _fileSystemWatcher.EnableRaisingEvents = true;
 
+        logger.LogInformation("Started watching {ModKey} at {FilePath}", modKey, _filePath);
+
         RxSchedulers.TaskpoolScheduler.Schedule(async void () =>
         {
             try
@@ -79,6 +91,8 @@ public sealed class ModWatcher(
         _fileSystemWatcher.EnableRaisingEvents = false;
         _subscription?.Dispose();
         _cancellationTokenSource.Cancel();
+
+        logger.LogInformation("Stopped watching {ModKey}", modKey);
     }
 
     public void Dispose()
@@ -90,6 +104,8 @@ public sealed class ModWatcher(
 
     private async Task OnFileChanged()
     {
+        logger.LogInformation("Change detected for {ModKey}.  Restarting analysis", modKey);
+
         await _cancellationTokenSource.CancelAsync();
         _cancellationTokenSource.Dispose();
         _cancellationTokenSource = new CancellationTokenSource();

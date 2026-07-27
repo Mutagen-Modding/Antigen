@@ -4,7 +4,7 @@ using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Binary.Streams;
 using Mutagen.Bethesda.Plugins.Records;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Game;
 
 public interface IModInfoProvider
 {

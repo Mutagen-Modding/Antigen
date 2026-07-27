@@ -5,7 +5,7 @@ using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Plugins.Records;
 using Mutagen.Bethesda.Skyrim;
 
-namespace Antigen.Services;
+namespace Antigen.Services.Game;
 
 public sealed class SkyrimAnalyzerResultInfoFactory : IAnalyzerResultInfoFactory
 {

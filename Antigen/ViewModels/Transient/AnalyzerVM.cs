@@ -4,7 +4,9 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Antigen.Models.Settings;
 using Antigen.Services;
-using Antigen.ViewModels.Settings;
+using Antigen.Services.Singleton;
+using Antigen.ViewModels.Analyzer;
+using Antigen.Views;
 using Antigen.Views.Analyzer;
 using Avalonia.Controls;
 using DynamicData;
@@ -17,21 +19,15 @@ using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using SettingsWindow = Antigen.Views.Settings.SettingsWindow;
 
-namespace Antigen.ViewModels.Analyzer;
+namespace Antigen.ViewModels.Transient;
 
-public enum ExpandableViewState
+public sealed partial class AnalyzerVM : ResizablePanelVM
 {
-    Collapsed = 0,
-    Expanded = 1,
-    Custom = 2
-}
-public sealed partial class AnalyzerVM : ViewModel
-{
-    private const double CollapsedHeight = 40.0;
-
     private readonly Subject<Unit> _returnTrigger = new();
+
     private readonly Func<ModKey, SettingsVM> _settingsVMFactory;
     private readonly Func<AnalyzerVM, DashboardVM> _dashboardVMFactory;
+    private readonly IMainWindow _mainWindow;
 
     private AnalyzerDashboard? _dashboardWindow;
 
@@ -41,21 +37,18 @@ public sealed partial class AnalyzerVM : ViewModel
     public ObservableCollectionExtended<Severity> EnabledSeverities { get; } = new(Enum.GetValues<Severity>());
     public ReadOnlyObservableCollection<AnalyzerResultVM> FilteredResults { get; }
 
-    [Reactive] public partial bool ShowDetails { get; set; }
     [Reactive] public partial string SearchText { get; set; } = string.Empty;
     [Reactive] public partial AnalyzerResultVM? CurrentSettingsViewResult { get; set; }
-    [Reactive] public partial ExpandableViewState ViewState { get; set; } = ExpandableViewState.Collapsed;
-    [Reactive] public partial double ExpandedViewHeight { get; set; } = 500.0;
-    [Reactive] public partial double CurrentWindowHeight { get; set; } = CollapsedHeight;
 
     public AnalyzerVM(
         Func<ModKey, SettingsVM> settingsVMFactory,
         ISettingsService settingsService,
         ModWatcherVM modWatcher,
-        Func<AnalyzerVM, DashboardVM> dashboardVMFactory,
-        ILogger<AnalyzerVM> logger)
+        IMainWindow mainWindow,
+        Func<AnalyzerVM, DashboardVM> dashboardVMFactory)
     {
         _settingsVMFactory = settingsVMFactory;
+        _mainWindow = mainWindow;
         SettingsService = settingsService;
         ModWatcher = modWatcher;
         _dashboardVMFactory = dashboardVMFactory;
@@ -100,16 +93,6 @@ public sealed partial class AnalyzerVM : ViewModel
             .DisposeWith(this);
 
         FilteredResults = readOnlyObservableCollection;
-
-        // Update window height when view state or expanded height changes
-        this.WhenAnyValue(x => x.ViewState, x => x.ExpandedViewHeight)
-            .Subscribe(UpdateWindowState)
-            .DisposeWith(this);
-    }
-
-    private void UpdateWindowState()
-    {
-        CurrentWindowHeight = ViewState == ExpandableViewState.Collapsed ? CollapsedHeight : ExpandedViewHeight;
     }
 
     [ReactiveCommand]
@@ -122,28 +105,15 @@ public sealed partial class AnalyzerVM : ViewModel
     }
 
     [ReactiveCommand]
-    private void ToggleDetails()
-    {
-        ShowDetails = !ShowDetails;
-        ViewState = ViewState == ExpandableViewState.Collapsed
-            ? ExpandableViewState.Expanded
-            : ExpandableViewState.Collapsed;
-        UpdateWindowState();
-    }
-
-    [ReactiveCommand]
-    private void SetCustomHeight(double height)
-    {
-        if (height < 40) height = 40; // Minimum height
-        ExpandedViewHeight = height;
-        ViewState = ExpandableViewState.Custom;
-        UpdateWindowState();
-    }
-
-    [ReactiveCommand]
     private void Return()
     {
         _returnTrigger.OnNext(Unit.Default);
+    }
+
+    [ReactiveCommand]
+    private void Close()
+    {
+        _mainWindow.Close();
     }
 
     [ReactiveCommand]

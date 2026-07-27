@@ -2,68 +2,43 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:plugins="clr-namespace:Mutagen.Bethesda.Plugins;assembly=Mutagen.Bethesda.Kernel"
-        xmlns:viewModels="clr-namespace:Antigen.ViewModels"
-        xmlns:behavior="clr-namespace:Antigen.Resources.Behavior"
+        xmlns:viewModels="clr-namespace:Antigen.ViewModels.Singleton"
+        xmlns:analyzerVm="clr-namespace:Antigen.ViewModels.Transient"
+        xmlns:views="clr-namespace:Antigen.Views"
+        xmlns:analyzerViews="clr-namespace:Antigen.Views.Analyzer"
         mc:Ignorable="d"
-        d:DesignWidth="800"
-        d:DesignHeight="450"
+        d:DesignWidth="600"
+        d:DesignHeight="40"
         x:Class="Antigen.Views.MainWindow"
         x:DataType="viewModels:MainVM"
         Background="Transparent"
         Width="600"
-        Height="40"
+        Height="{Binding ActivePanel.CurrentWindowHeight}"
         Title="Antigen"
         Topmost="True"
         WindowDecorations="None"
         WindowStartupLocation="Manual">
-    <Border x:Name="Bar"
-            CornerRadius="8"
-            Background="{DynamicResource SystemControlBackgroundChromeMediumLowBrush}">
-        <Grid ColumnDefinitions="Auto,8,*,8,Auto"
-              Margin="4">
-            <Button Grid.Column="0"
-                    Command="{Binding StartWatchingCommand}"
-                    IsEnabled="{Binding SelectedMod, Converter={x:Static ObjectConverters.IsNotNull}}"
-                    Padding="11,7"
-                    Content="⯈"
-                    Foreground="ForestGreen"
-                    Background="Transparent"
-                    BorderThickness="0" />
+    <Panel>
+        <ContentControl Content="{Binding ActivePanel}">
+            <ContentControl.DataTemplates>
+                <DataTemplate DataType="viewModels:HomeVM">
+                    <views:HomeView />
+                </DataTemplate>
+                <DataTemplate DataType="analyzerVm:AnalyzerVM">
+                    <analyzerViews:AnalyzerView />
+                </DataTemplate>
+            </ContentControl.DataTemplates>
+        </ContentControl>
 
-            <!-- Mod Selection -->
-            <AutoCompleteBox Grid.Column="2"
-                             VerticalAlignment="Center"
-                             HorizontalAlignment="Stretch"
-                             FilterMode="ContainsOrdinal"
-                             IsTextCompletionEnabled="True"
-                             MinimumPrefixLength="0"
-                             PlaceholderText="Select a mod to monitor..."
-                             ItemsSource="{Binding ModKeys}"
-                             ValueMemberBinding="{Binding FileName, x:DataType=plugins:ModKey}"
-                             SelectedItem="{Binding SelectedMod}">
-                <Interaction.Behaviors>
-                    <behavior:AutoCompleteZeroMinimumPrefixLengthDropdownBehaviour />
-                </Interaction.Behaviors>
-            </AutoCompleteBox>
-
-            <!-- Close Button -->
-            <Button Grid.Column="4"
-                    Content="✕"
-                    Click="CloseButton_Click"
-                    Background="Transparent"
-                    Padding="11,7"
-                    BorderThickness="0"
-                    FontWeight="Bold"
-                    ToolTip.Tip="Close">
-                <Button.Styles>
-                    <!-- Red Background When Mouse Over -->
-                    <Style Selector="Button:pointerover /template/ ContentPresenter">
-                        <Setter Property="Background"
-                                Value="IndianRed" />
-                    </Style>
-                </Button.Styles>
-            </Button>
-        </Grid>
-    </Border>
+        <Border x:Name="ResizeGrip"
+                Height="10"
+                VerticalAlignment="Bottom"
+                Background="Transparent"
+                Cursor="SizeNorthSouth"
+                IsVisible="{Binding ActivePanel.IsExpanded, FallbackValue=False}"
+                ToolTip.Tip="Drag to resize"
+                PointerPressed="ResizeGrip_PointerPressed"
+                PointerMoved="ResizeGrip_PointerMoved"
+                PointerReleased="ResizeGrip_PointerReleased" />
+    </Panel>
 </Window>

@@ -28,7 +28,9 @@
         <PackageReference Include="FluentAvaloniaUI"/>
         <PackageReference Include="Microsoft.Extensions.Logging"/>
         <PackageReference Include="Microsoft.Extensions.Logging.Abstractions"/>
-        <PackageReference Include="Microsoft.Extensions.Logging.Console"/>
+        <PackageReference Include="Serilog"/>
+        <PackageReference Include="Serilog.Extensions.Logging"/>
+        <PackageReference Include="Serilog.Sinks.File"/>
         <PackageReference Include="Mutagen.Bethesda.Analyzers"/>
         <PackageReference Include="Mutagen.Bethesda.Analyzers.Skyrim"/>
         <PackageReference Include="Mutagen.Bethesda.Autofac"/>
@@ -44,34 +46,4 @@
         <PackageReference Include="Xaml.Behaviors.Interactivity"/>
     </ItemGroup>
 
-    <ItemGroup>
-        <Compile Update="Services\SkyrimAnalyzerFilter.cs">
-            <DependentUpon>IAnalyzerFilter.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Services\AnalyzerService.cs">
-            <DependentUpon>IAnalyzerService.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Services\SkyrimAnalyzerResultInfoFactory.cs">
-            <DependentUpon>IAnalyzerResultInfoFactory.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Services\ModWatcher.cs">
-            <DependentUpon>IModWatcher.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Services\SettingsService.cs">
-            <DependentUpon>ISettingsService.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Services\SkyrimModInfoProvider.cs">
-            <DependentUpon>IModInfoProvider.cs</DependentUpon>
-        </Compile>
-        <Compile Update="Services\CrashLoggingService.cs">
-            <DependentUpon>ICrashLoggingService.cs</DependentUpon>
-        </Compile>
-        <Compile Update="ViewModels\Analyzer\DesignAnalyzerResultVM.cs">
-            <DependentUpon>AnalyzerResultVM.cs</DependentUpon>
-        </Compile>
-    </ItemGroup>
-
-    <ItemGroup>
-        <Folder Include="Assets\"/>
-    </ItemGroup>
 </Project>
