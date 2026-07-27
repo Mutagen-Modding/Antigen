@@ -159,4 +159,26 @@ public class PersistenceAnalyzerTest
             prepForFix: SetPersistent,
             PersistenceAnalyzer.NotPersistent);
     }
+
+    [Theory, MutagenModAutoData]
+    public void ReferencesSelf(Fixture fixture)
+    {
+        fixture.Run(
+            prepForError: (rec, mod) =>
+            {
+                SetPersistent(rec);
+                rec.VirtualMachineAdapter = new()
+                {
+                    Scripts = [new() {
+                        Properties = [
+                            new ScriptObjectProperty() {
+                                Object = rec.ToLink()
+                            }
+                        ]
+                    }]
+                };
+            },
+            prepForFix: SetTemporary,
+            PersistenceAnalyzer.UnnecessaryPersistence);
+    }
 }

@@ -43,6 +43,8 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
             // TODO: Usage cache link.Type always returns ILandscapeTextureGetter. Bug in Mutagen? Comparing link.Type would be faster than resolve
             // Exception: Worldspaces list their large refs but don't require them to be persistent
             .Where(u => !u.TryResolve<IWorldspaceGetter>(linkCache, out var _))
+            // Exception: an object may reference itself
+            .Where(u => !u.Equals(placed))
             .Any())
         {
             return (true, "referenced by another record");
