@@ -167,6 +167,10 @@ public class PersistenceAnalyzerTest
             prepForError: (rec, mod) =>
             {
                 SetPersistent(rec);
+                var cell = new Cell(mod);
+                cell.Flags |= Cell.Flag.IsInteriorCell;
+                mod.Cells.AddInteriorCell(cell);
+                cell.Persistent.Add(rec);
                 rec.VirtualMachineAdapter = new()
                 {
                     Scripts = [new() {
