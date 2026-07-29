@@ -11,9 +11,9 @@ using Noggog;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
-namespace Antigen.ViewModels.Singleton;
+namespace Antigen.ViewModels;
 
-public sealed partial class HomeVM : ResizablePanelVM
+public sealed partial class HomeVM : ResizablePanelVM, ISingleton
 {
     private readonly IMainWindow _mainWindow;
     private readonly GlobalSettingsVM _globalSettings;

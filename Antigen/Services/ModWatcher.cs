@@ -3,7 +3,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Antigen.Models.Analyzer;
-using Antigen.Services.Singleton;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;
@@ -12,7 +11,7 @@ using Noggog;
 using ReactiveMarbles.ObservableEvents;
 using ReactiveUI;
 
-namespace Antigen.Services.Transient;
+namespace Antigen.Services;
 
 public interface IModWatcher : IDisposable
 {
@@ -29,7 +28,7 @@ public sealed class ModWatcher(
     ModKey modKey,
     IAnalyzerService analyzerService,
     ILogger<ModWatcher> logger)
-    : IModWatcher
+    : IModWatcher, ITransient
 {
     private readonly DisposableBucket _disposables = new();
     private readonly Subject<IObservable<AnalyzerResultInfo>> _analysisCompleted = new();

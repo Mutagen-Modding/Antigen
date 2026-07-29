@@ -1,4 +1,4 @@
-using Antigen.ViewModels.Transient;
+using Antigen.ViewModels;
 using ReactiveUI.Avalonia;
 
 namespace Antigen.Views.Analyzer;

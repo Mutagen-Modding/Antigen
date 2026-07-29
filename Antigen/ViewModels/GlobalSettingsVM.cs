@@ -1,12 +1,12 @@
 using System.Reactive.Linq;
-using Antigen.Services.Singleton;
+using Antigen.Services;
 using Noggog.WorkEngine;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
-namespace Antigen.ViewModels.Singleton;
+namespace Antigen.ViewModels;
 
-public sealed partial class GlobalSettingsVM : ViewModel, INumWorkThreadsController
+public sealed partial class GlobalSettingsVM : ViewModel, INumWorkThreadsController, ISingleton
 {
     public const double DefaultPercentage = 0.5;
 

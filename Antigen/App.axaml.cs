@@ -1,22 +1,13 @@
-using System.IO.Abstractions;
 using System.Runtime.InteropServices;
 using Antigen.Models.Settings;
 using Antigen.Modules;
-using Antigen.Services.Singleton;
-using Antigen.Services.Transient;
-using Antigen.ViewModels.Singleton;
-using Antigen.ViewModels.Transient;
+using Antigen.ViewModels;
 using Antigen.Views;
 using Autofac;
 using Avalonia;
-using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
-using Mutagen.Bethesda.Analyzers.Skyrim;
-using Mutagen.Bethesda.Autofac;
-using Mutagen.Bethesda.Environments.DI;
-using Mutagen.Bethesda.Plugins.Meta;
 
 namespace Antigen;
 
@@ -79,30 +70,7 @@ public sealed class App : Application
         builder.RegisterInstance(window)
             .As<IMainWindow>();
 
-        builder.RegisterModule<LoggingModule>();
-
-        // Register base services
-        builder.RegisterType<FileSystem>()
-            .As<IFileSystem>()
-            .SingleInstance();
-
-        builder.RegisterModule<MutagenModule>();
-
-        builder.RegisterModule<SkyrimModule>();
-
-        builder.RegisterModule<SkyrimAnalyzerModule>();
-
-        builder.Register(context =>
-        {
-            var gameReleaseContext = context.Resolve<IGameReleaseContext>();
-            return GameConstants.Get(gameReleaseContext.Release);
-        });
-
-        // Register application services and view models by folder
-        builder.RegisterFolder<AnalyzerService>(RegistrationStyle.Singleton);
-        builder.RegisterFolder<ModWatcher>(RegistrationStyle.Transient);
-        builder.RegisterFolder<MainVM>(RegistrationStyle.Singleton);
-        builder.RegisterFolder<AnalyzerVM>(RegistrationStyle.Transient);
+        builder.RegisterModule<MainModule>();
 
         return builder.Build();
     }

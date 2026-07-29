@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:plugins="clr-namespace:Mutagen.Bethesda.Plugins;assembly=Mutagen.Bethesda.Kernel"
-             xmlns:viewModels="clr-namespace:Antigen.ViewModels.Singleton"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels"
              mc:Ignorable="d"
              d:DesignWidth="600"
              d:DesignHeight="400"
