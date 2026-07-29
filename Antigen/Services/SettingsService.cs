@@ -7,7 +7,7 @@ using Antigen.Models.Settings;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Plugins;
 
-namespace Antigen.Services.Singleton;
+namespace Antigen.Services;
 
 public interface ISettingsService
 {
@@ -20,7 +20,7 @@ public interface ISettingsService
     bool IsIgnored(ModKey modKey, AnalyzerResultInfo resultInfo);
 }
 
-public sealed class SettingsService : ISettingsService
+public sealed class SettingsService : ISettingsService, ISingleton
 {
     private readonly Dictionary<ModKey, List<IgnoreRule>> _cache = new();
     private readonly IFileSystem _fileSystem;

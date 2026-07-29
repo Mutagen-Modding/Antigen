@@ -8,14 +8,13 @@
              xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:analyzer="clr-namespace:Antigen.Views.Analyzer"
              xmlns:converter="clr-namespace:Antigen.Resources.Converter"
-             xmlns:viewModels="clr-namespace:Antigen.ViewModels.Singleton"
-             xmlns:vm="clr-namespace:Antigen.ViewModels.Transient"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels"
              xmlns:results="clr-namespace:Antigen.ViewModels.Analyzer"
              mc:Ignorable="d"
              d:DesignWidth="600"
              d:DesignHeight="500"
              x:Class="Antigen.Views.Analyzer.AnalyzerView"
-             x:DataType="vm:AnalyzerVM"
+             x:DataType="viewModels:AnalyzerVM"
              x:Name="Root">
     <UserControl.Resources>
         <converter:ListContainsConverter x:Key="SeverityEnabled"

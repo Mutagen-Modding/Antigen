@@ -1,7 +1,6 @@
 using System.Reactive.Linq;
 using Antigen.Models.Settings;
-using Antigen.Services.Singleton;
-using Antigen.ViewModels.Transient;
+using Antigen.Services;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
@@ -9,9 +8,9 @@ using Noggog;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
-namespace Antigen.ViewModels.Singleton;
+namespace Antigen.ViewModels;
 
-public sealed partial class MainVM : ViewModel
+public sealed partial class MainVM : ViewModel, ISingleton
 {
     private readonly Func<ModKey, ModWatcherVM> _modWatcherVMFactory;
     private readonly Func<ModWatcherVM, AnalyzerVM> _analyzerVMFactory;

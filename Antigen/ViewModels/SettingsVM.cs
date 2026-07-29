@@ -1,12 +1,12 @@
 using Antigen.Models.Settings;
-using Antigen.Services.Singleton;
+using Antigen.Services;
 using DynamicData.Binding;
 using Mutagen.Bethesda.Plugins;
 using ReactiveUI.SourceGenerators;
 
-namespace Antigen.ViewModels.Transient;
+namespace Antigen.ViewModels;
 
-public sealed partial class SettingsVM : ViewModel
+public sealed partial class SettingsVM : ViewModel, ITransient
 {
     [Reactive] public partial ObservableCollectionExtended<IgnoreRuleItem> Rules { get; set; } = [];
     [Reactive] public partial int SelectedIndex { get; set; } = -1;

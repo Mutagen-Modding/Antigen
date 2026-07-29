@@ -4,7 +4,6 @@ using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using Antigen.Models.Settings;
 using Antigen.Services;
-using Antigen.Services.Singleton;
 using Antigen.ViewModels.Analyzer;
 using Antigen.Views;
 using Antigen.Views.Analyzer;
@@ -19,9 +18,9 @@ using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 using SettingsWindow = Antigen.Views.Settings.SettingsWindow;
 
-namespace Antigen.ViewModels.Transient;
+namespace Antigen.ViewModels;
 
-public sealed partial class AnalyzerVM : ResizablePanelVM
+public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
 {
     private readonly Subject<Unit> _returnTrigger = new();
 

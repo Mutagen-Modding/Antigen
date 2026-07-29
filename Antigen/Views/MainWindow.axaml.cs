@@ -1,5 +1,4 @@
 using Antigen.ViewModels;
-using Antigen.ViewModels.Singleton;
 using Avalonia.Controls;
 using Avalonia.Input;
 

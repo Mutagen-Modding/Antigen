@@ -2,8 +2,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:viewModels="clr-namespace:Antigen.ViewModels.Singleton"
-        xmlns:analyzerVm="clr-namespace:Antigen.ViewModels.Transient"
+        xmlns:viewModels="clr-namespace:Antigen.ViewModels"
         xmlns:views="clr-namespace:Antigen.Views"
         xmlns:analyzerViews="clr-namespace:Antigen.Views.Analyzer"
         mc:Ignorable="d"
@@ -24,7 +23,7 @@
                 <DataTemplate DataType="viewModels:HomeVM">
                     <views:HomeView />
                 </DataTemplate>
-                <DataTemplate DataType="analyzerVm:AnalyzerVM">
+                <DataTemplate DataType="viewModels:AnalyzerVM">
                     <analyzerViews:AnalyzerView />
                 </DataTemplate>
             </ContentControl.DataTemplates>

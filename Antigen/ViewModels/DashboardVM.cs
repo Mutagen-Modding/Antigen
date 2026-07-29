@@ -20,9 +20,9 @@ using Noggog;
 using ReactiveUI.SourceGenerators;
 using Sortable.Avalonia;
 
-namespace Antigen.ViewModels.Transient;
+namespace Antigen.ViewModels;
 
-public sealed partial class DashboardVM : ViewModel
+public sealed partial class DashboardVM : ViewModel, ITransient
 {
     private readonly IFormattedTopicConverters _formattedTopicConverters;
 

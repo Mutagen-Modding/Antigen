@@ -3,8 +3,7 @@ using System.Reactive.Linq;
 using Antigen.Extensions;
 using Antigen.Models.Analyzer;
 using Antigen.Models.Settings;
-using Antigen.Services.Singleton;
-using Antigen.Services.Transient;
+using Antigen.Services;
 using DynamicData.Binding;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
@@ -13,9 +12,9 @@ using Noggog;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
-namespace Antigen.ViewModels.Transient;
+namespace Antigen.ViewModels;
 
-public sealed partial class ModWatcherVM : ViewModel
+public sealed partial class ModWatcherVM : ViewModel, ITransient
 {
     private readonly IModWatcher _modWatcher;
     private readonly ISettingsService _settingsService;

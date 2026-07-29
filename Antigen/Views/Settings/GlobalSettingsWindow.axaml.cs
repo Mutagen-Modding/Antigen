@@ -1,4 +1,4 @@
-using Antigen.ViewModels.Singleton;
+using Antigen.ViewModels;
 using Antigen.Views;
 using Avalonia.Interactivity;
 

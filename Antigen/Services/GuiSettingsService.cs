@@ -3,9 +3,9 @@ using System.Text.Json;
 using Antigen.Models.Settings;
 using Microsoft.Extensions.Logging;
 
-namespace Antigen.Services.Singleton;
+namespace Antigen.Services;
 
-public sealed class GuiSettingsService
+public sealed class GuiSettingsService : ISingleton
 {
     private readonly IFileSystem _fileSystem;
     private readonly ILogger<GuiSettingsService> _logger;

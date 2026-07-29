@@ -15,7 +15,7 @@ using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Order.DI;
 using Noggog;
 
-namespace Antigen.Services.Singleton;
+namespace Antigen.Services;
 
 public interface IAnalyzerService
 {
@@ -33,7 +33,7 @@ public sealed class AnalyzerService(
     IGameReleaseContext gameReleaseContext,
     IAnalyzerFilter analyzerFilter,
     IAnalyzerResultInfoFactory infoFactory,
-    ILogger<AnalyzerService> logger) : IAnalyzerService
+    ILogger<AnalyzerService> logger) : IAnalyzerService, ISingleton
 {
     private readonly Subject<StatusUpdate> _statusSubject = new();
 
