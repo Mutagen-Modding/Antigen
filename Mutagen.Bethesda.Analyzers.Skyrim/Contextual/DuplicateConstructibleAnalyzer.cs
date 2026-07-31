@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
@@ -8,7 +8,7 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Contextual;
 
 public class DuplicateConstructibleAnalyzer : IContextualAnalyzer
 {
-    private static readonly TopicDefinition<int, IFormLinkNullableGetter<IConstructibleGetter>> DuplicateConstructibleReference = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<int, IFormLinkNullableGetter<IConstructibleGetter>> DuplicateConstructibleReference = MutagenTopicBuilder.FromDiscussion(
             206,
             "Duplicate Constructible Object",
             Severity.Warning)
