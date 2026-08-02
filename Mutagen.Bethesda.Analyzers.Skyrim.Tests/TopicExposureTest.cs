@@ -1,3 +1,4 @@
+using System.Reflection;
 using Autofac;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
@@ -5,6 +6,7 @@ using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record.Conditions;
 using Mutagen.Bethesda.Analyzers.Testing;
 using Mutagen.Bethesda.Plugins.Meta;
+using Noggog;
 using Shouldly;
 using Xunit;
 
@@ -33,6 +35,13 @@ public class TopicExposureTest
         }
     }
 
+    IEnumerable<TopicDefinition> GetDeclaredTopics(Type type)
+    {
+        return type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.GetField)
+            .Select(f => f.GetValue(null) as TopicDefinition)
+            .WhereNotNull();
+    }
+
 
     [Theory, ClassData(typeof(TopicExposureTestData<IAnalyzer>))]
     public void AllTopicsExposed(IAnalyzer analyzer)
@@ -41,22 +50,12 @@ public class TopicExposureTest
         if (analyzer is ConditionAnalyzer)
             return;
 
-        var reflectionTopics = analyzer.GetType().GetFields()
-            .Where(f => f.IsStatic)
-            .Select(f => f.GetValue(analyzer))
-            .Where(f => f is TopicDefinition);
-
-        reflectionTopics.ShouldBe(analyzer.Topics, ignoreOrder: true, customMessage: analyzer.GetType().FullName);
+        GetDeclaredTopics(analyzer.GetType()).ShouldBe(analyzer.Topics, ignoreOrder: true, customMessage: analyzer.GetType().FullName);
     }
 
     [Theory, ClassData(typeof(TopicExposureTestData<IConditionAnalyzer>))]
     public void AllConditionTopicsExposed(IConditionAnalyzer analyzer)
     {
-        var reflectionTopics = analyzer.GetType().GetFields()
-            .Where(f => f.IsStatic)
-            .Select(f => f.GetValue(analyzer))
-            .Where(f => f is TopicDefinition);
-
-        reflectionTopics.ShouldBe(analyzer.Topics, ignoreOrder: true, customMessage: analyzer.GetType().FullName);
+        GetDeclaredTopics(analyzer.GetType()).ShouldBe(analyzer.Topics, ignoreOrder: true, customMessage: analyzer.GetType().FullName);
     }
 }
