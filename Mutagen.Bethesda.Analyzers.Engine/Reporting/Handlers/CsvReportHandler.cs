@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Drops;
+using Mutagen.Bethesda.Analyzers.SDK.Drops;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
@@ -9,21 +9,20 @@ namespace Mutagen.Bethesda.Analyzers.Reporting.Handlers;
 
 public record CsvInputs(string OutputFilePath);
 
-public class CsvReportHandler : IReportHandler
+public class CsvReportHandler : IReportHandler, IDisposable
 {
     private readonly IWorkDropoff _workDropoff;
-    private readonly CsvInputs _inputs;
     private readonly ILinkCache _linkCache;
-    private readonly Lock _lock = new();
+    private readonly StreamWriter _writer;
 
     public CsvReportHandler(
         CsvInputs inputs,
         ILinkCache linkCache,
         IWorkDropoff workDropoff)
     {
-        _inputs = inputs;
         _linkCache = linkCache;
         _workDropoff = workDropoff;
+        _writer = new(inputs.OutputFilePath, append: true);
     }
 
     public void Dropoff(
@@ -89,10 +88,14 @@ public class CsvReportHandler : IReportHandler
 
     private void Append(string line)
     {
-        lock (_lock)
+        lock (_writer)
         {
-            using var writer = new StreamWriter(_inputs.OutputFilePath, true);
-            writer.WriteLine(line);
+            _writer.WriteLine(line);
         }
+    }
+
+    public void Dispose()
+    {
+        _writer.Dispose();
     }
 }
