@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
 
@@ -18,7 +18,10 @@ public class RelationshipTypeAnalyzer : IContextualRecordAnalyzer<IRelationshipG
             Severity.Suggestion)
         .WithFormatting<Bethesda.Skyrim.Relationship.RankType>("Relationship type is Courting, but their rank {0} is lower than Acquaintance");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [CourtingRelationshipType];
+    public IEnumerable<TopicDefinition> Topics { get; } = [
+        SpouseRelationshipType,
+        CourtingRelationshipType,
+    ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IRelationshipGetter> param)
     {

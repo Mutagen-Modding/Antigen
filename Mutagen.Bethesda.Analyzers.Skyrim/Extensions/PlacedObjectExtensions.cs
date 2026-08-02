@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Plugins.Cache;
@@ -136,12 +136,18 @@ public static class PlacedObjectExtensions
         return (script, property?.Flags == ScriptProperty.Flag.Removed ? null : property);
     }
 
+    public static bool IsPersistent(this IPlacedGetter placed)
+    {
+        return placed.SkyrimMajorRecordFlags.HasFlag((SkyrimMajorRecord.SkyrimMajorRecordFlag)PlacedObject.DefaultMajorFlag.Persistent);
+    }
+
     public static ICellGetter? GetCell(this IPlacedGetter placed, ILinkCache linkCache, IExteriorCellCache exteriorCellCache)
     {
         if (!placed.ToLink().TryResolveSimpleContext(linkCache, out var context)) return null;
         if (context.Parent?.Record is not ICellGetter cell) return null;
 
-        if (cell.IsInteriorCell()) return cell;
+        // Persistent refs in exteriors are stored in a top level cell
+        if (cell.IsInteriorCell() || !placed.IsPersistent()) return cell;
 
         if (!context.TryGetParent<IWorldspaceGetter>(out var worldspace)) return null;
 

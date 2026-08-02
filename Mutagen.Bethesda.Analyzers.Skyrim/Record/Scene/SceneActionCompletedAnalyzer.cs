@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
 
@@ -27,7 +27,11 @@ public class SceneActionCompletedAnalyzer : IIsolatedRecordAnalyzer<ISceneGetter
         .WithFormatting<ISceneGetter, int, uint?>(
             "Scene {0} has a IsSceneActionComplete condition in phase {1} that references a scene action {2} that does not exist in the scene");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [StartConditionReferencesFutureSceneAction, EndConditionReferencesFutureSceneAction];
+    public IEnumerable<TopicDefinition> Topics { get; } = [
+        StartConditionReferencesFutureSceneAction,
+        EndConditionReferencesFutureSceneAction,
+        IsSceneActionCompleteReferencesMissingAction
+    ];
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<ISceneGetter> param)
     {
