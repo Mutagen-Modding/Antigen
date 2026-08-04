@@ -1,5 +1,6 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Quest;
@@ -19,14 +20,11 @@ public class StoryManagerQuestAnalyzer : IContextualRecordAnalyzer<IQuestGetter>
         var quest = param.Record;
         if (!quest.Event.HasValue) return;
 
-        // TODO: potentially replace with reference cache
-
-        if (param.LinkCache.PriorityOrder.WinningOverrides<IStoryManagerQuestNodeGetter>()
-            .SelectMany(questNode => questNode.Quests.Select(n => n.Quest.FormKey))
-            .All(questFormKey => questFormKey != quest.FormKey))
+        if (!param.ResolveCache<ILinkUsageCache>().GetUsagesOf<IStoryManagerQuestNodeGetter>(quest).UsageLinks
+            .Select(n => n.Resolve(param.LinkCache))
+            .Any(n => n.Quests.Any(q => q.Quest.Equals(quest))))
         {
-            param.AddTopic(
-                StoryManagerQuestNotAssigned.Format());
+            param.AddTopic(StoryManagerQuestNotAssigned.Format());
         }
     }
 
