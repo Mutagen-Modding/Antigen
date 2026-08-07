@@ -1,8 +1,6 @@
 using System.IO.Abstractions;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using Antigen.Views;
-using Antigen.Views.Settings;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
@@ -15,8 +13,6 @@ namespace Antigen.ViewModels;
 
 public sealed partial class HomeVM : ResizablePanelVM, ISingleton
 {
-    private readonly IMainWindow _mainWindow;
-    private readonly GlobalSettingsVM _globalSettings;
     private readonly Subject<ModKey> _startRequested = new();
 
     public override double MinResizeHeight => 100.0;
@@ -33,17 +29,13 @@ public sealed partial class HomeVM : ResizablePanelVM, ISingleton
             .ObserveOn(RxSchedulers.MainThreadScheduler);
 
     public HomeVM(
-        IMainWindow mainWindow,
-        GlobalSettingsVM globalSettings,
         IFileSystem fileSystem,
         IDataDirectoryProvider dataDirectoryProvider,
         ILoadOrderListingsProvider loadOrderListingsProvider,
         ILogger<HomeVM> logger)
     {
-        _mainWindow = mainWindow;
-        _globalSettings = globalSettings;
         IsExpanded = true;
-        ExpandedHeight = 400.0;
+        ExpandedHeight = 696.0;
 
         InitializeOAPH();
 
@@ -73,30 +65,5 @@ public sealed partial class HomeVM : ResizablePanelVM, ISingleton
         if (modKey.IsNull) return;
 
         _startRequested.OnNext(modKey);
-    }
-
-    [ReactiveCommand]
-    private void OpenSettings()
-    {
-        var window = new GlobalSettingsWindow(_globalSettings);
-        window.Show();
-    }
-
-    [ReactiveCommand]
-    private void Minimize()
-    {
-        _mainWindow.Minimize();
-    }
-
-    [ReactiveCommand]
-    private void ToggleMaximize()
-    {
-        _mainWindow.ToggleMaximize();
-    }
-
-    [ReactiveCommand]
-    private void Close()
-    {
-        _mainWindow.Close();
     }
 }

@@ -22,9 +22,13 @@ using Sortable.Avalonia;
 
 namespace Antigen.ViewModels;
 
-public sealed partial class DashboardVM : ViewModel, ITransient
+public sealed partial class DashboardVM : ResizablePanelVM, ITransient
 {
+    private readonly ActiveVmController _activeVm;
     private readonly IFormattedTopicConverters _formattedTopicConverters;
+
+    public override double MinResizeHeight => 300.0;
+    public override double MaxResizeHeight => 1400.0;
 
     public AnalyzerVM AnalyzerVM { get; }
     public ModWatcherVM ModWatcher => AnalyzerVM.ModWatcher;
@@ -46,12 +50,15 @@ public sealed partial class DashboardVM : ViewModel, ITransient
     public ObservableCollectionExtended<Severity> EnabledSeverities => AnalyzerVM.EnabledSeverities;
 
     public DashboardVM(
+        ActiveVmController activeVm,
         AnalyzerVM analyzerVM,
         IFormattedTopicConverters formattedTopicConverters,
         ILogger<DashboardVM> logger)
     {
+        _activeVm = activeVm;
         AnalyzerVM = analyzerVM;
         _formattedTopicConverters = formattedTopicConverters;
+        IsExpanded = true;
 
         ActiveGroupings.ObserveCollectionChanges()
             .Subscribe(UpdateResultsTreeSource)
@@ -68,6 +75,12 @@ public sealed partial class DashboardVM : ViewModel, ITransient
             .DisposeWith(this);
 
         UpdateResultsTreeSource();
+    }
+
+    [ReactiveCommand]
+    private void Back()
+    {
+        _activeVm.Active = AnalyzerVM;
     }
 
     [ReactiveCommand]

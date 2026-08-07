@@ -1,0 +1,70 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Values taken from the Penpot "ANTIGEN — App Layout" design. -->
+
+    <!-- Surfaces -->
+    <SolidColorBrush x:Key="WindowBackgroundBrush"
+                     Color="#1C1B21" />
+    <SolidColorBrush x:Key="CollapsedBackgroundBrush"
+                     Color="#25242A" />
+    <SolidColorBrush x:Key="TitleBarBrush"
+                     Color="#000000"
+                     Opacity="0.21" />
+    <SolidColorBrush x:Key="StatusBarBrush"
+                     Color="#FFFFFF"
+                     Opacity="0.04" />
+    <SolidColorBrush x:Key="WindowBorderBrush"
+                     Color="#3A3550" />
+
+    <!-- Dividers -->
+    <LinearGradientBrush x:Key="TitleDividerBrush"
+                         StartPoint="0%,50%"
+                         EndPoint="100%,50%">
+        <GradientStop Color="#B36459DF"
+                      Offset="0" />
+        <GradientStop Color="#006459DF"
+                      Offset="0.7" />
+        <GradientStop Color="#006459DF"
+                      Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="StatusDividerBrush"
+                     Color="#3A3550" />
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="TextPrimaryBrush"
+                     Color="#EDEDF5" />
+    <SolidColorBrush x:Key="TextSecondaryBrush"
+                     Color="#DCD9E6" />
+    <SolidColorBrush x:Key="TextMutedBrush"
+                     Color="#8C879E" />
+    <SolidColorBrush x:Key="GlyphBrush"
+                     Color="#C9C6D6" />
+    <SolidColorBrush x:Key="CloseGlyphBrush"
+                     Color="#E16063" />
+    <SolidColorBrush x:Key="AccentBrush"
+                     Color="#6459DF" />
+
+    <!-- Status -->
+    <SolidColorBrush x:Key="StatusIdleBrush"
+                     Color="#5BB85B" />
+    <SolidColorBrush x:Key="StatusBusyBrush"
+                     Color="#E6912E" />
+    <SolidColorBrush x:Key="TallyNewBrush"
+                     Color="#EB9433" />
+    <SolidColorBrush x:Key="TallyResolvedBrush"
+                     Color="#5BB85B" />
+
+    <!-- Interaction Brushes -->
+    <SolidColorBrush x:Key="ChromeHoverBrush"
+                     Color="#FFFFFF"
+                     Opacity="0.08" />
+    <SolidColorBrush x:Key="ChromePressedBrush"
+                     Color="#FFFFFF"
+                     Opacity="0.14" />
+    <SolidColorBrush x:Key="ChromeCloseHoverBrush"
+                     Color="#E16063"
+                     Opacity="0.22" />
+    <SolidColorBrush x:Key="ChromeClosePressedBrush"
+                     Color="#E16063"
+                     Opacity="0.38" />
+</ResourceDictionary>

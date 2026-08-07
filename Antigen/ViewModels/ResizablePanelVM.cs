@@ -5,14 +5,16 @@ using ReactiveUI.SourceGenerators;
 
 namespace Antigen.ViewModels;
 
-public abstract partial class ResizablePanelVM : ViewModel, IResizablePanel
+public abstract partial class ResizablePanelVM : ViewModel
 {
     protected const double CollapsedHeight = 40.0;
+    protected const double DefaultPanelWidth = 1050.0;
 
     [Reactive] public partial bool IsExpanded { get; set; }
     [Reactive] public partial double ExpandedHeight { get; set; } = 500.0;
     [Reactive] public partial double CurrentWindowHeight { get; set; } = CollapsedHeight;
 
+    public virtual double PanelWidth => DefaultPanelWidth;
     public virtual double MinResizeHeight => 200.0;
     public virtual double MaxResizeHeight => 1000.0;
 
@@ -27,11 +29,5 @@ public abstract partial class ResizablePanelVM : ViewModel, IResizablePanel
     {
         ExpandedHeight = Math.Clamp(height, MinResizeHeight, MaxResizeHeight);
         IsExpanded = true;
-    }
-
-    [ReactiveCommand]
-    private void ToggleExpanded()
-    {
-        IsExpanded = !IsExpanded;
     }
 }

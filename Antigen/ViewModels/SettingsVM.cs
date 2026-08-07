@@ -1,28 +1,41 @@
+using System.Reactive;
+using System.Reactive.Linq;
 using Antigen.Models.Settings;
 using Antigen.Services;
 using DynamicData.Binding;
 using Mutagen.Bethesda.Plugins;
+using Noggog;
+using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
 namespace Antigen.ViewModels;
 
-public sealed partial class SettingsVM : ViewModel, ITransient
+public sealed partial class SettingsVM : ResizablePanelVM, ITransient
 {
+    private readonly ActiveVmController _activeVm;
+    private readonly AnalyzerVM _analyzerVM;
+
     [Reactive] public partial ObservableCollectionExtended<IgnoreRuleItem> Rules { get; set; } = [];
     [Reactive] public partial int SelectedIndex { get; set; } = -1;
 
     public ISettingsService SettingsService { get; }
-    public ModKey ModKey { get; }
+    public ModKey ModKey => _analyzerVM.ModWatcher.ModKey;
 
-    public SettingsVM(ISettingsService settingsService, ModKey modKey)
+    public SettingsVM(ActiveVmController activeVm, AnalyzerVM analyzerVM, ISettingsService settingsService)
     {
+        _activeVm = activeVm;
+        _analyzerVM = analyzerVM;
         SettingsService = settingsService;
-        ModKey = modKey;
+        IsExpanded = true;
 
-        LoadRules();
+        SettingsService.RulesChanged
+            .Unit()
+            .StartWith(Unit.Default)
+            .ObserveOn(RxSchedulers.MainThreadScheduler)
+            .Subscribe(_ => LoadRules())
+            .DisposeWith(this);
     }
 
-    [ReactiveCommand]
     private void LoadRules()
     {
         var rules = SettingsService.GetRules(ModKey);
@@ -35,12 +48,17 @@ public sealed partial class SettingsVM : ViewModel, ITransient
     }
 
     [ReactiveCommand]
+    private void Back()
+    {
+        _activeVm.Active = _analyzerVM;
+    }
+
+    [ReactiveCommand]
     private void RemoveSelected()
     {
         if (SelectedIndex < 0 || SelectedIndex >= Rules.Count) return;
 
         SettingsService.RemoveRule(ModKey, SelectedIndex);
-        Rules.RemoveAt(SelectedIndex);
         SelectedIndex = -1;
     }
 
@@ -48,9 +66,9 @@ public sealed partial class SettingsVM : ViewModel, ITransient
     private void ClearAll()
     {
         SettingsService.ClearRules(ModKey);
-        Rules.Clear();
     }
 }
+
 public sealed record IgnoreRuleItem(IgnoreRule Rule)
 {
     public string Type => Rule.Type.ToString();

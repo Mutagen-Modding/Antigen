@@ -1,40 +1,89 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:Antigen.ViewModels"
         xmlns:views="clr-namespace:Antigen.Views"
+        xmlns:chrome="clr-namespace:Antigen.Views.Chrome"
         xmlns:analyzerViews="clr-namespace:Antigen.Views.Analyzer"
+        xmlns:settingsViews="clr-namespace:Antigen.Views.Settings"
         mc:Ignorable="d"
-        d:DesignWidth="600"
-        d:DesignHeight="40"
+        d:DesignWidth="1050"
+        d:DesignHeight="696"
         x:Class="Antigen.Views.MainWindow"
         x:DataType="viewModels:MainVM"
         Background="Transparent"
-        Width="600"
+        FontFamily="Open Sans"
+        Width="{Binding ActivePanel.PanelWidth}"
         Height="{Binding ActivePanel.CurrentWindowHeight}"
         Title="Antigen"
         Topmost="True"
         WindowDecorations="None"
         WindowStartupLocation="Manual">
     <Panel>
-        <ContentControl Content="{Binding ActivePanel}">
-            <ContentControl.DataTemplates>
-                <DataTemplate DataType="viewModels:HomeVM">
-                    <views:HomeView />
-                </DataTemplate>
-                <DataTemplate DataType="viewModels:AnalyzerVM">
-                    <analyzerViews:AnalyzerView />
-                </DataTemplate>
-            </ContentControl.DataTemplates>
-        </ContentControl>
+        <Border x:Name="WindowRoot"
+                Classes.collapsed="{Binding !IsExpanded}"
+                Background="{DynamicResource WindowBackgroundBrush}"
+                BorderBrush="{DynamicResource WindowBorderBrush}"
+                BorderThickness="1"
+                ClipToBounds="True">
+            <Border.Styles>
+                <Style Selector="Border#WindowRoot">
+                    <Setter Property="CornerRadius" Value="8" />
+                </Style>
+                <Style Selector="Border#WindowRoot.collapsed">
+                    <Setter Property="CornerRadius" Value="20" />
+                    <Setter Property="Background" Value="{DynamicResource CollapsedBackgroundBrush}" />
+                </Style>
+            </Border.Styles>
+
+            <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
+                <chrome:TitleBar Grid.Row="0"
+                                 IsVisible="{Binding IsExpanded}" />
+
+                <Rectangle Grid.Row="1"
+                           Height="1"
+                           IsVisible="{Binding IsExpanded}"
+                           Fill="{DynamicResource TitleDividerBrush}" />
+
+                <ContentControl Grid.Row="2"
+                                IsVisible="{Binding IsExpanded}"
+                                Content="{Binding ActivePanel}">
+                    <ContentControl.DataTemplates>
+                        <DataTemplate DataType="viewModels:HomeVM">
+                            <views:HomeView />
+                        </DataTemplate>
+                        <DataTemplate DataType="viewModels:AnalyzerVM">
+                            <analyzerViews:AnalyzerView />
+                        </DataTemplate>
+                        <DataTemplate DataType="viewModels:DashboardVM">
+                            <analyzerViews:DashboardView />
+                        </DataTemplate>
+                        <DataTemplate DataType="viewModels:GlobalSettingsVM">
+                            <settingsViews:GlobalSettingsView />
+                        </DataTemplate>
+                        <DataTemplate DataType="viewModels:SettingsVM">
+                            <settingsViews:SettingsView />
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+
+                <Rectangle Grid.Row="3"
+                           Height="1"
+                           IsVisible="{Binding ShowStatusDivider}"
+                           Fill="{DynamicResource StatusDividerBrush}" />
+
+                <chrome:StatusBar Grid.Row="4"
+                                  IsVisible="{Binding ShowStatusBar}" />
+            </Grid>
+        </Border>
 
         <Border x:Name="ResizeGrip"
                 Height="10"
                 VerticalAlignment="Bottom"
                 Background="Transparent"
                 Cursor="SizeNorthSouth"
-                IsVisible="{Binding ActivePanel.IsExpanded, FallbackValue=False}"
+                IsVisible="{Binding IsExpanded}"
                 ToolTip.Tip="Drag to resize"
                 PointerPressed="ResizeGrip_PointerPressed"
                 PointerMoved="ResizeGrip_PointerMoved"

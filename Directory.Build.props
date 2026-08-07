@@ -10,4 +10,11 @@
         <!-- Disable to ensure Mod Organizer 2 compatibility -->
         <CETCompat>false</CETCompat>
     </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="GitVersion.MsBuild">
+            <PrivateAssets>all</PrivateAssets>
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
 </Project>

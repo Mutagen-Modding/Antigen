@@ -156,8 +156,7 @@
 
                     <Button.Styles>
                         <Style Selector="Button:pointerover">
-                            <Setter Property="IsVisible"
-                                    Value="True" />
+                            <Setter Property="IsVisible" Value="True" />
                         </Style>
                     </Button.Styles>
                 </Button>

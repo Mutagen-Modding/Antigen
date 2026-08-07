@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="1050"
+             d:DesignHeight="500"
+             x:Class="Antigen.Views.Settings.SettingsView"
+             x:DataType="viewModels:SettingsVM">
+    <Border Background="Transparent">
+        <Grid RowDefinitions="Auto,*,Auto"
+              Margin="10">
+            <StackPanel Grid.Row="0"
+                        Orientation="Horizontal"
+                        Spacing="6"
+                        Margin="0,0,0,8">
+                <Button Command="{Binding BackCommand}"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        VerticalAlignment="Center"
+                        ToolTip.Tip="Back">
+                    <controls:FASymbolIcon Symbol="ChevronLeft" />
+                </Button>
+
+                <TextBlock Text="{Binding ModKey.FileName, StringFormat='{}Ignore Rules — {0}'}"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
+            </StackPanel>
+
+            <!-- Rules list -->
+            <DataGrid Grid.Row="1"
+                      ItemsSource="{Binding Rules}"
+                      SelectedIndex="{Binding SelectedIndex}"
+                      AutoGenerateColumns="False"
+                      IsReadOnly="True"
+                      CanUserResizeColumns="True"
+                      CanUserSortColumns="True"
+                      BorderThickness="1"
+                      GridLinesVisibility="All">
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Type"
+                                        Binding="{Binding Type}"
+                                        Width="100" />
+                    <DataGridTextColumn Header="Identifier"
+                                        Binding="{Binding Identifier}"
+                                        Width="*" />
+                </DataGrid.Columns>
+            </DataGrid>
+
+            <!-- Action buttons -->
+            <StackPanel Grid.Row="2"
+                        Orientation="Horizontal"
+                        Spacing="10"
+                        HorizontalAlignment="Right"
+                        Margin="0,10,0,0">
+                <Button Content="Remove Selected"
+                        Command="{Binding RemoveSelectedCommand}"
+                        Padding="10,5"
+                        MinWidth="120" />
+                <Button Content="Clear All"
+                        Command="{Binding ClearAllCommand}"
+                        Padding="10,5"
+                        MinWidth="100"
+                        Background="IndianRed" />
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

@@ -7,8 +7,15 @@
     <!-- "Default" ThemeVariant follows system theme variant. "Dark" or "Light" are other available options. -->
 
     <Application.Resources>
-        <converter:BoolToDoubleConverter x:Key="BoolToDoubleConverter" />
-        <converter:FormattedTopicConverterWrapper x:Key="FormattedTopicConverter" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://Antigen/Resources/Styles/Palette.axaml" />
+                <ResourceInclude Source="avares://Antigen/Resources/Styles/ChromeButtons.axaml" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <converter:BoolToDoubleConverter x:Key="BoolToDoubleConverter" />
+            <converter:FormattedTopicConverterWrapper x:Key="FormattedTopicConverter" />
+        </ResourceDictionary>
     </Application.Resources>
 
     <Application.DataTemplates>

@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converter="clr-namespace:Antigen.Resources.Converter"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="1050"
+             d:DesignHeight="40"
+             x:Class="Antigen.Views.Chrome.StatusBar"
+             x:DataType="viewModels:MainVM">
+    <UserControl.Resources>
+        <converter:BoolToColorConverter x:Key="StateDotColor"
+                                        ValidColor="#5BB85B"
+                                        ErrorColor="#E6912E" />
+    </UserControl.Resources>
+
+    <Border Height="40"
+            Background="{DynamicResource StatusBarBrush}">
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              Margin="16,0">
+            <!-- Analysis state -->
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="9"
+                        VerticalAlignment="Center">
+                <Ellipse Width="9"
+                         Height="9"
+                         VerticalAlignment="Center">
+                    <Ellipse.Fill>
+                        <SolidColorBrush
+                            Color="{Binding !CurrentWatcher.TotalResults, Converter={StaticResource StateDotColor}}" />
+                    </Ellipse.Fill>
+                </Ellipse>
+
+                <TextBlock Text="{Binding CurrentWatcher.AnalyzerStatus}"
+                           FontSize="13"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
+            </StackPanel>
+
+            <!-- Tallies -->
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        Spacing="16"
+                        VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="5">
+                    <TextBlock Text="New:"
+                               FontSize="12"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding CurrentWatcher.NewResultsCount}"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TallyNewBrush}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Spacing="5">
+                    <TextBlock Text="Resolved:"
+                               FontSize="12"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding CurrentWatcher.ResolvedResults}"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TallyResolvedBrush}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Spacing="5">
+                    <TextBlock Text="Total:"
+                               FontSize="12"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding CurrentWatcher.TotalResults}"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                </StackPanel>
+
+                <!-- Collapse Pill -->
+                <Button Theme="{StaticResource ChromeFlatButton}"
+                        Padding="4"
+                        Command="{Binding ToggleCollapsedCommand}"
+                        ToolTip.Tip="Collapse / expand">
+                    <Border Width="18"
+                            Height="8"
+                            CornerRadius="4"
+                            Background="{DynamicResource TextMutedBrush}" />
+                </Button>
+
+                <!-- Close -->
+                <Button Theme="{StaticResource ChromeFlatButton}"
+                        Padding="6,2"
+                        IsVisible="{Binding !IsExpanded}"
+                        Command="{Binding CloseCommand}"
+                        ToolTip.Tip="Close">
+                    <Path Data="M 0,0 L 9,9 M 9,0 L 0,9"
+                          Stroke="{DynamicResource CloseGlyphBrush}"
+                          StrokeThickness="1" />
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>
