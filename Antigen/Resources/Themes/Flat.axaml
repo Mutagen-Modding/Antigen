@@ -1,0 +1,38 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Color x:Key="BaseColor">#1C1B21</Color>
+    <Color x:Key="CollapsedColor">#25242A</Color>
+    <Color x:Key="BorderColor">#3B3A40</Color>
+    <Color x:Key="AccentColor">#A9A7B0</Color>
+    <Color x:Key="AccentTransparentColor">#00A9A7B0</Color>
+    <Color x:Key="AccentDimColor">#6C6A73</Color>
+    <Color x:Key="AccentSecondaryColor">#8C8A93</Color>
+    <Color x:Key="AccentTertiaryColor">#C9C7D0</Color>
+    <Color x:Key="RowWashColor">#2E2D33</Color>
+
+    <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BaseColor}" />
+    <SolidColorBrush x:Key="CollapsedBackgroundBrush" Color="{StaticResource CollapsedColor}" />
+    <SolidColorBrush x:Key="WindowBorderBrush" Color="{StaticResource BorderColor}" />
+
+    <LinearGradientBrush x:Key="TitleDividerBrush"
+                         StartPoint="0%,50%"
+                         EndPoint="100%,50%">
+        <GradientStop Color="#B3A9A7B0" Offset="0" />
+        <GradientStop Color="{StaticResource AccentTransparentColor}" Offset="0.7" />
+        <GradientStop Color="{StaticResource AccentTransparentColor}" Offset="1" />
+    </LinearGradientBrush>
+    <SolidColorBrush x:Key="StatusDividerBrush" Color="{StaticResource BorderColor}" />
+
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}" />
+    <SolidColorBrush x:Key="AccentDimBrush" Color="{StaticResource AccentDimColor}" />
+    <SolidColorBrush x:Key="AccentBorderBrush" Color="{StaticResource AccentColor}" Opacity="0.4" />
+    <SolidColorBrush x:Key="AccentSubtleBrush" Color="{StaticResource AccentColor}" Opacity="0.15" />
+    <SolidColorBrush x:Key="AccentSoftBrush" Color="{StaticResource AccentColor}" Opacity="0.1" />
+    <SolidColorBrush x:Key="OnAccentBrush" Color="{StaticResource BaseColor}" />
+    <SolidColorBrush x:Key="AccentSecondaryBrush" Color="{StaticResource AccentSecondaryColor}" />
+    <SolidColorBrush x:Key="AccentTertiaryBrush" Color="{StaticResource AccentTertiaryColor}" />
+
+    <SolidColorBrush x:Key="GlyphHoverBrush" Color="#FFFFFF" />
+
+    <SolidColorBrush x:Key="RowWashBrush" Color="{StaticResource RowWashColor}" />
+</ResourceDictionary>

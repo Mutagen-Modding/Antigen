@@ -28,8 +28,16 @@ public sealed class GuiSettingsService : ISingleton
             return null;
         }
 
-        var json = _fileSystem.File.ReadAllText(_filePath);
-        return JsonSerializer.Deserialize<GuiSettings>(json);
+        try
+        {
+            var json = _fileSystem.File.ReadAllText(_filePath);
+            return JsonSerializer.Deserialize<GuiSettings>(json);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
+        {
+            _logger.LogError(ex, "Failed to load GUI settings");
+            return null;
+        }
     }
 
     public void Save(GuiSettings settings)

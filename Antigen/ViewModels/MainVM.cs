@@ -108,7 +108,8 @@ public sealed partial class MainVM : ViewModel, ISingleton
             WindowX = WindowX,
             WindowY = WindowY,
             ExpandedHeight = ActivePanel?.ExpandedHeight ?? _expandedHeight,
-            WorkerThreadPercentage = _globalSettings.CorePercentage
+            WorkerThreadPercentage = _globalSettings.CorePercentage,
+            ColorScheme = _globalSettings.ColorScheme
         };
         _guiSettings.Save(settings);
     }

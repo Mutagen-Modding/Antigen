@@ -19,7 +19,6 @@
             Background="{DynamicResource StatusBarBrush}">
         <Grid ColumnDefinitions="Auto,*,Auto"
               Margin="16,0">
-            <!-- Analysis state -->
             <StackPanel Grid.Column="0"
                         Orientation="Horizontal"
                         Spacing="9"
@@ -40,7 +39,6 @@
                            Foreground="{DynamicResource TextPrimaryBrush}" />
             </StackPanel>
 
-            <!-- Tallies -->
             <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
                         Spacing="16"
@@ -81,7 +79,6 @@
                                Foreground="{DynamicResource TextPrimaryBrush}" />
                 </StackPanel>
 
-                <!-- Collapse Pill -->
                 <Button Theme="{StaticResource ChromeFlatButton}"
                         Padding="4"
                         Command="{Binding ToggleCollapsedCommand}"
@@ -89,17 +86,17 @@
                     <Border Width="18"
                             Height="8"
                             CornerRadius="4"
-                            Background="{DynamicResource TextMutedBrush}" />
+                            Background="{Binding $parent[Button].Foreground}" />
                 </Button>
 
-                <!-- Close -->
                 <Button Theme="{StaticResource ChromeFlatButton}"
+                        Classes="close"
                         Padding="6,2"
                         IsVisible="{Binding !IsExpanded}"
                         Command="{Binding CloseCommand}"
                         ToolTip.Tip="Close">
                     <Path Data="M 0,0 L 9,9 M 9,0 L 0,9"
-                          Stroke="{DynamicResource CloseGlyphBrush}"
+                          Stroke="{Binding $parent[Button].Foreground}"
                           StrokeThickness="1" />
                 </Button>
             </StackPanel>

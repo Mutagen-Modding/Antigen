@@ -1,5 +1,7 @@
 using System.Reactive.Linq;
+using Antigen.Models.Settings;
 using Antigen.Services;
+using Noggog;
 using Noggog.WorkEngine;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
@@ -14,6 +16,10 @@ public sealed partial class GlobalSettingsVM : ResizablePanelVM, INumWorkThreads
 
     [Reactive] public partial double CorePercentage { get; set; }
 
+    [Reactive] public partial ColorScheme ColorScheme { get; set; }
+
+    public static ColorScheme[] ColorSchemes { get; } = Enum.GetValues<ColorScheme>();
+
     [ObservableAsProperty]
     private IObservable<int> WorkerThreads() =>
         this.WhenAnyValue(x => x.CorePercentage).Select(ToThreadCount);
@@ -24,16 +30,25 @@ public sealed partial class GlobalSettingsVM : ResizablePanelVM, INumWorkThreads
     private readonly ActiveVmController _activeVm;
     private readonly HomeVM _homeVM;
 
-    public GlobalSettingsVM(ActiveVmController activeVm, HomeVM homeVM, GuiSettingsService guiSettings)
+    public GlobalSettingsVM(
+        ActiveVmController activeVm,
+        HomeVM homeVM,
+        GuiSettingsService guiSettings,
+        ColorSchemeService colorSchemes)
     {
         _activeVm = activeVm;
         _homeVM = homeVM;
         IsExpanded = true;
 
-        var saved = guiSettings.Load()?.WorkerThreadPercentage ?? DefaultPercentage;
-        CorePercentage = Math.Clamp(saved, 0, 1);
+        var saved = guiSettings.Load();
+        CorePercentage = Math.Clamp(saved?.WorkerThreadPercentage ?? DefaultPercentage, 0, 1);
+        ColorScheme = saved?.ColorScheme ?? ColorSchemeService.Default;
 
         InitializeOAPH();
+
+        this.WhenAnyValue(x => x.ColorScheme)
+            .Subscribe(colorSchemes.Apply)
+            .DisposeWith(this);
     }
 
     [ReactiveCommand]

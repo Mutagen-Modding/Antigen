@@ -13,14 +13,13 @@
             Background="{DynamicResource TitleBarBrush}">
         <Grid ColumnDefinitions="Auto,*,Auto"
               Margin="10,0,6,0">
-            <!-- Brand -->
             <StackPanel Grid.Column="0"
                         Orientation="Horizontal"
                         Spacing="9"
                         VerticalAlignment="Center">
                 <Ellipse Width="16"
                          Height="16"
-                         Stroke="{DynamicResource GlyphBrush}"
+                         Stroke="{DynamicResource AccentBrush}"
                          StrokeThickness="1.4" />
 
                 <TextBlock Text="ANTIGEN"
@@ -31,7 +30,6 @@
                            Foreground="{DynamicResource TextPrimaryBrush}" />
             </StackPanel>
 
-            <!-- Window Commands -->
             <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
                         Spacing="14"
@@ -48,7 +46,7 @@
                         Padding="2"
                         Command="{Binding OpenSettingsCommand}">
                     <controls:FASymbolIcon Symbol="SettingsFilled"
-                                           Foreground="{DynamicResource GlyphBrush}" />
+                                           Foreground="{Binding $parent[Button].Foreground}" />
                 </Button>
 
                 <TextBlock Text="{Binding Version}"
@@ -61,14 +59,14 @@
                             Command="{Binding MinimizeCommand}">
                         <Rectangle Width="9"
                                    Height="1"
-                                   Fill="{DynamicResource GlyphBrush}" />
+                                   Fill="{Binding $parent[Button].Foreground}" />
                     </Button>
 
                     <Button Theme="{StaticResource WindowCommandButton}"
                             Command="{Binding ToggleMaximizeCommand}">
                         <Rectangle Width="9"
                                    Height="9"
-                                   Stroke="{DynamicResource GlyphBrush}"
+                                   Stroke="{Binding $parent[Button].Foreground}"
                                    StrokeThickness="1" />
                     </Button>
 
@@ -76,7 +74,7 @@
                             Classes="close"
                             Command="{Binding CloseCommand}">
                         <Path Data="M 0,0 L 9,9 M 9,0 L 0,9"
-                              Stroke="{DynamicResource CloseGlyphBrush}"
+                              Stroke="{Binding $parent[Button].Foreground}"
                               StrokeThickness="1" />
                     </Button>
                 </StackPanel>

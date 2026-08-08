@@ -28,12 +28,9 @@
                 <ItemsControl ItemsSource="{Binding FilteredModKeys}">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate DataType="plugins:ModKey">
-                            <Button Content="{Binding FileName}"
-                                    HorizontalAlignment="Stretch"
-                                    HorizontalContentAlignment="Left"
-                                    Background="Transparent"
-                                    BorderThickness="0"
-                                    Padding="8,6"
+                            <Button Theme="{StaticResource ListRowButton}"
+                                    Margin="0,2"
+                                    Content="{Binding FileName}"
                                     Command="{Binding #Root.ViewModel.StartWatchingCommand}"
                                     CommandParameter="{Binding}" />
                         </DataTemplate>

@@ -6,4 +6,5 @@ public sealed record GuiSettings
     public int WindowY { get; init; }
     public double ExpandedHeight { get; init; } = 500;
     public double WorkerThreadPercentage { get; init; } = 0.5;
+    public ColorScheme ColorScheme { get; init; } = ColorScheme.Antigen;
 }
