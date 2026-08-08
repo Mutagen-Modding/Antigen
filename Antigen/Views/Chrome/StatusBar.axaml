@@ -44,7 +44,8 @@
                         Spacing="16"
                         VerticalAlignment="Center">
                 <StackPanel Orientation="Horizontal"
-                            Spacing="5">
+                            Spacing="5"
+                            VerticalAlignment="Center">
                     <TextBlock Text="New:"
                                FontSize="12"
                                FontWeight="Medium"
@@ -56,7 +57,8 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"
-                            Spacing="5">
+                            Spacing="5"
+                            VerticalAlignment="Center">
                     <TextBlock Text="Resolved:"
                                FontSize="12"
                                FontWeight="Medium"
@@ -68,7 +70,8 @@
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"
-                            Spacing="5">
+                            Spacing="5"
+                            VerticalAlignment="Center">
                     <TextBlock Text="Total:"
                                FontSize="12"
                                FontWeight="Medium"
@@ -79,26 +82,28 @@
                                Foreground="{DynamicResource TextPrimaryBrush}" />
                 </StackPanel>
 
-                <Button Theme="{StaticResource ChromeFlatButton}"
-                        Padding="4"
-                        Command="{Binding ToggleCollapsedCommand}"
-                        ToolTip.Tip="Collapse / expand">
-                    <Border Width="18"
-                            Height="8"
-                            CornerRadius="4"
-                            Background="{Binding $parent[Button].Foreground}" />
-                </Button>
+                <StackPanel Orientation="Horizontal">
+                    <Button Theme="{StaticResource WindowCommandButton}"
+                            Height="40"
+                            Command="{Binding ToggleCollapsedCommand}"
+                            ToolTip.Tip="Collapse / expand">
+                        <Border Width="18"
+                                Height="8"
+                                CornerRadius="4"
+                                Background="{Binding $parent[Button].Foreground}" />
+                    </Button>
 
-                <Button Theme="{StaticResource ChromeFlatButton}"
-                        Classes="close"
-                        Padding="6,2"
-                        IsVisible="{Binding !IsExpanded}"
-                        Command="{Binding CloseCommand}"
-                        ToolTip.Tip="Close">
-                    <Path Data="M 0,0 L 9,9 M 9,0 L 0,9"
-                          Stroke="{Binding $parent[Button].Foreground}"
-                          StrokeThickness="1" />
-                </Button>
+                    <Button Theme="{StaticResource WindowCommandButton}"
+                            Classes="close"
+                            Height="40"
+                            IsVisible="{Binding !IsExpanded}"
+                            Command="{Binding CloseCommand}"
+                            ToolTip.Tip="Close">
+                        <Path Data="M 0,0 L 9,9 M 9,0 L 0,9"
+                              Stroke="{Binding $parent[Button].Foreground}"
+                              StrokeThickness="1" />
+                    </Button>
+                </StackPanel>
             </StackPanel>
         </Grid>
     </Border>

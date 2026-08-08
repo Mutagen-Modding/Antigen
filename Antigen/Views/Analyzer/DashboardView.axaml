@@ -25,12 +25,15 @@
                 <Grid ColumnDefinitions="Auto,4,Auto,4,Auto,4,*">
                     <!-- Back Button -->
                     <Button Grid.Column="0"
-                            Padding="8,4"
+                            Theme="{StaticResource IconButton}"
                             Command="{Binding BackCommand}"
-                            Background="Transparent"
-                            BorderThickness="0"
                             ToolTip.Tip="Back">
-                        <controls:FASymbolIcon Symbol="ChevronLeft" />
+                        <Path Data="M 7,2 L 7,12 L 2.5,7 Z"
+                              Margin="-6,0,0,0"
+                              Fill="{Binding $parent[Button].Foreground}"
+                              Stroke="{Binding $parent[Button].Foreground}"
+                              StrokeThickness="3.5"
+                              StrokeJoin="Round" />
                     </Button>
 
                     <!-- Add Grouping Button -->

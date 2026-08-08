@@ -2,9 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <ControlTheme x:Key="WindowCommandButton"
                   TargetType="Button">
-        <Setter Property="Width" Value="44" />
+        <Setter Property="MinWidth" Value="44" />
         <Setter Property="Height" Value="30" />
-        <Setter Property="Padding" Value="0" />
+        <Setter Property="Padding" Value="8,0" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Foreground" Value="{DynamicResource GlyphBrush}" />
@@ -24,42 +24,33 @@
             </ControlTemplate>
         </Setter>
 
-        <Style Selector="^:pointerover /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource ChromeHoverBrush}" />
-        </Style>
-        <Style Selector="^:pressed /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource ChromePressedBrush}" />
-        </Style>
         <Style Selector="^:pointerover">
             <Setter Property="Foreground" Value="{DynamicResource GlyphHoverBrush}" />
+        </Style>
+        <Style Selector="^:pressed">
+            <Setter Property="Opacity" Value="0.6" />
         </Style>
 
         <Style Selector="^.close:pointerover">
             <Setter Property="Foreground" Value="{DynamicResource CloseGlyphHoverBrush}" />
         </Style>
-        <Style Selector="^.close:pointerover /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource ChromeCloseHoverBrush}" />
-        </Style>
-        <Style Selector="^.close:pressed /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource ChromeClosePressedBrush}" />
-        </Style>
     </ControlTheme>
 
-    <ControlTheme x:Key="ChromeFlatButton"
+    <ControlTheme x:Key="IconButton"
                   TargetType="Button">
-        <Setter Property="Padding" Value="6,2" />
+        <Setter Property="MinWidth" Value="42" />
+        <Setter Property="MinHeight" Value="34" />
+        <Setter Property="Padding" Value="4,2" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="BorderThickness" Value="0" />
         <Setter Property="Foreground" Value="{DynamicResource GlyphBrush}" />
-        <Setter Property="CornerRadius" Value="4" />
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalContentAlignment" Value="Center" />
         <Setter Property="VerticalContentAlignment" Value="Center" />
         <Setter Property="Template">
             <ControlTemplate>
                 <Border x:Name="PART_Root"
-                        Background="{TemplateBinding Background}"
-                        CornerRadius="{TemplateBinding CornerRadius}">
+                        Background="{TemplateBinding Background}">
                     <ContentPresenter x:Name="PART_ContentPresenter"
                                       Content="{TemplateBinding Content}"
                                       ContentTemplate="{TemplateBinding ContentTemplate}"
@@ -70,21 +61,11 @@
             </ControlTemplate>
         </Setter>
 
-        <Style Selector="^:pointerover /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource ChromeHoverBrush}" />
-        </Style>
-        <Style Selector="^:pressed /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource ChromePressedBrush}" />
-        </Style>
         <Style Selector="^:pointerover">
             <Setter Property="Foreground" Value="{DynamicResource GlyphHoverBrush}" />
         </Style>
-
-        <Style Selector="^.close:pointerover">
-            <Setter Property="Foreground" Value="{DynamicResource CloseGlyphHoverBrush}" />
-        </Style>
-        <Style Selector="^.close:pointerover /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource ChromeCloseHoverBrush}" />
+        <Style Selector="^:pressed">
+            <Setter Property="Opacity" Value="0.6" />
         </Style>
     </ControlTheme>
 </ResourceDictionary>

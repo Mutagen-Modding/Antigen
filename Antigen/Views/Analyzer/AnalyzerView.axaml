@@ -28,23 +28,25 @@
               Margin="10">
             <!-- Toolbar -->
             <Grid Grid.Row="0"
-                  ColumnDefinitions="Auto,Auto,4,*,Auto,Auto"
-                  Margin="4, 0, 0, 0">
+                  ColumnDefinitions="Auto,Auto,4,*,Auto,Auto">
                 <!-- Back Button -->
                 <Button Grid.Column="0"
+                        Theme="{StaticResource IconButton}"
                         Command="{Binding BackCommand}"
                         VerticalAlignment="Stretch"
-                        Background="Transparent"
-                        BorderThickness="0"
                         ToolTip.Tip="Back">
-                    <controls:FASymbolIcon Symbol="ChevronLeft" />
+                    <Path Data="M 7,2 L 7,12 L 2.5,7 Z"
+                          Margin="-6,0,0,0"
+                          Fill="{Binding $parent[Button].Foreground}"
+                          Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="3.5"
+                          StrokeJoin="Round" />
                 </Button>
 
                 <!-- Filter Severies Flyout -->
                 <Button Grid.Column="1"
+                        Theme="{StaticResource IconButton}"
                         VerticalAlignment="Stretch"
-                        Background="Transparent"
-                        BorderThickness="0"
                         ToolTip.Tip="Filter Severities">
                     <Button.Flyout>
                         <Flyout>
@@ -75,7 +77,10 @@
                         </Flyout>
                     </Button.Flyout>
 
-                    <controls:FASymbolIcon Symbol="Filter" />
+                    <Path Data="M 0,1.25 H 12 M 2,6.5 H 10 M 4,11.75 H 8"
+                          Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="2.5"
+                          StrokeLineCap="Round" />
                 </Button>
 
                 <!-- Search Bar -->
@@ -86,22 +91,22 @@
 
                 <!-- Ignore Rules Button -->
                 <Button Grid.Column="4"
+                        Theme="{StaticResource IconButton}"
                         Command="{Binding OpenSettingsCommand}"
                         VerticalAlignment="Stretch"
-                        Background="Transparent"
-                        BorderThickness="0"
                         ToolTip.Tip="Ignore Rules">
-                    <controls:FASymbolIcon Symbol="SettingsFilled" />
+                    <controls:FASymbolIcon Symbol="SettingsFilled"
+                                           FontSize="18" />
                 </Button>
 
                 <!-- Dashboard Button -->
                 <Button Grid.Column="5"
+                        Theme="{StaticResource IconButton}"
                         Command="{Binding OpenDashboardCommand}"
                         VerticalAlignment="Stretch"
-                        Background="Transparent"
-                        BorderThickness="0"
                         ToolTip.Tip="Dashboard">
-                    <controls:FASymbolIcon Symbol="BookmarkFilled" />
+                    <controls:FASymbolIcon Symbol="BookmarkFilled"
+                                           FontSize="18" />
                 </Button>
             </Grid>
 

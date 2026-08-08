@@ -32,9 +32,8 @@
 
             <StackPanel Grid.Column="2"
                         Orientation="Horizontal"
-                        Spacing="14"
                         VerticalAlignment="Center">
-                <Button Theme="{StaticResource ChromeFlatButton}"
+                <Button Theme="{StaticResource WindowCommandButton}"
                         Command="{Binding OpenProfileCommand}">
                     <TextBlock Text="{Binding ProfileName}"
                                FontSize="12"
@@ -42,42 +41,41 @@
                                Foreground="{DynamicResource TextSecondaryBrush}" />
                 </Button>
 
-                <Button Theme="{StaticResource ChromeFlatButton}"
-                        Padding="2"
+                <Button Theme="{StaticResource WindowCommandButton}"
                         Command="{Binding OpenSettingsCommand}">
                     <controls:FASymbolIcon Symbol="SettingsFilled"
+                                           FontSize="18"
                                            Foreground="{Binding $parent[Button].Foreground}" />
                 </Button>
 
                 <TextBlock Text="{Binding Version}"
                            FontSize="11"
+                           Margin="10,0"
                            VerticalAlignment="Center"
                            Foreground="{DynamicResource TextMutedBrush}" />
 
-                <StackPanel Orientation="Horizontal">
-                    <Button Theme="{StaticResource WindowCommandButton}"
-                            Command="{Binding MinimizeCommand}">
-                        <Rectangle Width="9"
-                                   Height="1"
-                                   Fill="{Binding $parent[Button].Foreground}" />
-                    </Button>
+                <Button Theme="{StaticResource WindowCommandButton}"
+                        Command="{Binding MinimizeCommand}">
+                    <Rectangle Width="9"
+                               Height="1"
+                               Fill="{Binding $parent[Button].Foreground}" />
+                </Button>
 
-                    <Button Theme="{StaticResource WindowCommandButton}"
-                            Command="{Binding ToggleMaximizeCommand}">
-                        <Rectangle Width="9"
-                                   Height="9"
-                                   Stroke="{Binding $parent[Button].Foreground}"
-                                   StrokeThickness="1" />
-                    </Button>
+                <Button Theme="{StaticResource WindowCommandButton}"
+                        Command="{Binding ToggleMaximizeCommand}">
+                    <Rectangle Width="9"
+                               Height="9"
+                               Stroke="{Binding $parent[Button].Foreground}"
+                               StrokeThickness="1" />
+                </Button>
 
-                    <Button Theme="{StaticResource WindowCommandButton}"
-                            Classes="close"
-                            Command="{Binding CloseCommand}">
-                        <Path Data="M 0,0 L 9,9 M 9,0 L 0,9"
-                              Stroke="{Binding $parent[Button].Foreground}"
-                              StrokeThickness="1" />
-                    </Button>
-                </StackPanel>
+                <Button Theme="{StaticResource WindowCommandButton}"
+                        Classes="close"
+                        Command="{Binding CloseCommand}">
+                    <Path Data="M 0,0 L 9,9 M 9,0 L 0,9"
+                          Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="1" />
+                </Button>
             </StackPanel>
         </Grid>
     </Border>
