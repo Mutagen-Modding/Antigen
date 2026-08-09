@@ -35,11 +35,11 @@
                         Command="{Binding BackCommand}"
                         VerticalAlignment="Stretch"
                         ToolTip.Tip="Back">
-                    <Path Data="M 7,2 L 7,12 L 2.5,7 Z"
+                    <Path Data="M 5,0 L 0,5 L 5,10"
                           Margin="-6,0,0,0"
-                          Fill="{Binding $parent[Button].Foreground}"
                           Stroke="{Binding $parent[Button].Foreground}"
-                          StrokeThickness="3.5"
+                          StrokeThickness="1.5"
+                          StrokeLineCap="Round"
                           StrokeJoin="Round" />
                 </Button>
 
@@ -77,9 +77,10 @@
                         </Flyout>
                     </Button.Flyout>
 
-                    <Path Data="M 0,1.25 H 12 M 2,6.5 H 10 M 4,11.75 H 8"
+                    <Path Data="M 0,2.25 H 12 M 2,6.5 H 10 M 4,10.75 H 8"
+                          Margin="0,0,0,4"
                           Stroke="{Binding $parent[Button].Foreground}"
-                          StrokeThickness="2.5"
+                          StrokeThickness="2"
                           StrokeLineCap="Round" />
                 </Button>
 
@@ -111,6 +112,7 @@
             </Grid>
 
             <ScrollViewer Grid.Row="1"
+                          Margin="0,8,0,0"
                           CornerRadius="8"
                           VerticalScrollBarVisibility="Auto">
                 <ScrollViewer.Resources>

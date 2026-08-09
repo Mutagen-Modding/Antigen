@@ -29,6 +29,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
     public static Severity[] SeverityValues { get; } = Enum.GetValues<Severity>();
 
     [Reactive] public partial ModWatcherVM? CurrentWatcher { get; set; }
+    [Reactive] public partial AnalyzerVM? CurrentAnalyzer { get; set; }
     [Reactive] public partial int WindowX { get; set; }
     [Reactive] public partial int WindowY { get; set; }
 
@@ -46,13 +47,21 @@ public sealed partial class MainVM : ViewModel, ISingleton
             .Select(panel => panel?.WhenAnyValue(x => x.IsExpanded) ?? Observable.Return(false))
             .Switch();
 
+    [ObservableAsProperty(PropertyName = "ShowPeek", InitialValue = "false")]
+    private IObservable<bool> ShowPeekObservable() =>
+        _activeVm.WhenAnyValue(x => x.Active)
+            .Select(panel => panel?.WhenAnyValue(x => x.IsExpanded, x => x.IsPeeking, (expanded, peeking) => !expanded && peeking)
+                ?? Observable.Return(false))
+            .Switch();
+
     [ObservableAsProperty(PropertyName = "ShowStatusBar", InitialValue = "false")]
     private IObservable<bool> ShowStatusBarObservable() =>
         this.WhenAnyValue(x => x.CurrentWatcher).Select(watcher => watcher is not null);
 
     [ObservableAsProperty(PropertyName = "ShowStatusDivider", InitialValue = "false")]
     private IObservable<bool> ShowStatusDividerObservable() =>
-        this.WhenAnyValue(x => x.IsExpanded, x => x.ShowStatusBar, (expanded, status) => expanded && status);
+        this.WhenAnyValue(x => x.IsExpanded, x => x.ShowPeek, x => x.ShowStatusBar,
+            (expanded, peeking, status) => (expanded || peeking) && status);
 
     public MainVM(
         HomeVM homeVM,
@@ -132,6 +141,15 @@ public sealed partial class MainVM : ViewModel, ISingleton
         if (ActivePanel is not { } panel) return;
 
         panel.IsExpanded = !panel.IsExpanded;
+        panel.IsPeeking = false;
+    }
+
+    [ReactiveCommand]
+    private void TogglePeek()
+    {
+        if (ActivePanel is not { } panel) return;
+
+        panel.IsPeeking = !panel.IsPeeking;
     }
 
     [ReactiveCommand]
@@ -156,8 +174,9 @@ public sealed partial class MainVM : ViewModel, ISingleton
     {
         CurrentWatcher?.Dispose();
         CurrentWatcher = _modWatcherVMFactory(modKey);
+        CurrentAnalyzer = _analyzerVMFactory(CurrentWatcher);
 
-        _activeVm.Active = _analyzerVMFactory(CurrentWatcher);
+        _activeVm.Active = CurrentAnalyzer;
     }
 
     // Carry the resized height across panel switches so the window keeps its size.

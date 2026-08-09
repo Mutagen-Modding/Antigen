@@ -68,6 +68,9 @@
                     </ContentControl.DataTemplates>
                 </ContentControl>
 
+                <chrome:ResultsPeek Grid.Row="2"
+                                    IsVisible="{Binding ShowPeek}" />
+
                 <Rectangle Grid.Row="3"
                            Height="1"
                            IsVisible="{Binding ShowStatusDivider}"

@@ -8,9 +8,11 @@ namespace Antigen.ViewModels;
 public abstract partial class ResizablePanelVM : ViewModel
 {
     protected const double CollapsedHeight = 40.0;
+    protected const double PeekHeight = 260.0;
     protected const double DefaultPanelWidth = 1050.0;
 
     [Reactive] public partial bool IsExpanded { get; set; }
+    [Reactive] public partial bool IsPeeking { get; set; }
     [Reactive] public partial double ExpandedHeight { get; set; } = 500.0;
     [Reactive] public partial double CurrentWindowHeight { get; set; } = CollapsedHeight;
 
@@ -20,8 +22,12 @@ public abstract partial class ResizablePanelVM : ViewModel
 
     protected ResizablePanelVM()
     {
-        this.WhenAnyValue(x => x.IsExpanded, x => x.ExpandedHeight)
-            .Subscribe(_ => CurrentWindowHeight = IsExpanded ? ExpandedHeight : CollapsedHeight)
+        this.WhenAnyValue(x => x.IsExpanded, x => x.IsPeeking, x => x.ExpandedHeight)
+            .Subscribe(_ => CurrentWindowHeight = IsExpanded
+                ? ExpandedHeight
+                : IsPeeking
+                    ? PeekHeight
+                    : CollapsedHeight)
             .DisposeWith(this);
     }
 

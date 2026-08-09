@@ -28,11 +28,11 @@
                             Theme="{StaticResource IconButton}"
                             Command="{Binding BackCommand}"
                             ToolTip.Tip="Back">
-                        <Path Data="M 7,2 L 7,12 L 2.5,7 Z"
+                        <Path Data="M 5,0 L 0,5 L 5,10"
                               Margin="-6,0,0,0"
-                              Fill="{Binding $parent[Button].Foreground}"
                               Stroke="{Binding $parent[Button].Foreground}"
-                              StrokeThickness="3.5"
+                              StrokeThickness="1.5"
+                              StrokeLineCap="Round"
                               StrokeJoin="Round" />
                     </Button>
 
