@@ -127,7 +127,8 @@
                 </ScrollViewer.Effect>
 
                 <!-- Results List -->
-                <controls:FAItemsRepeater ItemsSource="{Binding FilteredResults}">
+                <controls:FAItemsRepeater ItemsSource="{Binding FilteredResults}"
+                                          Margin="0,0,14,0">
                     <controls:FAItemsRepeater.Layout>
                         <controls:FAStackLayout Orientation="Vertical" />
                     </controls:FAItemsRepeater.Layout>

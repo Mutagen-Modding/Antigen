@@ -1,5 +1,18 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ControlTheme x:Key="ListRowBorder"
+                  TargetType="Border">
+        <Setter Property="Background" Value="{DynamicResource RowRestBrush}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource RowBorderBrush}" />
+        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="CornerRadius" Value="4" />
+
+        <Style Selector="^:pointerover">
+            <Setter Property="Background" Value="{DynamicResource RowWashBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentDimBrush}" />
+        </Style>
+    </ControlTheme>
+
     <ControlTheme x:Key="ListRowButton"
                   TargetType="Button">
         <Setter Property="Background" Value="{DynamicResource RowRestBrush}" />
