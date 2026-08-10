@@ -16,11 +16,20 @@ public abstract class PinnedWindow : Window
         Background = Brushes.Transparent;
         Topmost = true;
         WindowDecorations = WindowDecorations.None;
+
+        // Empty-area click pulls focus off text fields
+        Focusable = true;
     }
 
     private void OnPointerPressed(object? sender, PointerPressedEventArgs e)
     {
         if (!e.GetCurrentPoint(this).Properties.IsLeftButtonPressed) return;
+
+        // Clicking empty space drops keyboard focus
+        if (FocusManager?.GetFocusedElement() is TextBox)
+        {
+            Focus();
+        }
 
         BeginMoveDrag(e);
     }
