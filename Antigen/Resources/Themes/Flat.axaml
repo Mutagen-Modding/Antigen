@@ -41,4 +41,5 @@
     <SolidColorBrush x:Key="GlyphHoverBrush" Color="#FFFFFF" />
 
     <SolidColorBrush x:Key="RowWashBrush" Color="{StaticResource RowWashColor}" />
+    <SolidColorBrush x:Key="RowAccentWashBrush" Color="{StaticResource RowWashColor}" />
 </ResourceDictionary>

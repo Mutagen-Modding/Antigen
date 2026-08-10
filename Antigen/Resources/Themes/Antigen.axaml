@@ -57,4 +57,13 @@
         <GradientStop Color="{StaticResource BaseColor}" Offset="0" />
         <GradientStop Color="{StaticResource AccentDimColor}" Offset="1" />
     </RadialGradientBrush>
+
+    <RadialGradientBrush x:Key="RowAccentWashBrush"
+                         Center="0%,50%"
+                         GradientOrigin="0%,50%"
+                         RadiusX="350%"
+                         RadiusY="350%">
+        <GradientStop Color="{StaticResource BaseColor}" Offset="0" />
+        <GradientStop Color="{StaticResource AccentTertiaryColor}" Offset="1" />
+    </RadialGradientBrush>
 </ResourceDictionary>

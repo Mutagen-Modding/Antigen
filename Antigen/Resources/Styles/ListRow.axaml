@@ -42,16 +42,16 @@
         </Setter>
 
         <Style Selector="^:pointerover /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource RowWashBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource AccentDimBrush}" />
+            <Setter Property="Background" Value="{DynamicResource RowAccentWashBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentTertiaryBrush}" />
         </Style>
         <Style Selector="^.selected /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource RowWashBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Background" Value="{DynamicResource RowAccentWashBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentTertiaryBrush}" />
         </Style>
         <Style Selector="^:pressed /template/ Border#PART_Root">
-            <Setter Property="Background" Value="{DynamicResource RowWashBrush}" />
-            <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+            <Setter Property="Background" Value="{DynamicResource RowAccentWashBrush}" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentTertiaryBrush}" />
         </Style>
     </ControlTheme>
 </ResourceDictionary>
