@@ -20,6 +20,7 @@
     </UserControl.Resources>
 
     <UserControl.Styles>
+        <StyleInclude Source="avares://Antigen/Resources/Styles/ResultRow.axaml" />
         <Style Selector="Border#RowRoot Button#ConfigureButton">
             <Setter Property="IsVisible" Value="False" />
         </Style>
@@ -30,25 +31,29 @@
 
     <Border x:Name="RowRoot"
             Theme="{StaticResource ListRowBorder}"
-            Margin="0,2">
-        <Grid ColumnDefinitions="*,42">
+            Margin="0,2"
+            ClipToBounds="True">
+        <Panel>
+            <!-- Margin -1 bleeds the lip over the 1px border so it meets the stroke seamlessly -->
+            <Border x:Name="RowLip"
+                    Margin="-1"
+                    CornerRadius="4"
+                    IsHitTestVisible="False"
+                    BorderBrush="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToRowLip}}" />
+            <Grid ColumnDefinitions="*,42">
             <StackPanel Grid.Column="0"
-                        Margin="8,6"
+                        Margin="12,6,8,6"
                         Spacing="4">
                 <Grid ColumnDefinitions="Auto,Auto,*,Auto">
                     <!-- Severity -->
-                    <Border Grid.Column="0"
-                            ToolTip.Tip="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToDescription}}"
-                            CornerRadius="2"
-                            Padding="4,2"
-                            Margin="0,0,6,0"
-                            VerticalAlignment="Top"
-                            Background="{Binding Result.Topic.Severity, Converter={StaticResource SeverityToBrushConverter}}">
-                        <TextBlock Text="{Binding Result.Topic.Severity}"
-                                   FontSize="9"
-                                   Foreground="Black"
-                                   FontWeight="Bold" />
-                    </Border>
+                    <TextBlock Grid.Column="0"
+                               ToolTip.Tip="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToDescription}}"
+                               Text="{Binding Result.Topic.Severity}"
+                               Margin="0,0,6,0"
+                               VerticalAlignment="Center"
+                               FontSize="9"
+                               FontWeight="Bold"
+                               Foreground="{Binding Result.Topic.Severity, Converter={StaticResource SeverityToBrushConverter}}" />
 
                     <!-- Record Type -->
                     <Border Grid.Column="1"
@@ -166,6 +171,7 @@
                 <controls:FASymbolIcon Symbol="SettingsFilled"
                                        FontSize="18" />
             </Button>
-        </Grid>
+            </Grid>
+        </Panel>
     </Border>
 </UserControl>

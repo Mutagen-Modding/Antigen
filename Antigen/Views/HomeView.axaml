@@ -17,6 +17,7 @@
                   Margin="8,4">
                 <!-- Search Bar -->
                 <TextBox VerticalAlignment="Center"
+                         Theme="{StaticResource SearchTextBox}"
                          Text="{Binding SearchText, Delay=150}"
                          PlaceholderText="Filter mods..." />
             </Grid>

@@ -11,6 +11,12 @@
     <Color x:Key="GlowColor">#491D3D</Color>
     <Color x:Key="AccentCornerColor">#1A2117</Color>
 
+    <Color x:Key="SeverityCtdColor">#F0355F</Color>
+    <Color x:Key="SeverityErrorColor">#EE8A34</Color>
+    <Color x:Key="SeverityWarningColor">#E5C94F</Color>
+    <Color x:Key="SeveritySuggestionColor">#8E9CFF</Color>
+    <Color x:Key="SeverityInfoColor">#54CC9C</Color>
+
     <RadialGradientBrush x:Key="WindowBackgroundBrush"
                          Center="0%,0%"
                          GradientOrigin="0%,0%"

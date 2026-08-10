@@ -15,6 +15,10 @@
         <converter:SeverityToBrushConverter x:Key="SeverityToBrushConverter" />
     </UserControl.Resources>
 
+    <UserControl.Styles>
+        <StyleInclude Source="avares://Antigen/Resources/Styles/ResultRow.axaml" />
+    </UserControl.Styles>
+
     <ScrollViewer Margin="16,6"
                   VerticalScrollBarVisibility="Auto">
         <controls:FAItemsRepeater ItemsSource="{Binding CurrentAnalyzer.FilteredResults}"
@@ -25,22 +29,27 @@
 
             <controls:FAItemsRepeater.ItemTemplate>
                 <DataTemplate DataType="results:AnalyzerResultVM">
-                    <Border Theme="{StaticResource ListRowBorder}"
+                    <Border x:Name="RowRoot"
+                            Theme="{StaticResource ListRowBorder}"
                             Margin="0,2"
-                            Padding="6,4">
-                        <Grid ColumnDefinitions="Auto,Auto,*">
-                            <Border Grid.Column="0"
-                                    CornerRadius="2"
-                                    Padding="4,2"
-                                    Margin="0,0,6,0"
-                                    VerticalAlignment="Center"
-                                    ToolTip.Tip="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToDescription}}"
-                                    Background="{Binding Result.Topic.Severity, Converter={StaticResource SeverityToBrushConverter}}">
-                                <TextBlock Text="{Binding Result.Topic.Severity}"
-                                           FontSize="9"
-                                           Foreground="Black"
-                                           FontWeight="Bold" />
-                            </Border>
+                            ClipToBounds="True">
+                        <Panel>
+                            <!-- Margin -1 bleeds the lip over the 1px border so it meets the stroke seamlessly -->
+                            <Border x:Name="RowLip"
+                                    Margin="-1"
+                                    CornerRadius="4"
+                                    IsHitTestVisible="False"
+                                    BorderBrush="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToRowLip}}" />
+                            <Grid ColumnDefinitions="Auto,Auto,*"
+                                  Margin="10,4,6,4">
+                            <TextBlock Grid.Column="0"
+                                       ToolTip.Tip="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToDescription}}"
+                                       Text="{Binding Result.Topic.Severity}"
+                                       Margin="0,0,6,0"
+                                       VerticalAlignment="Center"
+                                       FontSize="9"
+                                       FontWeight="Bold"
+                                       Foreground="{Binding Result.Topic.Severity, Converter={StaticResource SeverityToBrushConverter}}" />
 
                             <TextBlock Grid.Column="1"
                                        Text="{Binding RecordDisplayName}"
@@ -53,7 +62,8 @@
                             <ContentControl Grid.Column="2"
                                             VerticalAlignment="Center"
                                             Content="{Binding Result.Topic.FormattedTopic, Converter={StaticResource FormattedTopicConverter}}" />
-                        </Grid>
+                            </Grid>
+                        </Panel>
                     </Border>
                 </DataTemplate>
             </controls:FAItemsRepeater.ItemTemplate>

@@ -24,7 +24,6 @@
     <SolidColorBrush x:Key="StatusIdleBrush" Color="#5BB85B" />
     <SolidColorBrush x:Key="StatusBusyBrush" Color="#E6912E" />
     <SolidColorBrush x:Key="TallyNewBrush" Color="#EB9433" />
-    <SolidColorBrush x:Key="TallyResolvedBrush" Color="#5BB85B" />
 
     <!-- Interaction Brushes -->
     <SolidColorBrush x:Key="ChromeHoverBrush" Color="#FFFFFF" Opacity="0.08" />

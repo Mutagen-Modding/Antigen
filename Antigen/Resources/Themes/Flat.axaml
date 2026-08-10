@@ -10,6 +10,12 @@
     <Color x:Key="AccentTertiaryColor">#C9C7D0</Color>
     <Color x:Key="RowWashColor">#2E2D33</Color>
 
+    <Color x:Key="SeverityCtdColor">#CD5C5C</Color>
+    <Color x:Key="SeverityErrorColor">#FFA500</Color>
+    <Color x:Key="SeverityWarningColor">#FFD700</Color>
+    <Color x:Key="SeveritySuggestionColor">#6495ED</Color>
+    <Color x:Key="SeverityInfoColor">#228B22</Color>
+
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BaseColor}" />
     <SolidColorBrush x:Key="CollapsedBackgroundBrush" Color="{StaticResource CollapsedColor}" />
     <SolidColorBrush x:Key="WindowBorderBrush" Color="{StaticResource BorderColor}" />

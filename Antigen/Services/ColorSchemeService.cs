@@ -1,4 +1,5 @@
 using Antigen.Models.Settings;
+using Antigen.Resources.Constants;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Markup.Xaml.Styling;
@@ -20,6 +21,9 @@ public sealed class ColorSchemeService : ISingleton
         "SliderTrackValueFill", "SliderTrackValueFillPointerOver", "SliderTrackValueFillPressed",
         "SliderThumbBackground",
         "ComboBoxItemPillFillBrush",
+        "ScrollBarThumbFill", "ScrollBarThumbFillPointerOver", "ScrollBarThumbFillPressed",
+        "CheckBoxCheckBackgroundFillChecked", "CheckBoxCheckBackgroundFillCheckedPointerOver", "CheckBoxCheckBackgroundFillCheckedPressed",
+        "CheckBoxCheckBackgroundStrokeChecked", "CheckBoxCheckBackgroundStrokeCheckedPointerOver", "CheckBoxCheckBackgroundStrokeCheckedPressed",
     ];
 
     private static readonly string[] HoverPinnedKeys =
@@ -51,6 +55,7 @@ public sealed class ColorSchemeService : ISingleton
         dictionaries.Add(_applied);
 
         ApplyFluentAccent(app);
+        SeverityBrushes.Refresh();
     }
 
     private static void ApplyFluentAccent(Application app)

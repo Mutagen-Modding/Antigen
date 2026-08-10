@@ -87,6 +87,7 @@
                 <!-- Search Bar -->
                 <TextBox Grid.Column="3"
                          x:Name="SearchBox"
+                         Theme="{StaticResource SearchTextBox}"
                          Text="{Binding SearchText, Delay=200}"
                          PlaceholderText="Search results..." />
 

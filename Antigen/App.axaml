@@ -12,10 +12,13 @@
                 <ResourceInclude Source="avares://Antigen/Resources/Styles/Palette.axaml" />
                 <ResourceInclude Source="avares://Antigen/Resources/Styles/ChromeButtons.axaml" />
                 <ResourceInclude Source="avares://Antigen/Resources/Styles/ListRow.axaml" />
+                <ResourceInclude Source="avares://Antigen/Resources/Styles/Inputs.axaml" />
             </ResourceDictionary.MergedDictionaries>
 
             <converter:BoolToDoubleConverter x:Key="BoolToDoubleConverter" />
             <converter:FormattedTopicConverterWrapper x:Key="FormattedTopicConverter" />
+
+            <SolidColorBrush x:Key="TextControlSelectionHighlightColor" Color="#664A90C2" />
         </ResourceDictionary>
     </Application.Resources>
 
@@ -31,5 +34,9 @@
         <StyleInclude Source="avares://AvaloniaProgressRing/Styles/ProgressRing.xaml" />
         <styling:FluentAvaloniaTheme PreferUserAccentColor="False"
                                      PreferSystemTheme="False" />
+
+        <Style Selector="ScrollBar /template/ Thumb">
+            <Setter Property="Background" Value="{DynamicResource AccentBrush}" />
+        </Style>
     </Application.Styles>
 </Application>

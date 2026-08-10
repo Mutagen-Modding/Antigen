@@ -66,7 +66,7 @@
                     <TextBlock Text="{Binding CurrentWatcher.ResolvedResults}"
                                FontSize="12"
                                FontWeight="Bold"
-                               Foreground="{DynamicResource TallyResolvedBrush}" />
+                               Foreground="{DynamicResource AccentBrush}" />
                 </StackPanel>
 
                 <StackPanel Orientation="Horizontal"

@@ -259,7 +259,7 @@ public sealed partial class DashboardVM : ResizablePanelVM, ITransient
         {
             Text = vm.Result.Topic.Severity.ToString(),
             VerticalAlignment = VerticalAlignment.Center,
-            Foreground = SeverityToBrushConverter.Convert(vm.Result.Topic.Severity),
+            Foreground = SeverityBrushes.Solid(vm.Result.Topic.Severity),
         };
     }
 
