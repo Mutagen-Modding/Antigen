@@ -18,6 +18,7 @@
     <SolidColorBrush x:Key="TextSecondaryBrush" Color="#DCD9E6" />
     <SolidColorBrush x:Key="TextMutedBrush" Color="#8C879E" />
     <SolidColorBrush x:Key="GlyphBrush" Color="#C9C6D6" />
+    <SolidColorBrush x:Key="LimeBrush" Color="#7ED321" />
     <SolidColorBrush x:Key="CloseGlyphHoverBrush" Color="#E16063" />
 
     <!-- Status -->

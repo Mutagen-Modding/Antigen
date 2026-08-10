@@ -27,6 +27,13 @@
         <Style Selector="Border#RowRoot:pointerover Button#ConfigureButton">
             <Setter Property="IsVisible" Value="True" />
         </Style>
+
+        <Style Selector="Border#ConfigureOverlay Button.ignore">
+            <Setter Property="Padding" Value="12,3" />
+            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
     </UserControl.Styles>
 
     <Border x:Name="RowRoot"
@@ -172,6 +179,52 @@
                                        FontSize="18" />
             </Button>
             </Grid>
+
+            <!-- Inline ignore overlay: covers just this row when configuring -->
+            <Border x:Name="ConfigureOverlay"
+                    IsVisible="{Binding IsConfiguring}"
+                    Background="#F21C1B21"
+                    CornerRadius="4">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                Margin="12,0"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="Ignore"
+                                   VerticalAlignment="Center"
+                                   FontSize="10"
+                                   FontWeight="Medium"
+                                   Foreground="{DynamicResource LimeBrush}" />
+
+                        <Button Classes="ignore"
+                                Content="Result"
+                                ToolTip.Tip="Ignore only this specific result"
+                                Command="{Binding IgnoreInstanceCommand}" />
+
+                        <Button Classes="ignore"
+                                Content="Topic"
+                                ToolTip.Tip="{Binding Result.Topic.TopicDefinition.Title, StringFormat='Ignore every \'{0}\' result'}"
+                                Command="{Binding IgnoreTopicCommand}" />
+
+                        <Button Classes="ignore"
+                                Content="Record"
+                                ToolTip.Tip="{Binding RecordDisplayName, StringFormat='Ignore all results for {0}'}"
+                                Command="{Binding IgnoreRecordCommand}" />
+                    </StackPanel>
+
+                    <Button Grid.Column="1"
+                            Theme="{StaticResource IconButton}"
+                            Margin="0,0,6,0"
+                            ToolTip.Tip="Cancel"
+                            Command="{Binding CancelConfigureCommand}">
+                        <Path Data="M 0,0 L 8,8 M 8,0 L 0,8"
+                              Stroke="{Binding $parent[Button].Foreground}"
+                              StrokeThickness="1.5"
+                              StrokeLineCap="Round" />
+                    </Button>
+                </Grid>
+            </Border>
         </Panel>
     </Border>
 </UserControl>

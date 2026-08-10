@@ -4,7 +4,6 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
              xmlns:topics="clr-namespace:Mutagen.Bethesda.Analyzers.SDK.Topics;assembly=Mutagen.Bethesda.Analyzers.SDK"
-             xmlns:system="clr-namespace:System;assembly=System.Runtime"
              xmlns:analyzer="clr-namespace:Antigen.Views.Analyzer"
              xmlns:converter="clr-namespace:Antigen.Resources.Converter"
              xmlns:viewModels="clr-namespace:Antigen.ViewModels"
@@ -116,19 +115,6 @@
                           Margin="0,8,0,0"
                           CornerRadius="8"
                           VerticalScrollBarVisibility="Auto">
-                <ScrollViewer.Resources>
-                    <converter:ReturnParameterIfTrueConverter x:Key="IfTrueConverter"
-                                                              x:TypeArguments="system:Double"
-                                                              DefaultValue="5" />
-                </ScrollViewer.Resources>
-
-                <ScrollViewer.Effect>
-                    <BlurEffect
-                        Radius="{Binding !CurrentSettingsViewResult,
-                                             Converter={StaticResource IfTrueConverter},
-                                             ConverterParameter=0}" />
-                </ScrollViewer.Effect>
-
                 <!-- Results List -->
                 <controls:FAItemsRepeater ItemsSource="{Binding FilteredResults}"
                                           Margin="0,0,14,0">
@@ -143,40 +129,6 @@
                     </controls:FAItemsRepeater.ItemTemplate>
                 </controls:FAItemsRepeater>
             </ScrollViewer>
-
-            <!-- Configure Mode -->
-            <Grid Grid.Row="0"
-                  Grid.RowSpan="2"
-                  VerticalAlignment="Stretch"
-                  HorizontalAlignment="Stretch"
-                  IsVisible="{Binding CurrentSettingsViewResult, Converter={x:Static ObjectConverters.IsNotNull}}"
-                  Background="#E0151515">
-                <StackPanel VerticalAlignment="Center"
-                            HorizontalAlignment="Center"
-                            IsVisible="{Binding CurrentSettingsViewResult, Converter={x:Static ObjectConverters.IsNotNull}}"
-                            Spacing="40">
-                    <Button Content="Ignore this instance only"
-                            HorizontalAlignment="Stretch"
-                            Command="{Binding IgnoreInstanceCommand}"
-                            CommandParameter="{Binding CurrentSettingsViewResult}" />
-
-                    <Button
-                        Content="{Binding CurrentSettingsViewResult?.Result.Topic.TopicDefinition.Title, StringFormat='{}Ignore all results for topic&#x0a;\'{0}\''}"
-                        HorizontalAlignment="Stretch"
-                        Command="{Binding IgnoreTopicTypeCommand}"
-                        CommandParameter="{Binding CurrentSettingsViewResult}" />
-
-                    <Button
-                        Content="{Binding CurrentSettingsViewResult?.RecordDisplayName, StringFormat='{}Ignore all reports for record&#x0a;\'{0}\''}"
-                        HorizontalAlignment="Stretch"
-                        Command="{Binding IgnoreRecordCommand}"
-                        CommandParameter="{Binding CurrentSettingsViewResult}" />
-
-                    <Button Content="Cancel"
-                            HorizontalAlignment="Center"
-                            Command="{Binding LeaveConfigureModeCommand}" />
-                </StackPanel>
-            </Grid>
         </Grid>
     </Border>
 </UserControl>

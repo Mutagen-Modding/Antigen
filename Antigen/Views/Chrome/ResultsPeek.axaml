@@ -3,7 +3,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="clr-namespace:FluentAvalonia.UI.Controls;assembly=FluentAvalonia"
-             xmlns:converter="clr-namespace:Antigen.Resources.Converter"
+             xmlns:analyzer="clr-namespace:Antigen.Views.Analyzer"
              xmlns:viewModels="clr-namespace:Antigen.ViewModels"
              xmlns:results="clr-namespace:Antigen.ViewModels.Analyzer"
              mc:Ignorable="d"
@@ -11,14 +11,6 @@
              d:DesignHeight="220"
              x:Class="Antigen.Views.Chrome.ResultsPeek"
              x:DataType="viewModels:MainVM">
-    <UserControl.Resources>
-        <converter:SeverityToBrushConverter x:Key="SeverityToBrushConverter" />
-    </UserControl.Resources>
-
-    <UserControl.Styles>
-        <StyleInclude Source="avares://Antigen/Resources/Styles/ResultRow.axaml" />
-    </UserControl.Styles>
-
     <ScrollViewer Margin="16,6"
                   VerticalScrollBarVisibility="Auto">
         <controls:FAItemsRepeater ItemsSource="{Binding CurrentAnalyzer.FilteredResults}"
@@ -29,42 +21,7 @@
 
             <controls:FAItemsRepeater.ItemTemplate>
                 <DataTemplate DataType="results:AnalyzerResultVM">
-                    <Border x:Name="RowRoot"
-                            Theme="{StaticResource ListRowBorder}"
-                            Margin="0,2"
-                            ClipToBounds="True">
-                        <Panel>
-                            <!-- Margin -1 bleeds the lip over the 1px border so it meets the stroke seamlessly -->
-                            <Border x:Name="RowLip"
-                                    Margin="-1"
-                                    CornerRadius="4"
-                                    IsHitTestVisible="False"
-                                    BorderBrush="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToRowLip}}" />
-                            <Grid ColumnDefinitions="Auto,Auto,*"
-                                  Margin="10,4,6,4">
-                            <TextBlock Grid.Column="0"
-                                       ToolTip.Tip="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToDescription}}"
-                                       Text="{Binding Result.Topic.Severity}"
-                                       Margin="0,0,6,0"
-                                       VerticalAlignment="Center"
-                                       FontSize="9"
-                                       FontWeight="Bold"
-                                       Foreground="{Binding Result.Topic.Severity, Converter={StaticResource SeverityToBrushConverter}}" />
-
-                            <TextBlock Grid.Column="1"
-                                       Text="{Binding RecordDisplayName}"
-                                       Margin="0,0,6,0"
-                                       FontSize="10"
-                                       FontWeight="Medium"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource TextSecondaryBrush}" />
-
-                            <ContentControl Grid.Column="2"
-                                            VerticalAlignment="Center"
-                                            Content="{Binding Result.Topic.FormattedTopic, Converter={StaticResource FormattedTopicConverter}}" />
-                            </Grid>
-                        </Panel>
-                    </Border>
+                    <analyzer:AnalyzerResultView />
                 </DataTemplate>
             </controls:FAItemsRepeater.ItemTemplate>
         </controls:FAItemsRepeater>

@@ -1,7 +1,6 @@
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
-using Antigen.Models.Settings;
 using Antigen.Services;
 using Antigen.ViewModels.Analyzer;
 using DynamicData;
@@ -23,6 +22,7 @@ public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
 
     private SettingsVM? _settingsVM;
     private DashboardVM? _dashboardVM;
+    private AnalyzerResultVM? _configuringResult;
 
     public ISettingsService SettingsService { get; }
     public ModWatcherVM ModWatcher { get; }
@@ -30,7 +30,6 @@ public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
     public ReadOnlyObservableCollection<AnalyzerResultVM> FilteredResults { get; }
 
     [Reactive] public partial string SearchText { get; set; } = string.Empty;
-    [Reactive] public partial AnalyzerResultVM? CurrentSettingsViewResult { get; set; }
 
     public AnalyzerVM(
         ActiveVmController activeVm,
@@ -53,11 +52,19 @@ public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
             .ToObservableChangeSet()
             .Transform(info =>
             {
-                var vm = new AnalyzerResultVM(info);
+                var vm = new AnalyzerResultVM(info, ModWatcher.IgnoreResult);
 
-                // Subscribe once when VM is created
+                // Only one row's ignore overlay is open at a time; close the previous one
                 vm.ConfigureRequested
-                    .Subscribe(targetVm => CurrentSettingsViewResult = targetVm)
+                    .Subscribe(targetVm =>
+                    {
+                        if (_configuringResult is { } previous && previous != targetVm)
+                        {
+                            previous.IsConfiguring = false;
+                        }
+
+                        _configuringResult = targetVm;
+                    })
                     .DisposeWith(this);
 
                 return vm;
@@ -109,39 +116,6 @@ public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
     private void OpenDashboard()
     {
         _activeVm.Active = _dashboardVM ??= _dashboardVMFactory(this);
-    }
-
-    [ReactiveCommand]
-    private void EnterConfigureMode(AnalyzerResultVM resultVM)
-    {
-        CurrentSettingsViewResult = resultVM;
-    }
-
-    [ReactiveCommand]
-    private void LeaveConfigureMode()
-    {
-        CurrentSettingsViewResult = null;
-    }
-
-    [ReactiveCommand]
-    private void IgnoreInstance(AnalyzerResultVM resultVM)
-    {
-        ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Instance);
-        LeaveConfigureMode();
-    }
-
-    [ReactiveCommand]
-    private void IgnoreTopicType(AnalyzerResultVM resultVM)
-    {
-        ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Topic);
-        LeaveConfigureMode();
-    }
-
-    [ReactiveCommand]
-    private void IgnoreRecord(AnalyzerResultVM resultVM)
-    {
-        ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Record);
-        LeaveConfigureMode();
     }
 
     [ReactiveCommand]
