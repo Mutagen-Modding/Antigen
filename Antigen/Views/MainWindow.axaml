@@ -37,48 +37,49 @@
                 </Style>
             </Border.Styles>
 
-            <Grid RowDefinitions="Auto,Auto,*,Auto,Auto">
-                <chrome:TitleBar Grid.Row="0"
+            <DockPanel>
+                <chrome:TitleBar DockPanel.Dock="Top"
                                  IsVisible="{Binding IsExpanded}" />
 
-                <Rectangle Grid.Row="1"
+                <Rectangle DockPanel.Dock="Top"
                            Height="1"
                            IsVisible="{Binding IsExpanded}"
                            Fill="{DynamicResource TitleDividerBrush}" />
 
-                <ContentControl Grid.Row="2"
-                                IsVisible="{Binding IsExpanded}"
-                                Content="{Binding ActivePanel}">
-                    <ContentControl.DataTemplates>
-                        <DataTemplate DataType="viewModels:HomeVM">
-                            <views:HomeView />
-                        </DataTemplate>
-                        <DataTemplate DataType="viewModels:AnalyzerVM">
-                            <analyzerViews:AnalyzerView />
-                        </DataTemplate>
-                        <DataTemplate DataType="viewModels:DashboardVM">
-                            <analyzerViews:DashboardView />
-                        </DataTemplate>
-                        <DataTemplate DataType="viewModels:GlobalSettingsVM">
-                            <settingsViews:GlobalSettingsView />
-                        </DataTemplate>
-                        <DataTemplate DataType="viewModels:SettingsVM">
-                            <settingsViews:SettingsView />
-                        </DataTemplate>
-                    </ContentControl.DataTemplates>
-                </ContentControl>
+                <!-- Docks against the monitor edge the capsule sits on, so a peek grows the other way. -->
+                <chrome:StatusBar DockPanel.Dock="{Binding StatusBarDock}"
+                                  IsVisible="{Binding ShowStatusBar}" />
 
-                <chrome:ResultsPeek Grid.Row="2"
-                                    IsVisible="{Binding ShowPeek}" />
-
-                <Rectangle Grid.Row="3"
+                <Rectangle DockPanel.Dock="{Binding StatusBarDock}"
                            Height="1"
                            IsVisible="{Binding ShowStatusDivider}"
                            Fill="{DynamicResource StatusDividerBrush}" />
 
-                <chrome:StatusBar Grid.Row="4"
-                                  IsVisible="{Binding ShowStatusBar}" />
-            </Grid>
+                <Panel>
+                    <ContentControl IsVisible="{Binding IsExpanded}"
+                                    Content="{Binding ActivePanel}">
+                        <ContentControl.DataTemplates>
+                            <DataTemplate DataType="viewModels:HomeVM">
+                                <views:HomeView />
+                            </DataTemplate>
+                            <DataTemplate DataType="viewModels:AnalyzerVM">
+                                <analyzerViews:AnalyzerView />
+                            </DataTemplate>
+                            <DataTemplate DataType="viewModels:DashboardVM">
+                                <analyzerViews:DashboardView />
+                            </DataTemplate>
+                            <DataTemplate DataType="viewModels:GlobalSettingsVM">
+                                <settingsViews:GlobalSettingsView />
+                            </DataTemplate>
+                            <DataTemplate DataType="viewModels:SettingsVM">
+                                <settingsViews:SettingsView />
+                            </DataTemplate>
+                        </ContentControl.DataTemplates>
+                    </ContentControl>
+
+                    <chrome:ResultsPeek IsVisible="{Binding ShowPeek}" />
+                </Panel>
+            </DockPanel>
         </Border>
 
         <Border x:Name="ResizeGrip"

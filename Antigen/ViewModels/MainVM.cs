@@ -3,6 +3,7 @@ using System.Reactive.Linq;
 using Antigen.Models.Settings;
 using Antigen.Services;
 using Antigen.Views;
+using Avalonia.Controls;
 using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;
@@ -32,6 +33,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
     [Reactive] public partial AnalyzerVM? CurrentAnalyzer { get; set; }
     [Reactive] public partial int WindowX { get; set; }
     [Reactive] public partial int WindowY { get; set; }
+    [Reactive] public partial bool AnchoredToBottom { get; set; }
 
     public string Version { get; }
     public string ProfileName { get; }
@@ -57,6 +59,15 @@ public sealed partial class MainVM : ViewModel, ISingleton
     [ObservableAsProperty(PropertyName = "ShowStatusBar", InitialValue = "false")]
     private IObservable<bool> ShowStatusBarObservable() =>
         this.WhenAnyValue(x => x.CurrentWatcher).Select(watcher => watcher is not null);
+
+    [ObservableAsProperty(PropertyName = "StatusBarDock", InitialValue = "global::Avalonia.Controls.Dock.Bottom")]
+    private IObservable<Dock> StatusBarDockObservable() =>
+        this.WhenAnyValue(x => x.ShowPeek, x => x.AnchoredToBottom,
+            (peeking, bottom) => peeking && !bottom ? Dock.Top : Dock.Bottom);
+
+    [ObservableAsProperty(PropertyName = "PeekArrowDown", InitialValue = "true")]
+    private IObservable<bool> PeekArrowDownObservable() =>
+        this.WhenAnyValue(x => x.ShowPeek, x => x.AnchoredToBottom, (peeking, bottom) => peeking == bottom);
 
     [ObservableAsProperty(PropertyName = "ShowStatusDivider", InitialValue = "false")]
     private IObservable<bool> ShowStatusDividerObservable() =>

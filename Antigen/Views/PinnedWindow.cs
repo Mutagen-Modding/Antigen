@@ -31,6 +31,8 @@ public abstract class PinnedWindow : Window
             Focus();
         }
 
-        BeginMoveDrag(e);
+        BeginDrag(e);
     }
+
+    protected virtual void BeginDrag(PointerPressedEventArgs e) => BeginMoveDrag(e);
 }
