@@ -31,7 +31,7 @@ public sealed partial class SkyrimFormattedTopicConverters : IFormattedTopicConv
         {
             VerticalAlignment = VerticalAlignment.Center,
             TextWrapping = TextWrapping.Wrap,
-            FontSize = 10,
+            FontSize = 12,
             Foreground = StandardBrushes.DarkGrayBrush
         };
         textBlock.Inlines ??= new InlineCollection();
@@ -51,7 +51,7 @@ public sealed partial class SkyrimFormattedTopicConverters : IFormattedTopicConv
             textBlock.Inlines.Add(new Run
             {
                 Text = textPart,
-                FontSize = 10,
+                FontSize = 12,
                 BaselineAlignment = BaselineAlignment.Center
             });
 
@@ -70,7 +70,7 @@ public sealed partial class SkyrimFormattedTopicConverters : IFormattedTopicConv
             textBlock.Inlines.Add(new InlineUIContainer(new Button
             {
                 Content = item?.ToString(),
-                FontSize = 10,
+                FontSize = 12,
                 Background = Brushes.Transparent,
                 BorderThickness = new Thickness(0),
                 Foreground = StandardBrushes.TextBrush,

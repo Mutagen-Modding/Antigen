@@ -30,7 +30,7 @@
 
         <Style Selector="Border#ConfigureOverlay Button.ignore">
             <Setter Property="Padding" Value="12,3" />
-            <Setter Property="FontSize" Value="10" />
+            <Setter Property="FontSize" Value="12" />
             <Setter Property="FontWeight" Value="Medium" />
             <Setter Property="HorizontalContentAlignment" Value="Center" />
         </Style>
@@ -58,7 +58,7 @@
                                Text="{Binding Result.Topic.Severity}"
                                Margin="0,0,6,0"
                                VerticalAlignment="Center"
-                               FontSize="9"
+                               FontSize="11"
                                FontWeight="Bold"
                                Foreground="{Binding Result.Topic.Severity, Converter={StaticResource SeverityToBrushConverter}}" />
 
@@ -71,7 +71,7 @@
                             Background="Gray">
                         <TextBlock
                             Text="{Binding Result.Record?.Type, Converter={x:Static converter:RecordTypeConverters.GetName}}"
-                            FontSize="9"
+                            FontSize="11"
                             Foreground="Black"
                             FontWeight="Bold" />
                     </Border>
@@ -85,7 +85,7 @@
                             BorderThickness="0"
                             Padding="2"
                             Content="{Binding Result.Topic.TopicDefinition.Title}"
-                            FontSize="9"
+                            FontSize="11"
                             FontWeight="Medium"
                             Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
                             VerticalAlignment="Center" />
@@ -136,7 +136,7 @@
                             Padding="0"
                             Click="Copy_PointerPressed"
                             ToolTip.Tip="Copy Record Identifier"
-                            FontSize="10"
+                            FontSize="12"
                             FontWeight="Medium"
                             Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
                             VerticalAlignment="Center" />
@@ -144,7 +144,7 @@
                     <!-- Colon -->
                     <TextBlock Grid.Column="1"
                                Text=":"
-                               FontSize="10"
+                               FontSize="12"
                                FontWeight="Medium"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
                                VerticalAlignment="Center" />
@@ -161,7 +161,7 @@
                             Padding="2"
                             ToolTip.Tip="Copy Parent Identifier"
                             Click="Copy_PointerPressed"
-                            FontSize="10"
+                            FontSize="12"
                             FontWeight="Medium"
                             Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
                             VerticalAlignment="Center" />
@@ -193,7 +193,7 @@
                                 VerticalAlignment="Center">
                         <TextBlock Text="Ignore"
                                    VerticalAlignment="Center"
-                                   FontSize="10"
+                                   FontSize="12"
                                    FontWeight="Medium"
                                    Foreground="{DynamicResource LimeBrush}" />
 
