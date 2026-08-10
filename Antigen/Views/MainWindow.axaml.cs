@@ -80,6 +80,8 @@ public partial class MainWindow : PinnedWindow, IMainWindow
         var requested = _resizeRequested;
         _resizeRequested = false;
 
+        RememberExpandedSize(e.NewSize);
+
         if (!requested
             || _isResizing
             || _isDragging
@@ -101,6 +103,15 @@ public partial class MainWindow : PinnedWindow, IMainWindow
 
         _placed = placed;
         Position = placed;
+    }
+
+    private void RememberExpandedSize(Size size)
+    {
+        if (_isResizing || WindowState != WindowState.Normal) return;
+        if (Panel is not { IsExpanded: true } panel) return;
+
+        panel.ExpandedWidth = size.Width;
+        panel.ExpandedHeight = size.Height;
     }
 
     protected override void BeginDrag(PointerPressedEventArgs e)

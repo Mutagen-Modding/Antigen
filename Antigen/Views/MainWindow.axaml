@@ -23,17 +23,21 @@
     <Panel>
         <Border x:Name="WindowRoot"
                 Classes.collapsed="{Binding !IsExpanded}"
-                Background="{DynamicResource WindowBackgroundBrush}"
+                Classes.peeking="{Binding ShowPeek}"
                 BorderBrush="{DynamicResource WindowBorderBrush}"
                 BorderThickness="1"
                 ClipToBounds="True">
             <Border.Styles>
                 <Style Selector="Border#WindowRoot">
                     <Setter Property="CornerRadius" Value="8" />
+                    <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}" />
                 </Style>
                 <Style Selector="Border#WindowRoot.collapsed">
-                    <Setter Property="CornerRadius" Value="20" />
-                    <Setter Property="Background" Value="{DynamicResource CollapsedBackgroundBrush}" />
+                    <Setter Property="CornerRadius" Value="15" />
+                    <Setter Property="Background" Value="{DynamicResource CapsuleBackgroundBrush}" />
+                </Style>
+                <Style Selector="Border#WindowRoot.collapsed.peeking">
+                    <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}" />
                 </Style>
             </Border.Styles>
 

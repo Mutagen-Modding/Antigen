@@ -7,7 +7,7 @@ namespace Antigen.ViewModels;
 
 public abstract partial class ResizablePanelVM : ViewModel
 {
-    protected const double CollapsedHeight = 40.0;
+    protected const double CollapsedHeight = 30.0;
     protected const double PeekHeight = 260.0;
     protected const double DefaultPanelWidth = 1050.0;
     protected const double CapsuleWidth = 800.0;

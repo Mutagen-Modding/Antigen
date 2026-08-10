@@ -1,7 +1,6 @@
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <Color x:Key="BaseColor">#0C0E13</Color>
-    <Color x:Key="CollapsedColor">#15171C</Color>
     <Color x:Key="BorderColor">#2A2350</Color>
     <Color x:Key="AccentColor">#B6F24A</Color>
     <Color x:Key="AccentTransparentColor">#00B6F24A</Color>
@@ -26,7 +25,18 @@
         <GradientStop Color="{StaticResource BaseColor}" Offset="0.14" />
         <GradientStop Color="{StaticResource GlowColor}" Offset="0.9" />
     </RadialGradientBrush>
-    <SolidColorBrush x:Key="CollapsedBackgroundBrush" Color="{StaticResource CollapsedColor}" />
+
+    <!-- Anchored bottom right, but stretched vertically so the capsule reads mostly left to right. -->
+    <RadialGradientBrush x:Key="CapsuleBackgroundBrush"
+                         Center="100%,100%"
+                         GradientOrigin="100%,100%"
+                         RadiusX="130%"
+                         RadiusY="600%">
+        <GradientStop Color="{StaticResource GlowColor}" Offset="0" />
+        <GradientStop Color="{StaticResource BaseColor}" Offset="0.35" />
+        <GradientStop Color="{StaticResource AccentCornerColor}" Offset="0.85" />
+    </RadialGradientBrush>
+
     <SolidColorBrush x:Key="WindowBorderBrush" Color="{StaticResource BorderColor}" />
 
     <LinearGradientBrush x:Key="TitleDividerBrush"

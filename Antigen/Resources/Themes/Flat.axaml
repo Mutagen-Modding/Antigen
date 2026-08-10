@@ -17,7 +17,7 @@
     <Color x:Key="SeverityInfoColor">#228B22</Color>
 
     <SolidColorBrush x:Key="WindowBackgroundBrush" Color="{StaticResource BaseColor}" />
-    <SolidColorBrush x:Key="CollapsedBackgroundBrush" Color="{StaticResource CollapsedColor}" />
+    <SolidColorBrush x:Key="CapsuleBackgroundBrush" Color="{StaticResource CollapsedColor}" />
     <SolidColorBrush x:Key="WindowBorderBrush" Color="{StaticResource BorderColor}" />
 
     <LinearGradientBrush x:Key="TitleDividerBrush"
