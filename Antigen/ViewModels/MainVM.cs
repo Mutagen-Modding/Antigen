@@ -126,6 +126,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
     [ReactiveCommand]
     private void OpenSettings()
     {
+        _globalSettings.ReturnTo = _activeVm.Active;
         _activeVm.Active = _globalSettings;
     }
 

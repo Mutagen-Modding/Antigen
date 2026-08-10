@@ -20,6 +20,8 @@ public sealed partial class GlobalSettingsVM : ResizablePanelVM, INumWorkThreads
 
     public static ColorScheme[] ColorSchemes { get; } = Enum.GetValues<ColorScheme>();
 
+    public ResizablePanelVM? ReturnTo { get; set; }
+
     [ObservableAsProperty]
     private IObservable<int> WorkerThreads() =>
         this.WhenAnyValue(x => x.CorePercentage).Select(ToThreadCount);
@@ -54,7 +56,7 @@ public sealed partial class GlobalSettingsVM : ResizablePanelVM, INumWorkThreads
     [ReactiveCommand]
     private void Back()
     {
-        _activeVm.Active = _homeVM;
+        _activeVm.Active = ReturnTo ?? _homeVM;
     }
 
     private static int ToThreadCount(double percentage) =>
