@@ -26,6 +26,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
 
     private ResizablePanelVM? _sizedPanel;
     private double _expandedHeight;
+    private double _expandedWidth;
 
     public static Severity[] SeverityValues { get; } = Enum.GetValues<Severity>();
 
@@ -104,11 +105,12 @@ public sealed partial class MainVM : ViewModel, ISingleton
             WindowY = saved.WindowY;
         }
         _expandedHeight = SavedSettings?.ExpandedHeight ?? homeVM.ExpandedHeight;
+        _expandedWidth = SavedSettings?.ExpandedWidth ?? homeVM.ExpandedWidth;
 
         InitializeOAPH();
 
         _activeVm.WhenAnyValue(x => x.Active)
-            .Subscribe(CarryHeight)
+            .Subscribe(CarrySize)
             .DisposeWith(this);
 
         _activeVm.Active = homeVM;
@@ -128,6 +130,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
             WindowX = WindowX,
             WindowY = WindowY,
             ExpandedHeight = ActivePanel?.ExpandedHeight ?? _expandedHeight,
+            ExpandedWidth = ActivePanel?.ExpandedWidth ?? _expandedWidth,
             WorkerThreadPercentage = _globalSettings.CorePercentage,
             ColorScheme = _globalSettings.ColorScheme
         };
@@ -192,16 +195,18 @@ public sealed partial class MainVM : ViewModel, ISingleton
     }
 
     // Carry the resized height across panel switches so the window keeps its size.
-    private void CarryHeight(ResizablePanelVM? panel)
+    private void CarrySize(ResizablePanelVM? panel)
     {
         if (_sizedPanel is { } leaving)
         {
             _expandedHeight = leaving.ExpandedHeight;
+            _expandedWidth = leaving.ExpandedWidth;
         }
 
         _sizedPanel = panel;
         if (panel is null) return;
 
         panel.ExpandedHeight = Math.Clamp(_expandedHeight, panel.MinResizeHeight, panel.MaxResizeHeight);
+        panel.ExpandedWidth = Math.Clamp(_expandedWidth, panel.MinResizeWidth, panel.MaxResizeWidth);
     }
 }

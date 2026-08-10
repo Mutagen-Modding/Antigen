@@ -14,7 +14,7 @@
         x:DataType="viewModels:MainVM"
         Background="Transparent"
         FontFamily="Open Sans"
-        Width="{Binding ActivePanel.PanelWidth}"
+        Width="{Binding ActivePanel.CurrentWindowWidth}"
         Height="{Binding ActivePanel.CurrentWindowHeight}"
         Title="Antigen"
         Topmost="True"
@@ -82,11 +82,37 @@
             </DockPanel>
         </Border>
 
-        <Border x:Name="ResizeGrip"
+        <Border x:Name="ResizeGripBottom"
                 Height="10"
+                Margin="0,0,10,0"
                 VerticalAlignment="Bottom"
                 Background="Transparent"
                 Cursor="SizeNorthSouth"
+                IsVisible="{Binding IsExpanded}"
+                ToolTip.Tip="Drag to resize"
+                PointerPressed="ResizeGrip_PointerPressed"
+                PointerMoved="ResizeGrip_PointerMoved"
+                PointerReleased="ResizeGrip_PointerReleased" />
+
+        <Border x:Name="ResizeGripRight"
+                Width="10"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Right"
+                Background="Transparent"
+                Cursor="SizeWestEast"
+                IsVisible="{Binding IsExpanded}"
+                ToolTip.Tip="Drag to resize"
+                PointerPressed="ResizeGrip_PointerPressed"
+                PointerMoved="ResizeGrip_PointerMoved"
+                PointerReleased="ResizeGrip_PointerReleased" />
+
+        <Border x:Name="ResizeGripCorner"
+                Width="10"
+                Height="10"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Background="Transparent"
+                Cursor="BottomRightCorner"
                 IsVisible="{Binding IsExpanded}"
                 ToolTip.Tip="Drag to resize"
                 PointerPressed="ResizeGrip_PointerPressed"

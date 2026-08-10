@@ -12,8 +12,11 @@ public partial class MainWindow : PinnedWindow, IMainWindow
     private readonly record struct Anchor(PixelPoint Corner, bool Right, bool Bottom);
 
     private bool _isResizing;
+    private bool _resizesWidth;
+    private bool _resizesHeight;
     private bool _resizeRequested;
-    private double _dragStartY;
+    private Point _dragStart;
+    private double _originalWidth;
     private double _originalHeight;
     private Anchor? _anchor;
     private PixelPoint? _placed;
@@ -217,20 +220,26 @@ public partial class MainWindow : PinnedWindow, IMainWindow
 
     private void ResizeGrip_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
-        if (Panel is null) return;
+        if (Panel is not { } panel) return;
 
         _isResizing = true;
-        _dragStartY = e.GetPosition(null).Y;
-        _originalHeight = Panel.CurrentWindowHeight;
+        _resizesWidth = !ReferenceEquals(sender, ResizeGripBottom);
+        _resizesHeight = !ReferenceEquals(sender, ResizeGripRight);
+        _dragStart = e.GetPosition(null);
+        _originalWidth = panel.CurrentWindowWidth;
+        _originalHeight = panel.CurrentWindowHeight;
         e.Pointer.Capture(sender as IInputElement);
         e.Handled = true;
     }
 
     private void ResizeGrip_PointerMoved(object? sender, PointerEventArgs e)
     {
-        if (!_isResizing || Panel is null) return;
+        if (!_isResizing || Panel is not { } panel) return;
 
-        Panel.Resize(_originalHeight + (e.GetPosition(null).Y - _dragStartY));
+        var moved = e.GetPosition(null) - _dragStart;
+        panel.Resize(
+            _resizesWidth ? _originalWidth + moved.X : _originalWidth,
+            _resizesHeight ? _originalHeight + moved.Y : _originalHeight);
     }
 
     private void ResizeGrip_PointerReleased(object? sender, PointerReleasedEventArgs e)
