@@ -1,0 +1,26 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:analyzer="clr-namespace:Antigen.ViewModels.Analyzer"
+        xmlns:converter="clr-namespace:Antigen.Resources.Converter">
+    <!-- Set through a style rather than locally so the theme's :pointerover still wins -->
+    <Style Selector="Border#RowRoot"
+           x:DataType="analyzer:AnalyzerResultVM">
+        <Setter Property="Background" Value="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToRowFill}}" />
+    </Style>
+    <Style Selector="Border#RowRoot:pointerover"
+           x:DataType="analyzer:AnalyzerResultVM">
+        <Setter Property="Background" Value="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToRowHoverFill}}" />
+        <Setter Property="BorderBrush" Value="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToRowHoverStroke}}" />
+    </Style>
+    <Style Selector="Border#RowLip">
+        <Setter Property="BorderThickness" Value="2,0,0,0" />
+        <Setter Property="Transitions">
+            <Transitions>
+                <ThicknessTransition Property="BorderThickness" Duration="0:0:0.13" />
+            </Transitions>
+        </Setter>
+    </Style>
+    <Style Selector="Border#RowRoot:pointerover Border#RowLip">
+        <Setter Property="BorderThickness" Value="5,0,0,0" />
+    </Style>
+</Styles>

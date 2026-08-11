@@ -1,16 +1,26 @@
 using System.Reactive.Linq;
+using Antigen.Models.Settings;
 using Antigen.Services;
+using Noggog;
 using Noggog.WorkEngine;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
 
 namespace Antigen.ViewModels;
 
-public sealed partial class GlobalSettingsVM : ViewModel, INumWorkThreadsController, ISingleton
+public sealed partial class GlobalSettingsVM : ResizablePanelVM, INumWorkThreadsController, ISingleton
 {
     public const double DefaultPercentage = 0.5;
 
+    public override double MinResizeHeight => 150.0;
+
     [Reactive] public partial double CorePercentage { get; set; }
+
+    [Reactive] public partial ColorScheme ColorScheme { get; set; }
+
+    public static ColorScheme[] ColorSchemes { get; } = Enum.GetValues<ColorScheme>();
+
+    public ResizablePanelVM? ReturnTo { get; set; }
 
     [ObservableAsProperty]
     private IObservable<int> WorkerThreads() =>
@@ -19,12 +29,34 @@ public sealed partial class GlobalSettingsVM : ViewModel, INumWorkThreadsControl
     public IObservable<int?> NumDesiredThreads =>
         this.WhenAnyValue(x => x.CorePercentage).Select(p => (int?)ToThreadCount(p));
 
-    public GlobalSettingsVM(GuiSettingsService guiSettings)
+    private readonly ActiveVmController _activeVm;
+    private readonly HomeVM _homeVM;
+
+    public GlobalSettingsVM(
+        ActiveVmController activeVm,
+        HomeVM homeVM,
+        GuiSettingsService guiSettings,
+        ColorSchemeService colorSchemes)
     {
-        var saved = guiSettings.Load()?.WorkerThreadPercentage ?? DefaultPercentage;
-        CorePercentage = Math.Clamp(saved, 0, 1);
+        _activeVm = activeVm;
+        _homeVM = homeVM;
+        IsExpanded = true;
+
+        var saved = guiSettings.Load();
+        CorePercentage = Math.Clamp(saved?.WorkerThreadPercentage ?? DefaultPercentage, 0, 1);
+        ColorScheme = saved?.ColorScheme ?? ColorSchemeService.Default;
 
         InitializeOAPH();
+
+        this.WhenAnyValue(x => x.ColorScheme)
+            .Subscribe(colorSchemes.Apply)
+            .DisposeWith(this);
+    }
+
+    [ReactiveCommand]
+    private void Back()
+    {
+        _activeVm.Active = ReturnTo ?? _homeVM;
     }
 
     private static int ToThreadCount(double percentage) =>

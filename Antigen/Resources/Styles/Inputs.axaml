@@ -1,0 +1,24 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <ControlTheme x:Key="SearchTextBox"
+                  TargetType="TextBox"
+                  BasedOn="{StaticResource {x:Type TextBox}}">
+        <ControlTheme.Resources>
+            <LinearGradientBrush x:Key="SearchUnderlineBrush"
+                                 StartPoint="0%,0%"
+                                 EndPoint="0%,100%">
+                <GradientStop Offset="0" Color="#33FFFFFF" />
+                <GradientStop Offset="0.92" Color="#33FFFFFF" />
+                <GradientStop Offset="0.92" Color="#4AD9F2" />
+                <GradientStop Offset="1" Color="#4AD9F2" />
+            </LinearGradientBrush>
+        </ControlTheme.Resources>
+
+        <Style Selector="^:focus /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="{StaticResource SearchUnderlineBrush}" />
+        </Style>
+        <Style Selector="^:focus-within /template/ Border#PART_BorderElement">
+            <Setter Property="BorderBrush" Value="{StaticResource SearchUnderlineBrush}" />
+        </Style>
+    </ControlTheme>
+</ResourceDictionary>

@@ -19,149 +19,212 @@
         <converter:SeverityToBrushConverter x:Key="SeverityToBrushConverter" />
     </UserControl.Resources>
 
-    <Border BorderThickness="0,0,0,1"
-            Padding="8,6"
-            Margin="0,2">
-        <StackPanel Spacing="4"
-                    Background="Transparent">
-            <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto">
-                <!-- Severity -->
-                <Border Grid.Column="0"
-                        ToolTip.Tip="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToDescription}}"
-                        CornerRadius="2"
-                        Padding="4,2"
-                        Margin="0,0,6,0"
-                        VerticalAlignment="Top"
-                        Background="{Binding Result.Topic.Severity, Converter={StaticResource SeverityToBrushConverter}}">
-                    <TextBlock Text="{Binding Result.Topic.Severity}"
-                               FontSize="9"
-                               Foreground="Black"
-                               FontWeight="Bold" />
-                </Border>
+    <UserControl.Styles>
+        <StyleInclude Source="avares://Antigen/Resources/Styles/ResultRow.axaml" />
+        <Style Selector="Border#RowRoot Button#ConfigureButton">
+            <Setter Property="IsVisible" Value="False" />
+        </Style>
+        <Style Selector="Border#RowRoot:pointerover Button#ConfigureButton">
+            <Setter Property="IsVisible" Value="True" />
+        </Style>
 
-                <!-- Record Type -->
-                <Border Grid.Column="1"
-                        CornerRadius="2"
-                        Padding="4,2"
-                        Margin="0,0,6,0"
-                        VerticalAlignment="Top"
-                        Background="Gray">
-                    <TextBlock
-                        Text="{Binding Result.Record?.Type, Converter={x:Static converter:RecordTypeConverters.GetName}}"
-                        FontSize="9"
-                        Foreground="Black"
-                        FontWeight="Bold" />
-                </Border>
+        <Style Selector="Border#ConfigureOverlay Button.ignore">
+            <Setter Property="Padding" Value="12,3" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="FontWeight" Value="Medium" />
+            <Setter Property="HorizontalContentAlignment" Value="Center" />
+        </Style>
+    </UserControl.Styles>
 
-                <!-- Topic Title -->
-                <Button Grid.Column="2"
-                        ToolTip.Tip="Open Topic Definition"
-                        Command="{x:Static commands:OpenLinkCommands.OpenUriCommand}"
-                        CommandParameter="{Binding Result.Topic.TopicDefinition.InformationUri}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="2"
-                        Content="{Binding Result.Topic.TopicDefinition.Title}"
-                        FontSize="9"
-                        FontWeight="Medium"
-                        Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
-                        VerticalAlignment="Center" />
+    <Border x:Name="RowRoot"
+            Theme="{StaticResource ListRowBorder}"
+            Margin="0,2"
+            ClipToBounds="True">
+        <Panel>
+            <!-- Margin -1 bleeds the lip over the 1px border so it meets the stroke seamlessly -->
+            <Border x:Name="RowLip"
+                    Margin="-1"
+                    CornerRadius="4"
+                    IsHitTestVisible="False"
+                    BorderBrush="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToRowLip}}" />
+            <Grid ColumnDefinitions="*,42">
+            <StackPanel Grid.Column="0"
+                        Margin="12,6,8,6"
+                        Spacing="4">
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto">
+                    <!-- Severity -->
+                    <TextBlock Grid.Column="0"
+                               ToolTip.Tip="{Binding Result.Topic.Severity, Converter={x:Static converter:SeverityConverters.ToDescription}}"
+                               Text="{Binding Result.Topic.Severity}"
+                               Margin="0,0,6,0"
+                               VerticalAlignment="Center"
+                               FontSize="11"
+                               FontWeight="Bold"
+                               Foreground="{Binding Result.Topic.Severity, Converter={StaticResource SeverityToBrushConverter}}" />
 
-                <!-- Metadata -->
-                <Button Grid.Column="3"
-                        IsVisible="{Binding !!Result.Topic.MetaData.Length}"
-                        FontSize="12"
-                        Padding="4, 0"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        VerticalAlignment="Center">
-                    <Button.Flyout>
-                        <Flyout FlyoutPresenterClasses="Flyout1000x500">
-                            <TableView ItemsSource="{Binding Result.Topic.MetaData}">
-                                <TableView.Columns>
-                                    <TableViewColumn Header="Name"
-                                                     Width="200"
-                                                     Binding="{Binding Converter={x:Static converter:MetaDataConverters.ToName}}" />
-                                    <TableViewColumn Header="Value"
-                                                     Width="750"
-                                                     Binding="{Binding Converter={x:Static converter:MetaDataConverters.ToValue}}">
-                                        <TableViewColumn.CellTemplate>
-                                            <DataTemplate>
-                                                <TextBlock
-                                                    Text="{Binding Converter={x:Static converter:MetaDataConverters.ToValue}}"
-                                                    TextWrapping="Wrap" />
-                                            </DataTemplate>
-                                        </TableViewColumn.CellTemplate>
-                                    </TableViewColumn>
-                                </TableView.Columns>
-                            </TableView>
-                        </Flyout>
-                    </Button.Flyout>
+                    <!-- Record Type -->
+                    <Border Grid.Column="1"
+                            CornerRadius="2"
+                            Padding="4,2"
+                            Margin="0,0,6,0"
+                            VerticalAlignment="Top"
+                            Background="Gray">
+                        <TextBlock
+                            Text="{Binding Result.Record?.Type, Converter={x:Static converter:RecordTypeConverters.GetName}}"
+                            FontSize="11"
+                            Foreground="Black"
+                            FontWeight="Bold" />
+                    </Border>
 
-                    <controls:FAFontIcon Glyph="ℹ️"
-                                         FontSize="12"
-                                         ToolTip.Tip="{Binding Result.Topic.MetaData, Converter={x:Static converter:MetaDataConverters.ToString}}" />
-                </Button>
+                    <!-- Topic Title -->
+                    <Button Grid.Column="2"
+                            ToolTip.Tip="Open Topic Definition"
+                            Command="{x:Static commands:OpenLinkCommands.OpenUriCommand}"
+                            CommandParameter="{Binding Result.Topic.TopicDefinition.InformationUri}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="2"
+                            Content="{Binding Result.Topic.TopicDefinition.Title}"
+                            FontSize="11"
+                            FontWeight="Medium"
+                            Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                            VerticalAlignment="Center" />
+
+                    <!-- Metadata -->
+                    <Button Grid.Column="3"
+                            IsVisible="{Binding !!Result.Topic.MetaData.Length}"
+                            FontSize="12"
+                            Padding="4, 0"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            VerticalAlignment="Center">
+                        <Button.Flyout>
+                            <Flyout FlyoutPresenterClasses="Flyout1000x500">
+                                <TableView ItemsSource="{Binding Result.Topic.MetaData}">
+                                    <TableView.Columns>
+                                        <TableViewColumn Header="Name"
+                                                         Width="200"
+                                                         Binding="{Binding Converter={x:Static converter:MetaDataConverters.ToName}}" />
+                                        <TableViewColumn Header="Value"
+                                                         Width="750"
+                                                         Binding="{Binding Converter={x:Static converter:MetaDataConverters.ToValue}}">
+                                            <TableViewColumn.CellTemplate>
+                                                <DataTemplate>
+                                                    <TextBlock
+                                                        Text="{Binding Converter={x:Static converter:MetaDataConverters.ToValue}}"
+                                                        TextWrapping="Wrap" />
+                                                </DataTemplate>
+                                            </TableViewColumn.CellTemplate>
+                                        </TableViewColumn>
+                                    </TableView.Columns>
+                                </TableView>
+                            </Flyout>
+                        </Button.Flyout>
+
+                        <controls:FAFontIcon Glyph="ℹ️"
+                                             FontSize="12"
+                                             ToolTip.Tip="{Binding Result.Topic.MetaData, Converter={x:Static converter:MetaDataConverters.ToString}}" />
+                    </Button>
+                </Grid>
+
+                <Grid ColumnDefinitions="Auto,6,*,Auto">
+                    <!-- Record Identifier -->
+                    <Button Grid.Column="0"
+                            Content="{Binding RecordDisplayName}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="0"
+                            Click="Copy_PointerPressed"
+                            ToolTip.Tip="Copy Record Identifier"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                            VerticalAlignment="Center" />
+
+                    <!-- Colon -->
+                    <TextBlock Grid.Column="1"
+                               Text=":"
+                               FontSize="12"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                               VerticalAlignment="Center" />
+
+                    <!-- Message -->
+                    <ContentControl Grid.Column="2"
+                                    Content="{Binding Result.Topic.FormattedTopic, Converter={StaticResource FormattedTopicConverter}}" />
+
+                    <!-- Parent -->
+                    <Button Grid.Column="3"
+                            Content="{Binding ParentDisplayName}"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Padding="2"
+                            ToolTip.Tip="Copy Parent Identifier"
+                            Click="Copy_PointerPressed"
+                            FontSize="12"
+                            FontWeight="Medium"
+                            Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
+                            VerticalAlignment="Center" />
+                </Grid>
+            </StackPanel>
+
+            <!-- Configure Button -->
+            <Button Grid.Column="1"
+                    x:Name="ConfigureButton"
+                    Theme="{StaticResource IconButton}"
+                    VerticalAlignment="Stretch"
+                    ToolTip.Tip="Configure this result"
+                    Command="{Binding RequestConfigureCommand}">
+                <controls:FASymbolIcon Symbol="SettingsFilled"
+                                       FontSize="18" />
+            </Button>
             </Grid>
 
-            <Grid ColumnDefinitions="Auto,6,*,Auto,Auto,Auto">
-                <!-- Record Identifier -->
-                <Button Grid.Column="0"
-                        Content="{Binding RecordDisplayName}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="0"
-                        Click="Copy_PointerPressed"
-                        ToolTip.Tip="Copy Record Identifier"
-                        FontSize="10"
-                        FontWeight="Medium"
-                        Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
-                        VerticalAlignment="Center" />
+            <!-- Inline ignore overlay: covers just this row when configuring -->
+            <Border x:Name="ConfigureOverlay"
+                    IsVisible="{Binding IsConfiguring}"
+                    Background="#F21C1B21"
+                    CornerRadius="4">
+                <Grid ColumnDefinitions="*,Auto">
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                Margin="12,0"
+                                VerticalAlignment="Center">
+                        <TextBlock Text="Ignore"
+                                   VerticalAlignment="Center"
+                                   FontSize="12"
+                                   FontWeight="Medium"
+                                   Foreground="{DynamicResource LimeBrush}" />
 
-                <!-- Colon -->
-                <TextBlock Grid.Column="1"
-                           Text=":"
-                           FontSize="10"
-                           FontWeight="Medium"
-                           Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
-                           VerticalAlignment="Center" />
+                        <Button Classes="ignore"
+                                Content="Result"
+                                ToolTip.Tip="Ignore only this specific result"
+                                Command="{Binding IgnoreInstanceCommand}" />
 
-                <!-- Message -->
-                <ContentControl Grid.Column="2"
-                                Content="{Binding Result.Topic.FormattedTopic, Converter={StaticResource FormattedTopicConverter}}" />
+                        <Button Classes="ignore"
+                                Content="Topic"
+                                ToolTip.Tip="{Binding Result.Topic.TopicDefinition.Title, StringFormat='Ignore every \'{0}\' result'}"
+                                Command="{Binding IgnoreTopicCommand}" />
 
-                <!-- Parent -->
-                <Button Grid.Column="4"
-                        Content="{Binding ParentDisplayName}"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        Padding="2"
-                        ToolTip.Tip="Copy Parent Identifier"
-                        Click="Copy_PointerPressed"
-                        FontSize="10"
-                        FontWeight="Medium"
-                        Foreground="{DynamicResource SystemControlForegroundBaseMediumLowBrush}"
-                        VerticalAlignment="Center" />
+                        <Button Classes="ignore"
+                                Content="Record"
+                                ToolTip.Tip="{Binding RecordDisplayName, StringFormat='Ignore all results for {0}'}"
+                                Command="{Binding IgnoreRecordCommand}" />
+                    </StackPanel>
 
-                <!-- Configure Button -->
-                <Button Grid.Column="5"
-                        FontSize="12"
-                        Padding="4,2"
-                        Background="Transparent"
-                        BorderThickness="0"
-                        VerticalAlignment="Center"
-                        ToolTip.Tip="Configure this result"
-                        Command="{Binding RequestConfigureCommand}">
-                    <controls:FASymbolIcon Symbol="SettingsFilled" />
-
-                    <Button.Styles>
-                        <Style Selector="Button:pointerover">
-                            <Setter Property="IsVisible"
-                                    Value="True" />
-                        </Style>
-                    </Button.Styles>
-                </Button>
-            </Grid>
-        </StackPanel>
+                    <Button Grid.Column="1"
+                            Theme="{StaticResource IconButton}"
+                            Margin="0,0,6,0"
+                            ToolTip.Tip="Cancel"
+                            Command="{Binding CancelConfigureCommand}">
+                        <Path Data="M 0,0 L 8,8 M 8,0 L 0,8"
+                              Stroke="{Binding $parent[Button].Foreground}"
+                              StrokeThickness="1.5"
+                              StrokeLineCap="Round" />
+                    </Button>
+                </Grid>
+            </Border>
+        </Panel>
     </Border>
 </UserControl>

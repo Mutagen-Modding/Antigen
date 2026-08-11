@@ -1,40 +1,123 @@
-﻿<Window xmlns="https://github.com/avaloniaui"
+<Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModels="clr-namespace:Antigen.ViewModels"
         xmlns:views="clr-namespace:Antigen.Views"
+        xmlns:chrome="clr-namespace:Antigen.Views.Chrome"
         xmlns:analyzerViews="clr-namespace:Antigen.Views.Analyzer"
+        xmlns:settingsViews="clr-namespace:Antigen.Views.Settings"
         mc:Ignorable="d"
-        d:DesignWidth="600"
-        d:DesignHeight="40"
+        d:DesignWidth="1050"
+        d:DesignHeight="696"
         x:Class="Antigen.Views.MainWindow"
         x:DataType="viewModels:MainVM"
         Background="Transparent"
-        Width="600"
+        FontFamily="Open Sans"
+        Width="{Binding ActivePanel.CurrentWindowWidth}"
         Height="{Binding ActivePanel.CurrentWindowHeight}"
         Title="Antigen"
         Topmost="True"
         WindowDecorations="None"
         WindowStartupLocation="Manual">
     <Panel>
-        <ContentControl Content="{Binding ActivePanel}">
-            <ContentControl.DataTemplates>
-                <DataTemplate DataType="viewModels:HomeVM">
-                    <views:HomeView />
-                </DataTemplate>
-                <DataTemplate DataType="viewModels:AnalyzerVM">
-                    <analyzerViews:AnalyzerView />
-                </DataTemplate>
-            </ContentControl.DataTemplates>
-        </ContentControl>
+        <Border x:Name="WindowRoot"
+                Classes.collapsed="{Binding !IsExpanded}"
+                Classes.peeking="{Binding ShowPeek}"
+                BorderBrush="{DynamicResource WindowBorderBrush}"
+                BorderThickness="1"
+                ClipToBounds="True">
+            <Border.Styles>
+                <Style Selector="Border#WindowRoot">
+                    <Setter Property="CornerRadius" Value="8" />
+                    <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}" />
+                </Style>
+                <Style Selector="Border#WindowRoot.collapsed">
+                    <Setter Property="CornerRadius" Value="15" />
+                    <Setter Property="Background" Value="{DynamicResource CapsuleBackgroundBrush}" />
+                </Style>
+                <Style Selector="Border#WindowRoot.collapsed.peeking">
+                    <Setter Property="Background" Value="{DynamicResource WindowBackgroundBrush}" />
+                </Style>
+            </Border.Styles>
 
-        <Border x:Name="ResizeGrip"
+            <DockPanel>
+                <chrome:TitleBar DockPanel.Dock="Top"
+                                 IsVisible="{Binding IsExpanded}" />
+
+                <Rectangle DockPanel.Dock="Top"
+                           Height="1"
+                           IsVisible="{Binding IsExpanded}"
+                           Fill="{DynamicResource TitleDividerBrush}" />
+
+                <!-- Docks against the monitor edge the capsule sits on, so a peek grows the other way. -->
+                <chrome:StatusBar DockPanel.Dock="{Binding StatusBarDock}"
+                                  IsVisible="{Binding ShowStatusBar}" />
+
+                <Rectangle DockPanel.Dock="{Binding StatusBarDock}"
+                           Height="1"
+                           IsVisible="{Binding ShowStatusDivider}"
+                           Fill="{DynamicResource StatusDividerBrush}" />
+
+                <Panel>
+                    <ContentControl IsVisible="{Binding IsExpanded}"
+                                    Content="{Binding ActivePanel}">
+                        <ContentControl.DataTemplates>
+                            <DataTemplate DataType="viewModels:HomeVM">
+                                <views:HomeView />
+                            </DataTemplate>
+                            <DataTemplate DataType="viewModels:AnalyzerVM">
+                                <analyzerViews:AnalyzerView />
+                            </DataTemplate>
+                            <DataTemplate DataType="viewModels:DashboardVM">
+                                <analyzerViews:DashboardView />
+                            </DataTemplate>
+                            <DataTemplate DataType="viewModels:GlobalSettingsVM">
+                                <settingsViews:GlobalSettingsView />
+                            </DataTemplate>
+                            <DataTemplate DataType="viewModels:SettingsVM">
+                                <settingsViews:SettingsView />
+                            </DataTemplate>
+                        </ContentControl.DataTemplates>
+                    </ContentControl>
+
+                    <chrome:ResultsPeek IsVisible="{Binding ShowPeek}" />
+                </Panel>
+            </DockPanel>
+        </Border>
+
+        <Border x:Name="ResizeGripBottom"
                 Height="10"
+                Margin="0,0,10,0"
                 VerticalAlignment="Bottom"
                 Background="Transparent"
                 Cursor="SizeNorthSouth"
-                IsVisible="{Binding ActivePanel.IsExpanded, FallbackValue=False}"
+                IsVisible="{Binding IsExpanded}"
+                ToolTip.Tip="Drag to resize"
+                PointerPressed="ResizeGrip_PointerPressed"
+                PointerMoved="ResizeGrip_PointerMoved"
+                PointerReleased="ResizeGrip_PointerReleased" />
+
+        <Border x:Name="ResizeGripRight"
+                Width="10"
+                Margin="0,0,0,10"
+                HorizontalAlignment="Right"
+                Background="Transparent"
+                Cursor="SizeWestEast"
+                IsVisible="{Binding IsExpanded}"
+                ToolTip.Tip="Drag to resize"
+                PointerPressed="ResizeGrip_PointerPressed"
+                PointerMoved="ResizeGrip_PointerMoved"
+                PointerReleased="ResizeGrip_PointerReleased" />
+
+        <Border x:Name="ResizeGripCorner"
+                Width="10"
+                Height="10"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Bottom"
+                Background="Transparent"
+                Cursor="BottomRightCorner"
+                IsVisible="{Binding IsExpanded}"
                 ToolTip.Tip="Drag to resize"
                 PointerPressed="ResizeGrip_PointerPressed"
                 PointerMoved="ResizeGrip_PointerMoved"

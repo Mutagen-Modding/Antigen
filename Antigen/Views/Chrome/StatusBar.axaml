@@ -1,0 +1,159 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converter="clr-namespace:Antigen.Resources.Converter"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="1050"
+             d:DesignHeight="30"
+             x:Class="Antigen.Views.Chrome.StatusBar"
+             x:DataType="viewModels:MainVM">
+    <UserControl.Resources>
+        <converter:BoolToColorConverter x:Key="StateDotColor"
+                                        ValidColor="#5BB85B"
+                                        ErrorColor="#E6912E" />
+    </UserControl.Resources>
+
+    <!-- Collapsed, this bar is the whole capsule, so it lets the capsule gradient through. -->
+    <Border x:Name="StatusRoot"
+            Height="30"
+            Classes.capsule="{Binding !IsExpanded}">
+        <Border.Styles>
+            <Style Selector="Border#StatusRoot">
+                <Setter Property="Background" Value="{DynamicResource StatusBarBrush}" />
+            </Style>
+            <Style Selector="Border#StatusRoot.capsule">
+                <Setter Property="Background" Value="Transparent" />
+            </Style>
+        </Border.Styles>
+
+        <Grid ColumnDefinitions="Auto,*,Auto"
+              Margin="10,0,6,0">
+            <StackPanel Grid.Column="0"
+                        Orientation="Horizontal"
+                        Spacing="9"
+                        IsVisible="{Binding !IsExpanded}"
+                        VerticalAlignment="Center">
+                <Ellipse Width="16"
+                         Height="16"
+                         Stroke="{DynamicResource AccentBrush}"
+                         StrokeThickness="1.4" />
+
+                <TextBlock Text="ANTIGEN"
+                           FontSize="12"
+                           FontWeight="SemiBold"
+                           LetterSpacing="1.5"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource TextPrimaryBrush}" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="1"
+                        Orientation="Horizontal"
+                        Spacing="16"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal"
+                            Spacing="9"
+                            VerticalAlignment="Center">
+                    <Ellipse Width="9"
+                             Height="9"
+                             VerticalAlignment="Center">
+                        <Ellipse.Fill>
+                            <SolidColorBrush
+                                Color="{Binding !CurrentWatcher.TotalResults, Converter={StaticResource StateDotColor}}" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                    <TextBlock Text="{Binding CurrentWatcher.AnalyzerStatus}"
+                               FontSize="13"
+                               FontWeight="Bold"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Spacing="5"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="New:"
+                               FontSize="12"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding CurrentWatcher.NewResultsCount}"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TallyNewBrush}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Spacing="5"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Resolved:"
+                               FontSize="12"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding CurrentWatcher.ResolvedResults}"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource AccentBrush}" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal"
+                            Spacing="5"
+                            VerticalAlignment="Center">
+                    <TextBlock Text="Total:"
+                               FontSize="12"
+                               FontWeight="Medium"
+                               Foreground="{DynamicResource TextMutedBrush}" />
+                    <TextBlock Text="{Binding CurrentWatcher.TotalResults}"
+                               FontSize="12"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextPrimaryBrush}" />
+                </StackPanel>
+            </StackPanel>
+
+            <StackPanel Grid.Column="2"
+                        Orientation="Horizontal"
+                        VerticalAlignment="Center">
+                <Button Theme="{StaticResource WindowCommandButton}"
+                        IsVisible="{Binding !IsExpanded}"
+                        Command="{Binding TogglePeekCommand}"
+                        ToolTip.Tip="Peek at results">
+                    <Grid VerticalAlignment="Center">
+                        <Path Data="M 0,0 L 5,5 L 10,0"
+                              IsVisible="{Binding PeekArrowDown}"
+                              Stroke="{Binding $parent[Button].Foreground}"
+                              StrokeThickness="1.5"
+                              StrokeLineCap="Round"
+                              StrokeJoin="Round" />
+                        <Path Data="M 0,5 L 5,0 L 10,5"
+                              IsVisible="{Binding !PeekArrowDown}"
+                              Stroke="{Binding $parent[Button].Foreground}"
+                              StrokeThickness="1.5"
+                              StrokeLineCap="Round"
+                              StrokeJoin="Round" />
+                    </Grid>
+                </Button>
+
+                <Button Theme="{StaticResource WindowCommandButton}"
+                        Command="{Binding ToggleCollapsedCommand}"
+                        ToolTip.Tip="Collapse / expand">
+                    <Border Width="18"
+                            Height="8"
+                            CornerRadius="4"
+                            Background="{Binding $parent[Button].Foreground}" />
+                </Button>
+
+                <Button Theme="{StaticResource WindowCommandButton}"
+                        Classes="close"
+                        IsVisible="{Binding !IsExpanded}"
+                        Command="{Binding CloseCommand}"
+                        ToolTip.Tip="Close">
+                    <Path Data="M 0,0 L 9,9 M 9,0 L 0,9"
+                          Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="1" />
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

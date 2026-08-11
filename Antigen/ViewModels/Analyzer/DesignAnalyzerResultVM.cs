@@ -11,7 +11,7 @@ namespace Antigen.ViewModels.Analyzer;
 /// <summary>
 ///     Design-time instance of <see cref="AnalyzerResultVM" /> for XAML designer support.
 /// </summary>
-public sealed class DesignAnalyzerResultVM() : AnalyzerResultVM(CreateDesignData())
+public sealed class DesignAnalyzerResultVM() : AnalyzerResultVM(CreateDesignData(), static (_, _) => { })
 {
     private static AnalyzerResultInfo CreateDesignData()
     {

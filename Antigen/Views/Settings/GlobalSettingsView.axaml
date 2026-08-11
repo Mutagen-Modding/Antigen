@@ -1,0 +1,73 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:converter="clr-namespace:Antigen.Resources.Converter"
+             xmlns:viewModels="clr-namespace:Antigen.ViewModels"
+             mc:Ignorable="d"
+             d:DesignWidth="1050"
+             d:DesignHeight="300"
+             x:Class="Antigen.Views.Settings.GlobalSettingsView"
+             x:DataType="viewModels:GlobalSettingsVM">
+    <Border Background="Transparent">
+        <StackPanel Orientation="Vertical"
+                    Margin="15">
+            <StackPanel Orientation="Horizontal"
+                        Spacing="6">
+                <Button Theme="{StaticResource IconButton}"
+                        Command="{Binding BackCommand}"
+                        ToolTip.Tip="Back">
+                    <Path Data="M 5,0 L 0,5 L 5,10"
+                          Margin="-6,0,0,0"
+                          Stroke="{Binding $parent[Button].Foreground}"
+                          StrokeThickness="1.5"
+                          StrokeLineCap="Round"
+                          StrokeJoin="Round" />
+                </Button>
+
+                <TextBlock Text="Processing"
+                           FontSize="16"
+                           FontWeight="Bold"
+                           VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Orientation="Vertical"
+                        Margin="12,10,0,0"
+                        Spacing="6">
+                <TextBlock Text="Worker Threads" />
+                <StackPanel Orientation="Horizontal"
+                            Spacing="12"
+                            VerticalAlignment="Center">
+                    <Slider Width="240"
+                            VerticalAlignment="Center"
+                            Minimum="0"
+                            Maximum="1"
+                            Value="{Binding CorePercentage}"
+                            ToolTip.Tip="Percentage of your processors to use while analyzing" />
+                    <TextBlock VerticalAlignment="Center"
+                               MinWidth="70"
+                               Foreground="{DynamicResource SystemColorGrayTextColor}"
+                               Text="{Binding WorkerThreadsProperty, StringFormat='{}{0} threads'}" />
+                </StackPanel>
+            </StackPanel>
+
+            <TextBlock Text="Appearance"
+                       FontSize="16"
+                       FontWeight="Bold"
+                       Margin="0,20,0,0" />
+            <StackPanel Orientation="Vertical"
+                        Margin="12,10,0,0"
+                        Spacing="6">
+                <TextBlock Text="Color Scheme" />
+                <ComboBox Width="240"
+                          ItemsSource="{x:Static viewModels:GlobalSettingsVM.ColorSchemes}"
+                          SelectedItem="{Binding ColorScheme}">
+                    <ComboBox.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Converter={x:Static converter:EnumConverters.ToStringWithSpaces}}" />
+                        </DataTemplate>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
+            </StackPanel>
+        </StackPanel>
+    </Border>
+</UserControl>

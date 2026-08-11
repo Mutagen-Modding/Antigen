@@ -1,67 +1,70 @@
 using System.Collections.ObjectModel;
 using System.Reactive;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
-using Antigen.Models.Settings;
 using Antigen.Services;
 using Antigen.ViewModels.Analyzer;
-using Antigen.Views;
-using Antigen.Views.Analyzer;
-using Avalonia.Controls;
 using DynamicData;
 using DynamicData.Binding;
-using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Plugins;
 using Noggog;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
-using SettingsWindow = Antigen.Views.Settings.SettingsWindow;
 
 namespace Antigen.ViewModels;
 
 public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
 {
-    private readonly Subject<Unit> _returnTrigger = new();
-
-    private readonly Func<ModKey, SettingsVM> _settingsVMFactory;
+    private readonly ActiveVmController _activeVm;
+    private readonly HomeVM _homeVM;
+    private readonly Func<AnalyzerVM, SettingsVM> _settingsVMFactory;
     private readonly Func<AnalyzerVM, DashboardVM> _dashboardVMFactory;
-    private readonly IMainWindow _mainWindow;
 
-    private AnalyzerDashboard? _dashboardWindow;
+    private SettingsVM? _settingsVM;
+    private DashboardVM? _dashboardVM;
+    private AnalyzerResultVM? _configuringResult;
 
-    public IObservable<Unit> ReturnRequested => _returnTrigger;
     public ISettingsService SettingsService { get; }
     public ModWatcherVM ModWatcher { get; }
     public ObservableCollectionExtended<Severity> EnabledSeverities { get; } = new(Enum.GetValues<Severity>());
     public ReadOnlyObservableCollection<AnalyzerResultVM> FilteredResults { get; }
 
     [Reactive] public partial string SearchText { get; set; } = string.Empty;
-    [Reactive] public partial AnalyzerResultVM? CurrentSettingsViewResult { get; set; }
 
     public AnalyzerVM(
-        Func<ModKey, SettingsVM> settingsVMFactory,
+        ActiveVmController activeVm,
+        HomeVM homeVM,
+        Func<AnalyzerVM, SettingsVM> settingsVMFactory,
         ISettingsService settingsService,
         ModWatcherVM modWatcher,
-        IMainWindow mainWindow,
         Func<AnalyzerVM, DashboardVM> dashboardVMFactory)
     {
+        _activeVm = activeVm;
+        _homeVM = homeVM;
         _settingsVMFactory = settingsVMFactory;
-        _mainWindow = mainWindow;
         SettingsService = settingsService;
         ModWatcher = modWatcher;
         _dashboardVMFactory = dashboardVMFactory;
+        IsExpanded = true;
 
         // Transform to vms and apply filters
         ModWatcher.AllResults
             .ToObservableChangeSet()
             .Transform(info =>
             {
-                var vm = new AnalyzerResultVM(info);
+                var vm = new AnalyzerResultVM(info, ModWatcher.IgnoreResult);
 
-                // Subscribe once when VM is created
+                // Only one row's ignore overlay is open at a time; close the previous one
                 vm.ConfigureRequested
-                    .Subscribe(targetVm => CurrentSettingsViewResult = targetVm)
+                    .Subscribe(targetVm =>
+                    {
+                        if (_configuringResult is { } previous && previous != targetVm)
+                        {
+                            previous.IsConfiguring = false;
+                        }
+
+                        _configuringResult = targetVm;
+                    })
                     .DisposeWith(this);
 
                 return vm;
@@ -95,6 +98,12 @@ public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
     }
 
     [ReactiveCommand]
+    private void Back()
+    {
+        _activeVm.Active = _homeVM;
+    }
+
+    [ReactiveCommand]
     private void ToggleSeverity(Severity severity)
     {
         if (!EnabledSeverities.Remove(severity))
@@ -104,71 +113,14 @@ public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
     }
 
     [ReactiveCommand]
-    private void Return()
-    {
-        _returnTrigger.OnNext(Unit.Default);
-    }
-
-    [ReactiveCommand]
-    private void Close()
-    {
-        _mainWindow.Close();
-    }
-
-    [ReactiveCommand]
     private void OpenDashboard()
     {
-        if (_dashboardWindow?.PlatformImpl is null)
-        {
-            _dashboardWindow = new AnalyzerDashboard(_dashboardVMFactory(this));
-        }
-
-        if (_dashboardWindow.WindowState == WindowState.Minimized)
-        {
-            _dashboardWindow.WindowState = WindowState.Normal;
-        }
-        _dashboardWindow.Topmost = true;
-        _dashboardWindow.Show();
-        _dashboardWindow.Topmost = false;
-    }
-
-    [ReactiveCommand]
-    private void EnterConfigureMode(AnalyzerResultVM resultVM)
-    {
-        CurrentSettingsViewResult = resultVM;
-    }
-
-    [ReactiveCommand]
-    private void LeaveConfigureMode()
-    {
-        CurrentSettingsViewResult = null;
-    }
-
-    [ReactiveCommand]
-    private void IgnoreInstance(AnalyzerResultVM resultVM)
-    {
-        ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Instance);
-        LeaveConfigureMode();
-    }
-
-    [ReactiveCommand]
-    private void IgnoreTopicType(AnalyzerResultVM resultVM)
-    {
-        ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Topic);
-        LeaveConfigureMode();
-    }
-
-    [ReactiveCommand]
-    private void IgnoreRecord(AnalyzerResultVM resultVM)
-    {
-        ModWatcher.IgnoreResult(resultVM.Info, IgnoreType.Record);
-        LeaveConfigureMode();
+        _activeVm.Active = _dashboardVM ??= _dashboardVMFactory(this);
     }
 
     [ReactiveCommand]
     private void OpenSettings()
     {
-        var managerWindow = new SettingsWindow(_settingsVMFactory(ModWatcher.ModKey));
-        managerWindow.Show();
+        _activeVm.Active = _settingsVM ??= _settingsVMFactory(this);
     }
 }
