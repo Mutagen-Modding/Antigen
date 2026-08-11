@@ -23,19 +23,38 @@ public static class Log
         var logFileName = $"{StartTime:MM-dd-yyyy_HH'h'mm'm'ss's'}.log";
 
         var currentLog = Path.Combine(logFolder, "Current.log");
-        if (File.Exists(currentLog))
+        var currentLogFailure = TryDelete(currentLog);
+
+        var config = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.File(Path.Combine(logFolder, logFileName), outputTemplate: OutputTemplate);
+
+        if (currentLogFailure == null)
         {
-            File.Delete(currentLog);
+            config = config.WriteTo.File(currentLog, outputTemplate: OutputTemplate);
         }
 
-        Serilog.Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.File(Path.Combine(logFolder, logFileName), outputTemplate: OutputTemplate)
-            .WriteTo.File(currentLog, outputTemplate: OutputTemplate)
-            .CreateLogger();
-
+        Serilog.Log.Logger = config.CreateLogger();
         Logger = Serilog.Log.Logger;
 
+        if (currentLogFailure != null)
+        {
+            Logger.Warning(currentLogFailure, "{LogFile} is in use; logging only to {LogFileName}", currentLog, logFileName);
+        }
+
         LogCleaner.Clean(logFolder, Logger);
+    }
+
+    private static Exception? TryDelete(string path)
+    {
+        try
+        {
+            File.Delete(path);
+            return null;
+        }
+        catch (Exception ex)
+        {
+            return ex;
+        }
     }
 }
