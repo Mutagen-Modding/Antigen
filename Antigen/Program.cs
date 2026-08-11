@@ -8,10 +8,13 @@ namespace Antigen;
 
 internal sealed class Program
 {
-    private static readonly ILoggerFactory LoggerFactory =
+    private static ILoggerFactory? _loggerFactory;
+    private static ILogger<Program>? _logger;
+
+    private static ILoggerFactory LoggerFactory => _loggerFactory ??=
         Microsoft.Extensions.Logging.LoggerFactory.Create(logging => logging.AddSerilog(Logging.Log.Logger, dispose: true));
 
-    private static readonly ILogger<Program> Logger = LoggerFactory.CreateLogger<Program>();
+    private static ILogger<Program> Logger => _logger ??= LoggerFactory.CreateLogger<Program>();
 
     // Initialization code. Don't use any Avalonia, third-party APIs or any
     // SynchronizationContext-reliant code before AppMain is called: things aren't initialized
@@ -19,6 +22,8 @@ internal sealed class Program
     [STAThread]
     public static void Main(string[] args)
     {
+        Logging.Log.Initialize();
+
         AppDomain.CurrentDomain.UnhandledException += (_, e) =>
         {
             if (e.ExceptionObject is Exception ex)

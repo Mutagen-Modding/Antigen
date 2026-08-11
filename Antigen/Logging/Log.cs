@@ -10,11 +10,16 @@ public static class Log
     // Serilog's default, minus the `zzz` timezone offset
     private const string OutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss.fff} [{Level:u3}] {Message:lj}{NewLine}{Exception}";
 
-    public static readonly ILogger Logger;
-    public static readonly DateTime StartTime;
+    private static bool _initialized;
 
-    static Log()
+    public static ILogger Logger { get; private set; } = Serilog.Core.Logger.None;
+    public static DateTime StartTime { get; private set; }
+
+    public static void Initialize()
     {
+        if (_initialized) return;
+        _initialized = true;
+
         StartTime = DateTime.Now;
 
         var logFolder = Path.Combine(AppContext.BaseDirectory, LogFolder);
