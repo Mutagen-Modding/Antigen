@@ -7,12 +7,6 @@ namespace Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Object;
 
 public class MapMarkerAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
 {
-    public static readonly TopicDefinition NoMenuDisplayObject = MutagenTopicBuilder.FromDiscussion(
-            286,
-            "Not Persistent",
-            Severity.Error)
-        .WithoutFormatting("Map marker not persistent");
-
     public static readonly TopicDefinition NoLocRefType = MutagenTopicBuilder.FromDiscussion(
             346,
             "No Loc Ref Type",
@@ -31,20 +25,13 @@ public class MapMarkerAnalyzer : IContextualRecordAnalyzer<IPlacedObjectGetter>
             Severity.Suggestion)
         .WithoutFormatting("Map marker missing linked reference for player spawn location");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [NoMenuDisplayObject, NoLocRefType, NoEditorID, NoLinkedReference];
+    public IEnumerable<TopicDefinition> Topics { get; } = [NoLocRefType, NoEditorID, NoLinkedReference];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedObjectGetter> param)
     {
         var placedObject = param.Record;
 
         if (placedObject.Base.FormKey != FormKeys.SkyrimSE.Skyrim.Static.MapMarker.FormKey) return;
-
-        // Not Persistent
-        if ((placedObject.SkyrimMajorRecordFlags & (SkyrimMajorRecord.SkyrimMajorRecordFlag)PlacedObject.DefaultMajorFlag.Persistent) == 0)
-        {
-            param.AddTopic(
-                NoMenuDisplayObject.Format());
-        }
 
         // No Loc Ref Type
         if (placedObject.LocationRefTypes is null || placedObject.LocationRefTypes.All(link => link.FormKey != FormKeys.SkyrimSE.Skyrim.LocationReferenceType.MapMarkerRefType.FormKey))
