@@ -1,11 +1,9 @@
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using Antigen.Services;
 using Antigen.Views;
 using Avalonia.Controls;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;
-using Mutagen.Bethesda.Plugins;
 using Noggog;
 using ReactiveUI;
 using ReactiveUI.SourceGenerators;
@@ -14,8 +12,6 @@ namespace Antigen.ViewModels;
 
 public sealed partial class MainVM : ViewModel, ISingleton
 {
-    private readonly Func<ModKey, ModWatcherVM> _modWatcherVMFactory;
-    private readonly Func<ModWatcherVM, AnalyzerVM> _analyzerVMFactory;
     private readonly GlobalSettingsVM _globalSettings;
     private readonly NavigationController _navigation;
     private readonly IMainWindow _mainWindow;
@@ -26,14 +22,13 @@ public sealed partial class MainVM : ViewModel, ISingleton
 
     public static Severity[] SeverityValues { get; } = Enum.GetValues<Severity>();
 
-    [Reactive] public partial ModWatcherVM? CurrentWatcher { get; set; }
-    [Reactive] public partial AnalyzerVM? CurrentAnalyzer { get; set; }
     [Reactive] public partial int WindowX { get; set; }
     [Reactive] public partial int WindowY { get; set; }
     [Reactive] public partial bool AnchoredToBottom { get; set; }
 
     public string Version { get; }
     public string ProfileName { get; }
+    public SessionVM Session { get; }
 
     public double ExpandedHeight => ActivePanel?.ExpandedHeight ?? _expandedHeight;
     public double ExpandedWidth => ActivePanel?.ExpandedWidth ?? _expandedWidth;
@@ -57,7 +52,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
 
     [ObservableAsProperty(PropertyName = "ShowStatusBar", InitialValue = "false")]
     private IObservable<bool> ShowStatusBarObservable() =>
-        this.WhenAnyValue(x => x.CurrentWatcher).Select(watcher => watcher is not null);
+        Session.WhenAnyValue(x => x.CurrentWatcher).Select(watcher => watcher is not null);
 
     [ObservableAsProperty(PropertyName = "StatusBarDock", InitialValue = "global::Avalonia.Controls.Dock.Bottom")]
     private IObservable<Dock> StatusBarDockObservable() =>
@@ -74,21 +69,18 @@ public sealed partial class MainVM : ViewModel, ISingleton
             (expanded, peeking, status) => (expanded || peeking) && status);
 
     public MainVM(
-        HomeVM homeVM,
         GuiSettingsService guiSettings,
         GlobalSettingsVM globalSettings,
         NavigationController navigation,
+        SessionVM session,
         VersionProvider versionProvider,
         IMainWindow mainWindow,
-        IGameReleaseContext gameReleaseContext,
-        Func<ModKey, ModWatcherVM> modWatcherVMFactory,
-        Func<ModWatcherVM, AnalyzerVM> analyzerVMFactory)
+        IGameReleaseContext gameReleaseContext)
     {
         _globalSettings = globalSettings;
         _navigation = navigation;
         _mainWindow = mainWindow;
-        _modWatcherVMFactory = modWatcherVMFactory;
-        _analyzerVMFactory = analyzerVMFactory;
+        Session = session;
 
         Version = $"v{versionProvider.Current}";
         ProfileName = gameReleaseContext.Release.ToString();
@@ -103,11 +95,6 @@ public sealed partial class MainVM : ViewModel, ISingleton
 
         _navigation.WhenAnyValue(x => x.Active)
             .Subscribe(CarrySize)
-            .DisposeWith(this);
-
-        homeVM.StartRequested
-            .ObserveOn(RxSchedulers.MainThreadScheduler)
-            .Subscribe(StartWatching)
             .DisposeWith(this);
     }
 
@@ -156,15 +143,6 @@ public sealed partial class MainVM : ViewModel, ISingleton
     private void Close()
     {
         _mainWindow.Close();
-    }
-
-    private void StartWatching(ModKey modKey)
-    {
-        CurrentWatcher?.Dispose();
-        CurrentWatcher = _modWatcherVMFactory(modKey);
-        CurrentAnalyzer = _analyzerVMFactory(CurrentWatcher);
-
-        _navigation.GoTo(CurrentAnalyzer);
     }
 
     // Carry the resized height across panel switches so the window keeps its size.

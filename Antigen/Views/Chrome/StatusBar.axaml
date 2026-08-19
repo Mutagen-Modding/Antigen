@@ -61,11 +61,11 @@
                              VerticalAlignment="Center">
                         <Ellipse.Fill>
                             <SolidColorBrush
-                                Color="{Binding !CurrentWatcher.TotalResults, Converter={StaticResource StateDotColor}}" />
+                                Color="{Binding !Session.CurrentWatcher.TotalResults, Converter={StaticResource StateDotColor}}" />
                         </Ellipse.Fill>
                     </Ellipse>
 
-                    <TextBlock Text="{Binding CurrentWatcher.AnalyzerStatus}"
+                    <TextBlock Text="{Binding Session.CurrentWatcher.AnalyzerStatus}"
                                FontSize="13"
                                FontWeight="Bold"
                                VerticalAlignment="Center"
@@ -79,7 +79,7 @@
                                FontSize="12"
                                FontWeight="Medium"
                                Foreground="{DynamicResource TextMutedBrush}" />
-                    <TextBlock Text="{Binding CurrentWatcher.NewResultsCount}"
+                    <TextBlock Text="{Binding Session.CurrentWatcher.NewResultsCount}"
                                FontSize="12"
                                FontWeight="Bold"
                                Foreground="{DynamicResource TallyNewBrush}" />
@@ -92,7 +92,7 @@
                                FontSize="12"
                                FontWeight="Medium"
                                Foreground="{DynamicResource TextMutedBrush}" />
-                    <TextBlock Text="{Binding CurrentWatcher.ResolvedResults}"
+                    <TextBlock Text="{Binding Session.CurrentWatcher.ResolvedResults}"
                                FontSize="12"
                                FontWeight="Bold"
                                Foreground="{DynamicResource AccentBrush}" />
@@ -105,7 +105,7 @@
                                FontSize="12"
                                FontWeight="Medium"
                                Foreground="{DynamicResource TextMutedBrush}" />
-                    <TextBlock Text="{Binding CurrentWatcher.TotalResults}"
+                    <TextBlock Text="{Binding Session.CurrentWatcher.TotalResults}"
                                FontSize="12"
                                FontWeight="Bold"
                                Foreground="{DynamicResource TextPrimaryBrush}" />
