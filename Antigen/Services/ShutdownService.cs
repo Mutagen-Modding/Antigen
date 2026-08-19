@@ -1,4 +1,3 @@
-using Antigen.Models.Settings;
 using Antigen.ViewModels;
 using Microsoft.Extensions.Logging;
 
@@ -14,7 +13,7 @@ public sealed class ShutdownService(
     {
         logger.LogInformation("Exiting");
 
-        guiSettings.Save((guiSettings.Load() ?? new GuiSettings()) with
+        guiSettings.Save(guiSettings.Current with
         {
             WindowX = mainVM.WindowX,
             WindowY = mainVM.WindowY,

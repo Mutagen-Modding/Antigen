@@ -1,6 +1,5 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using Antigen.Models.Settings;
 using Antigen.Services;
 using Antigen.Views;
 using Avalonia.Controls;
@@ -35,7 +34,6 @@ public sealed partial class MainVM : ViewModel, ISingleton
 
     public string Version { get; }
     public string ProfileName { get; }
-    public GuiSettings? SavedSettings { get; }
 
     public double ExpandedHeight => ActivePanel?.ExpandedHeight ?? _expandedHeight;
     public double ExpandedWidth => ActivePanel?.ExpandedWidth ?? _expandedWidth;
@@ -95,14 +93,11 @@ public sealed partial class MainVM : ViewModel, ISingleton
         Version = $"v{versionProvider.Current}";
         ProfileName = gameReleaseContext.Release.ToString();
 
-        SavedSettings = guiSettings.Load();
-        if (SavedSettings is { } saved)
-        {
-            WindowX = saved.WindowX;
-            WindowY = saved.WindowY;
-        }
-        _expandedHeight = SavedSettings?.ExpandedHeight ?? homeVM.ExpandedHeight;
-        _expandedWidth = SavedSettings?.ExpandedWidth ?? homeVM.ExpandedWidth;
+        var saved = guiSettings.Current;
+        WindowX = saved.WindowX ?? 0;
+        WindowY = saved.WindowY ?? 0;
+        _expandedHeight = saved.ExpandedHeight;
+        _expandedWidth = saved.ExpandedWidth;
 
         InitializeOAPH();
 

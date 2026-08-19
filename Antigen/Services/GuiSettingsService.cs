@@ -11,6 +11,8 @@ public sealed class GuiSettingsService : ISingleton
     private readonly ILogger<GuiSettingsService> _logger;
     private readonly string _filePath;
 
+    public GuiSettings Current { get; private set; }
+
     public GuiSettingsService(IFileSystem fileSystem, ILogger<GuiSettingsService> logger)
     {
         _fileSystem = fileSystem;
@@ -19,9 +21,11 @@ public sealed class GuiSettingsService : ISingleton
             AppDomain.CurrentDomain.BaseDirectory,
             "GuiSettings.json"
         );
+
+        Current = Read() ?? new GuiSettings();
     }
 
-    public GuiSettings? Load()
+    private GuiSettings? Read()
     {
         if (!_fileSystem.File.Exists(_filePath))
         {
@@ -42,6 +46,8 @@ public sealed class GuiSettingsService : ISingleton
 
     public void Save(GuiSettings settings)
     {
+        Current = settings;
+
         try
         {
             var json = JsonSerializer.Serialize(settings, new JsonSerializerOptions { WriteIndented = true });

@@ -38,7 +38,7 @@ public sealed class App : Application
 
             window.DataContext = startup.Main;
 
-            RestorePosition(window, startup.Main.SavedSettings);
+            RestorePosition(window, startup.GuiSettings.Current);
 
             desktop.MainWindow = window;
             desktop.Exit += (_, _) => startup.Shutdown.Save();
@@ -47,11 +47,12 @@ public sealed class App : Application
         base.OnFrameworkInitializationCompleted();
     }
 
-    private static void RestorePosition(MainWindow window, GuiSettings? saved)
+    private static void RestorePosition(MainWindow window, GuiSettings saved)
     {
-        if (saved is not null && window.Screens.All.Any(s => s.Bounds.Contains(new PixelPoint(saved.WindowX, saved.WindowY))))
+        if (saved.WindowX is { } x && saved.WindowY is { } y
+            && window.Screens.All.Any(s => s.Bounds.Contains(new PixelPoint(x, y))))
         {
-            window.Position = new PixelPoint(saved.WindowX, saved.WindowY);
+            window.Position = new PixelPoint(x, y);
             return;
         }
 
@@ -80,4 +81,5 @@ public sealed class App : Application
 public sealed record AppStartup(
     ILogger<App> Logger,
     MainVM Main,
+    GuiSettingsService GuiSettings,
     ShutdownService Shutdown) : ISingleton;

@@ -10,8 +10,6 @@ namespace Antigen.ViewModels;
 
 public sealed partial class GlobalSettingsVM : ResizablePanelVM, INumWorkThreadsController, ISingleton
 {
-    public const double DefaultPercentage = 0.5;
-
     public override double MinResizeHeight => 150.0;
 
     [Reactive] public partial double CorePercentage { get; set; }
@@ -42,9 +40,9 @@ public sealed partial class GlobalSettingsVM : ResizablePanelVM, INumWorkThreads
         _homeVM = homeVM;
         IsExpanded = true;
 
-        var saved = guiSettings.Load();
-        CorePercentage = Math.Clamp(saved?.WorkerThreadPercentage ?? DefaultPercentage, 0, 1);
-        ColorScheme = saved?.ColorScheme ?? ColorSchemeService.Default;
+        var saved = guiSettings.Current;
+        CorePercentage = Math.Clamp(saved.WorkerThreadPercentage, 0, 1);
+        ColorScheme = saved.ColorScheme;
 
         InitializeOAPH();
 
