@@ -12,7 +12,7 @@ namespace Antigen.ViewModels;
 
 public sealed partial class SettingsVM : ResizablePanelVM, ITransient
 {
-    private readonly ActiveVmController _activeVm;
+    private readonly NavigationController _navigation;
     private readonly AnalyzerVM _analyzerVM;
 
     [Reactive] public partial ObservableCollectionExtended<IgnoreRuleItem> Rules { get; set; } = [];
@@ -21,9 +21,9 @@ public sealed partial class SettingsVM : ResizablePanelVM, ITransient
     public ISettingsService SettingsService { get; }
     public ModKey ModKey => _analyzerVM.ModWatcher.ModKey;
 
-    public SettingsVM(ActiveVmController activeVm, AnalyzerVM analyzerVM, ISettingsService settingsService)
+    public SettingsVM(NavigationController navigation, AnalyzerVM analyzerVM, ISettingsService settingsService)
     {
-        _activeVm = activeVm;
+        _navigation = navigation;
         _analyzerVM = analyzerVM;
         SettingsService = settingsService;
         IsExpanded = true;
@@ -50,7 +50,7 @@ public sealed partial class SettingsVM : ResizablePanelVM, ITransient
     [ReactiveCommand]
     private void Back()
     {
-        _activeVm.Active = _analyzerVM;
+        _navigation.GoTo(_analyzerVM);
     }
 
     [ReactiveCommand]

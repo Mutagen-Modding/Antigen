@@ -17,7 +17,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
     private readonly Func<ModKey, ModWatcherVM> _modWatcherVMFactory;
     private readonly Func<ModWatcherVM, AnalyzerVM> _analyzerVMFactory;
     private readonly GlobalSettingsVM _globalSettings;
-    private readonly ActiveVmController _activeVm;
+    private readonly NavigationController _navigation;
     private readonly IMainWindow _mainWindow;
 
     private ResizablePanelVM? _sizedPanel;
@@ -40,17 +40,17 @@ public sealed partial class MainVM : ViewModel, ISingleton
 
     [ObservableAsProperty(PropertyName = "ActivePanel")]
     private IObservable<ResizablePanelVM?> ActivePanelObservable() =>
-        _activeVm.WhenAnyValue(x => x.Active);
+        _navigation.WhenAnyValue(x => x.Active);
 
     [ObservableAsProperty(PropertyName = "IsExpanded", InitialValue = "true")]
     private IObservable<bool> IsExpandedObservable() =>
-        _activeVm.WhenAnyValue(x => x.Active)
+        _navigation.WhenAnyValue(x => x.Active)
             .Select(panel => panel?.WhenAnyValue(x => x.IsExpanded) ?? Observable.Return(false))
             .Switch();
 
     [ObservableAsProperty(PropertyName = "ShowPeek", InitialValue = "false")]
     private IObservable<bool> ShowPeekObservable() =>
-        _activeVm.WhenAnyValue(x => x.Active)
+        _navigation.WhenAnyValue(x => x.Active)
             .Select(panel => panel?.WhenAnyValue(x => x.IsExpanded, x => x.IsPeeking, (expanded, peeking) => !expanded && peeking)
                 ?? Observable.Return(false))
             .Switch();
@@ -77,7 +77,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
         HomeVM homeVM,
         GuiSettingsService guiSettings,
         GlobalSettingsVM globalSettings,
-        ActiveVmController activeVm,
+        NavigationController navigation,
         VersionProvider versionProvider,
         IMainWindow mainWindow,
         IGameReleaseContext gameReleaseContext,
@@ -85,7 +85,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
         Func<ModWatcherVM, AnalyzerVM> analyzerVMFactory)
     {
         _globalSettings = globalSettings;
-        _activeVm = activeVm;
+        _navigation = navigation;
         _mainWindow = mainWindow;
         _modWatcherVMFactory = modWatcherVMFactory;
         _analyzerVMFactory = analyzerVMFactory;
@@ -101,11 +101,9 @@ public sealed partial class MainVM : ViewModel, ISingleton
 
         InitializeOAPH();
 
-        _activeVm.WhenAnyValue(x => x.Active)
+        _navigation.WhenAnyValue(x => x.Active)
             .Subscribe(CarrySize)
             .DisposeWith(this);
-
-        _activeVm.Active = homeVM;
 
         homeVM.StartRequested
             .ObserveOn(RxSchedulers.MainThreadScheduler)
@@ -116,8 +114,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
     [ReactiveCommand]
     private void OpenSettings()
     {
-        _globalSettings.ReturnTo = _activeVm.Active;
-        _activeVm.Active = _globalSettings;
+        _navigation.Push(_globalSettings);
     }
 
     // Profiles aren't implemented yet.
@@ -167,7 +164,7 @@ public sealed partial class MainVM : ViewModel, ISingleton
         CurrentWatcher = _modWatcherVMFactory(modKey);
         CurrentAnalyzer = _analyzerVMFactory(CurrentWatcher);
 
-        _activeVm.Active = CurrentAnalyzer;
+        _navigation.GoTo(CurrentAnalyzer);
     }
 
     // Carry the resized height across panel switches so the window keeps its size.

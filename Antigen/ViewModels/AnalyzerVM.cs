@@ -15,7 +15,7 @@ namespace Antigen.ViewModels;
 
 public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
 {
-    private readonly ActiveVmController _activeVm;
+    private readonly NavigationController _navigation;
     private readonly HomeVM _homeVM;
     private readonly Func<AnalyzerVM, SettingsVM> _settingsVMFactory;
     private readonly Func<AnalyzerVM, DashboardVM> _dashboardVMFactory;
@@ -32,14 +32,14 @@ public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
     [Reactive] public partial string SearchText { get; set; } = string.Empty;
 
     public AnalyzerVM(
-        ActiveVmController activeVm,
+        NavigationController navigation,
         HomeVM homeVM,
         Func<AnalyzerVM, SettingsVM> settingsVMFactory,
         ISettingsService settingsService,
         ModWatcherVM modWatcher,
         Func<AnalyzerVM, DashboardVM> dashboardVMFactory)
     {
-        _activeVm = activeVm;
+        _navigation = navigation;
         _homeVM = homeVM;
         _settingsVMFactory = settingsVMFactory;
         SettingsService = settingsService;
@@ -100,7 +100,7 @@ public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
     [ReactiveCommand]
     private void Back()
     {
-        _activeVm.Active = _homeVM;
+        _navigation.GoTo(_homeVM);
     }
 
     [ReactiveCommand]
@@ -115,12 +115,12 @@ public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
     [ReactiveCommand]
     private void OpenDashboard()
     {
-        _activeVm.Active = _dashboardVM ??= _dashboardVMFactory(this);
+        _navigation.GoTo(_dashboardVM ??= _dashboardVMFactory(this));
     }
 
     [ReactiveCommand]
     private void OpenSettings()
     {
-        _activeVm.Active = _settingsVM ??= _settingsVMFactory(this);
+        _navigation.GoTo(_settingsVM ??= _settingsVMFactory(this));
     }
 }
