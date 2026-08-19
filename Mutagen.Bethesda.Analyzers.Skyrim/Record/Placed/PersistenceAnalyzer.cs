@@ -16,11 +16,29 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
             Severity.Warning)
         .WithoutFormatting("Placed record is persistent but does not need to be");
 
-    public static readonly TopicDefinition<string?> NotPersistent = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<PersistReason> NotPersistent = MutagenTopicBuilder.FromDiscussion(
             286,
             "Not Persistent",
             Severity.Error)
-        .WithFormatting<string?>("Placed record is not persistent but needs to be due to {0}");
+        .WithFormatting<PersistReason>("Placed record is not persistent but needs to be due to {0}");
+
+    public enum PersistReason
+    {
+        // Reference does not need to persist
+        None,
+        // Referenced by another record
+        Referenced,
+        // Persist location is PersistAll
+        PersistLocationPersistAll,
+        // Full LOD flag set
+        FullLod,
+        // Markers are always persistent in the CK
+        Marker,
+        // Water is always persistent in the CK
+        Water,
+        // Decals are always persistent in the CK
+        Decal,
+    };
 
     public IEnumerable<TopicDefinition> Topics { get; } = [UnnecessaryPersistence, NotPersistent];
 
@@ -34,7 +52,7 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
         Statics.XMarkerHeading.FormKey,
     ];
 
-    public (bool expected, string? reason) RequiresPersistent(IPlacedGetter placed, ILinkCache linkCache, ILinkUsageCache usageCache)
+    public static PersistReason RequiresPersistent(IPlacedGetter placed, ILinkCache linkCache, ILinkUsageCache usageCache)
     {
         // A record should be persistent if it is referenced by another record
         if (usageCache.GetUsagesOf(placed).UsageLinks
@@ -47,33 +65,33 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
             .Where(u => !u.Equals(placed))
             .Any())
         {
-            return (true, "referenced by another record");
+            return PersistReason.Referenced;
         }
 
         if (placed.GetPersistLocation().Equals(FormKeys.SkyrimSE.Skyrim.Location.PersistAll))
-            return (true, "persist location is PersistAll");
+            return PersistReason.PersistLocationPersistAll;
 
         if (placed is IPlacedObjectGetter placedObject)
         {
             // Full LOD references need to be persistent. Lights are never full LOD and reuse the flag for never fades
             if (placedObject.SkyrimMajorRecordFlags.HasFlag((SkyrimMajorRecord.SkyrimMajorRecordFlag)PlacedObject.DefaultMajorFlag.IsFullLod))
                 if (!placedObject.Base.TryResolve<ILightGetter>(linkCache, out var _))
-                    return (true, "full LOD");
+                    return PersistReason.FullLod;
 
             // The CK sets certain base objects as persistent
             if (AlwaysPersistentBases.Contains(placedObject.Base.FormKey))
-                return (true, "base object is marker");
+                return PersistReason.Marker;
 
             // The CK sets water activators as persistent
             if (placedObject.Base.TryResolve<IActivatorGetter>(linkCache, out var activator) && !activator.WaterType.IsNull)
-                return (true, "base object is water");
+                return PersistReason.Water;
 
             // The CK sets decals as persistent
             if (placedObject.Base.TryResolve<ITextureSetGetter>(linkCache, out var _))
-                return (true, "base object is texture set");
+                return PersistReason.Decal;
         }
 
-        return (false, null);
+        return PersistReason.None;
     }
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPlacedGetter> param)
@@ -81,15 +99,15 @@ public class PersistenceAnalyzer : IContextualRecordAnalyzer<IPlacedGetter>
         var placed = param.Record;
 
         var persistent = placed.SkyrimMajorRecordFlags.HasFlag((SkyrimMajorRecord.SkyrimMajorRecordFlag)PlacedObject.DefaultMajorFlag.Persistent);
-        var (expected, reason) = RequiresPersistent(placed, param.LinkCache, param.ResolveCache<ILinkUsageCache>());
+        var expected = RequiresPersistent(placed, param.LinkCache, param.ResolveCache<ILinkUsageCache>());
 
-        if (persistent && !expected)
+        if (persistent && expected == PersistReason.None)
         {
             param.AddTopic(UnnecessaryPersistence.Format());
         }
-        else if (!persistent && expected)
+        else if (!persistent && expected != PersistReason.None)
         {
-            param.AddTopic(NotPersistent.Format(reason));
+            param.AddTopic(NotPersistent.Format(expected));
         }
     }
 
