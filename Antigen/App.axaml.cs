@@ -28,22 +28,20 @@ public sealed class App : Application
             var window = new MainWindow();
             Container = SetupServices(window);
 
-            var logger = Container.Resolve<ILogger<App>>();
-            logger.LogInformation(
+            var startup = Container.Resolve<AppStartup>();
+
+            startup.Logger.LogInformation(
                 "Antigen starting - {Runtime} on {OS} with {ProcessorCount} processors",
                 RuntimeInformation.FrameworkDescription,
                 RuntimeInformation.OSDescription,
                 Environment.ProcessorCount);
 
-            var mainVM = Container.Resolve<MainVM>();
-            window.DataContext = mainVM;
+            window.DataContext = startup.Main;
 
-            RestorePosition(window, mainVM.SavedSettings);
+            RestorePosition(window, startup.Main.SavedSettings);
 
             desktop.MainWindow = window;
-
-            var shutdown = Container.Resolve<ShutdownService>();
-            desktop.Exit += (_, _) => shutdown.Save();
+            desktop.Exit += (_, _) => startup.Shutdown.Save();
         }
 
         base.OnFrameworkInitializationCompleted();
@@ -78,3 +76,8 @@ public sealed class App : Application
         return builder.Build();
     }
 }
+
+public sealed record AppStartup(
+    ILogger<App> Logger,
+    MainVM Main,
+    ShutdownService Shutdown) : ISingleton;
