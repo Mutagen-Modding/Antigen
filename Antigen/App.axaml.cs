@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Antigen.Models.Settings;
 using Antigen.Modules;
+using Antigen.Services;
 using Antigen.ViewModels;
 using Antigen.Views;
 using Autofac;
@@ -40,7 +41,9 @@ public sealed class App : Application
             RestorePosition(window, mainVM.SavedSettings);
 
             desktop.MainWindow = window;
-            desktop.Exit += (_, _) => mainVM.Exit();
+
+            var shutdown = Container.Resolve<ShutdownService>();
+            desktop.Exit += (_, _) => shutdown.Save();
         }
 
         base.OnFrameworkInitializationCompleted();

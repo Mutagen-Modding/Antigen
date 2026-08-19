@@ -4,7 +4,6 @@ using Antigen.Models.Settings;
 using Antigen.Services;
 using Antigen.Views;
 using Avalonia.Controls;
-using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins;
@@ -18,11 +17,9 @@ public sealed partial class MainVM : ViewModel, ISingleton
 {
     private readonly Func<ModKey, ModWatcherVM> _modWatcherVMFactory;
     private readonly Func<ModWatcherVM, AnalyzerVM> _analyzerVMFactory;
-    private readonly GuiSettingsService _guiSettings;
     private readonly GlobalSettingsVM _globalSettings;
     private readonly ActiveVmController _activeVm;
     private readonly IMainWindow _mainWindow;
-    private readonly ILogger<MainVM> _logger;
 
     private ResizablePanelVM? _sizedPanel;
     private double _expandedHeight;
@@ -39,6 +36,9 @@ public sealed partial class MainVM : ViewModel, ISingleton
     public string Version { get; }
     public string ProfileName { get; }
     public GuiSettings? SavedSettings { get; }
+
+    public double ExpandedHeight => ActivePanel?.ExpandedHeight ?? _expandedHeight;
+    public double ExpandedWidth => ActivePanel?.ExpandedWidth ?? _expandedWidth;
 
     [ObservableAsProperty(PropertyName = "ActivePanel")]
     private IObservable<ResizablePanelVM?> ActivePanelObservable() =>
@@ -84,14 +84,11 @@ public sealed partial class MainVM : ViewModel, ISingleton
         IMainWindow mainWindow,
         IGameReleaseContext gameReleaseContext,
         Func<ModKey, ModWatcherVM> modWatcherVMFactory,
-        Func<ModWatcherVM, AnalyzerVM> analyzerVMFactory,
-        ILogger<MainVM> logger)
+        Func<ModWatcherVM, AnalyzerVM> analyzerVMFactory)
     {
-        _guiSettings = guiSettings;
         _globalSettings = globalSettings;
         _activeVm = activeVm;
         _mainWindow = mainWindow;
-        _logger = logger;
         _modWatcherVMFactory = modWatcherVMFactory;
         _analyzerVMFactory = analyzerVMFactory;
 
@@ -119,22 +116,6 @@ public sealed partial class MainVM : ViewModel, ISingleton
             .ObserveOn(RxSchedulers.MainThreadScheduler)
             .Subscribe(StartWatching)
             .DisposeWith(this);
-    }
-
-    public void Exit()
-    {
-        _logger.LogInformation("Exiting");
-
-        var settings = (_guiSettings.Load() ?? new GuiSettings()) with
-        {
-            WindowX = WindowX,
-            WindowY = WindowY,
-            ExpandedHeight = ActivePanel?.ExpandedHeight ?? _expandedHeight,
-            ExpandedWidth = ActivePanel?.ExpandedWidth ?? _expandedWidth,
-            WorkerThreadPercentage = _globalSettings.CorePercentage,
-            ColorScheme = _globalSettings.ColorScheme
-        };
-        _guiSettings.Save(settings);
     }
 
     [ReactiveCommand]
