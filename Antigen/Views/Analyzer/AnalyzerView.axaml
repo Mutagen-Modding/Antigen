@@ -49,7 +49,7 @@
                         ToolTip.Tip="Filter Severities">
                     <Button.Flyout>
                         <Flyout>
-                            <ItemsControl ItemsSource="{x:Static viewModels:MainVM.SeverityValues}">
+                            <ItemsControl ItemsSource="{x:Static viewModels:AnalyzerVM.SeverityValues}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate DataType="topics:Severity">
                                         <StackPanel Orientation="Horizontal">

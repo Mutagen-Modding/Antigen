@@ -15,6 +15,8 @@ namespace Antigen.ViewModels;
 
 public sealed partial class AnalyzerVM : ResizablePanelVM, ITransient
 {
+    public static Severity[] SeverityValues { get; } = Enum.GetValues<Severity>();
+
     private readonly NavigationController _navigation;
     private readonly HomeVM _homeVM;
     private readonly Func<AnalyzerVM, SettingsVM> _settingsVMFactory;

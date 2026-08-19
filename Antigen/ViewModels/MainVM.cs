@@ -2,7 +2,6 @@ using System.Reactive.Linq;
 using Antigen.Services;
 using Antigen.Views;
 using Avalonia.Controls;
-using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Environments.DI;
 using Noggog;
 using ReactiveUI;
@@ -19,8 +18,6 @@ public sealed partial class MainVM : ViewModel, ISingleton
     private ResizablePanelVM? _sizedPanel;
     private double _expandedHeight;
     private double _expandedWidth;
-
-    public static Severity[] SeverityValues { get; } = Enum.GetValues<Severity>();
 
     [Reactive] public partial int WindowX { get; set; }
     [Reactive] public partial int WindowY { get; set; }
