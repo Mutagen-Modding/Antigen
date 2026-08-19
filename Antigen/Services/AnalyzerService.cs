@@ -27,7 +27,7 @@ public interface IAnalyzerService
 public sealed class AnalyzerService(
     IFileSystem fileSystem,
     IDataDirectoryProvider dataDirectoryProvider,
-    IModInfoProvider modInfoProvider,
+    ModInfoProvider modInfoProvider,
     IReadOnlyList<IAnalyzer> analyzers,
     ILoadOrderListingsProvider loadOrderListingsProvider,
     IGameReleaseContext gameReleaseContext,

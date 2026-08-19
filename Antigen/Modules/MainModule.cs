@@ -1,7 +1,7 @@
 using System.IO.Abstractions;
 using System.Reflection;
 using Autofac;
-using Mutagen.Bethesda.Analyzers.Skyrim;
+using Mutagen.Bethesda;
 using Mutagen.Bethesda.Autofac;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins.Meta;
@@ -22,9 +22,11 @@ public class MainModule : Module
 
         builder.RegisterModule<MutagenModule>();
 
-        builder.RegisterModule<SkyrimModule>();
+        builder.RegisterInstance(new GameReleaseInjection(GameRelease.SkyrimSE))
+            .SingleInstance()
+            .AsImplementedInterfaces();
 
-        builder.RegisterModule<SkyrimAnalyzerModule>();
+        builder.RegisterModule<SkyrimModule>();
 
         builder.Register(context =>
         {

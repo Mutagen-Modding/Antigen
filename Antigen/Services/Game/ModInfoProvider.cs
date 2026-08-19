@@ -1,55 +1,35 @@
-﻿using System.IO.Abstractions;
+using System.IO.Abstractions;
 using Antigen.Resources.Comparer;
 using DynamicData;
+using Microsoft.Extensions.Logging;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Plugins;
-using Mutagen.Bethesda.Plugins.Binary.Parameters;
-using Mutagen.Bethesda.Plugins.Binary.Streams;
-using Mutagen.Bethesda.Plugins.Records;
-using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Plugins.Masters;
 
 namespace Antigen.Services.Game;
 
-public record struct ModInfo(
-    ModKey ModKey,
-    string? Author,
-    string? Description,
-    bool Localization,
-    int FormVersion,
-    ModKey[] DirectMasters)
-{
-    public ModInfo(ModKey modKey) : this(modKey, null, null, false, -1, []) {}
-}
-public sealed class SkyrimModInfoProvider : IModInfoProvider<ISkyrimModGetter>
-{
+public record struct ModInfo(ModKey ModKey, ModKey[] DirectMasters);
 
-    public ModInfo GetModInfo(ModKey modKey, MutagenFrame modHeaderFrame)
-    {
-        return GetModInfo(modKey, SkyrimModHeader.CreateFromBinary(modHeaderFrame));
-    }
-    public ModInfo? GetModInfo(IModGetter mod)
-    {
-        return mod is ISkyrimModGetter skyrimMod ? GetModInfo(skyrimMod.ModKey, skyrimMod.ModHeader) : null;
-    }
-    public ModInfo GetModInfo(ISkyrimModGetter mod)
-    {
-        return GetModInfo(mod.ModKey, mod.ModHeader);
-    }
+public sealed class ModInfoProvider(ILogger<ModInfoProvider> logger) : ISingleton
+{
     public ModInfo? GetModInfo(string filePath, IFileSystem fileSystem, GameRelease gameRelease)
     {
         if (!fileSystem.File.Exists(filePath)) return null;
 
-        var fileName = fileSystem.Path.GetFileName(filePath);
+        var modKey = ModKey.FromFileName(fileSystem.Path.GetFileName(filePath));
 
-        var modKey = ModKey.FromFileName(fileName);
-        var binaryReadParameters = new BinaryReadParameters { FileSystem = fileSystem };
-        var modPath = new ModPath(modKey, filePath);
-        var parsingMeta = ParsingMeta.Factory(binaryReadParameters, gameRelease, modPath);
-        var stream = new MutagenBinaryReadStream(filePath, parsingMeta);
-        using var frame = new MutagenFrame(stream);
-        return GetModInfo(modKey, frame);
+        try
+        {
+            var masters = MasterReferenceCollection.FromPath(new ModPath(modKey, filePath), gameRelease, fileSystem);
+            return new ModInfo(modKey, masters.Masters.Select(master => master.Master).ToArray());
+        }
+        catch (Exception ex)
+        {
+            logger.LogDebug(ex, "Could not read masters for {Path}", filePath);
+            return null;
+        }
     }
-
+    
     public Dictionary<ModKey, (HashSet<ModKey> Masters, bool Valid)> GetMasterInfos(IReadOnlyList<ModInfo> modInfos)
     {
         var sortedMods = modInfos
@@ -108,27 +88,5 @@ public sealed class SkyrimModInfoProvider : IModInfoProvider<ISkyrimModGetter>
         }
 
         return masterInfos;
-    }
-
-    public uint GetRecordCount(ISkyrimModGetter mod)
-    {
-        return mod.ModHeader.Stats.NumRecords;
-    }
-
-    public uint GetRecordCount(IModGetter mod)
-    {
-        return mod is ISkyrimModGetter skyrimModGetter
-            ? GetRecordCount(skyrimModGetter)
-            : 0;
-    }
-    public static ModInfo GetModInfo(ModKey modKey, ISkyrimModHeaderGetter modHeader)
-    {
-        return new ModInfo(
-            modKey,
-            modHeader.Author,
-            modHeader.Description,
-            (modHeader.Flags & SkyrimModHeader.HeaderFlag.Localized) != 0,
-            modHeader.FormVersion,
-            modHeader.MasterReferences.Select(master => master.Master).ToArray());
     }
 }

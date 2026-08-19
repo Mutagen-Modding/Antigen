@@ -1,0 +1,97 @@
+using System.Reflection;
+using System.Text.RegularExpressions;
+using Antigen.Resources.Constants;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.ApplicationLifetimes;
+using Avalonia.Controls.Documents;
+using Avalonia.Data.Converters;
+using Avalonia.Input.Platform;
+using Avalonia.Layout;
+using Avalonia.Media;
+using Mutagen.Bethesda.Analyzers.SDK.Topics;
+using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Records;
+using ReactiveUI;
+
+namespace Antigen.Resources.Converter;
+
+public partial class FormattedTopicConverters : IFormattedTopicConverters
+{
+    [GeneratedRegex(@"\{\d+\}")]
+    private static partial Regex PlaceholderRegex { get; }
+
+    public IValueConverter ExtractMessage { get; }
+
+    public FormattedTopicConverters()
+    {
+        ExtractMessage = new FuncValueConverter<IFormattedTopicDefinition?, object?>(ExtractTopicFormat);
+    }
+
+    protected virtual object? Describe(object? item) => item switch
+    {
+        IMajorRecordIdentifierGetter recordIdentifier => recordIdentifier.EditorID ?? recordIdentifier.FormKey.ToString(),
+        IFormLinkIdentifier formLinkIdentifier => ObjectConverters.GetStringValue(formLinkIdentifier),
+        _ => item
+    };
+
+    private TextBlock? ExtractTopicFormat(IFormattedTopicDefinition? formattedTopicDefinition)
+    {
+        if (formattedTopicDefinition is null) return null;
+
+        var textBlock = new TextBlock
+        {
+            VerticalAlignment = VerticalAlignment.Center,
+            TextWrapping = TextWrapping.Wrap,
+            FontSize = 12,
+            Foreground = StandardBrushes.DarkGrayBrush
+        };
+        textBlock.Inlines ??= new InlineCollection();
+
+        var topicItems = formattedTopicDefinition.GetType()
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.Name.StartsWith("Item", StringComparison.OrdinalIgnoreCase))
+            .OrderBy(x => x.Name)
+            .Select(x => x.GetValue(formattedTopicDefinition))
+            .ToArray();
+
+        var textParts = PlaceholderRegex.Split(formattedTopicDefinition.TopicDefinition.MessageFormat);
+        for (var i = 0; i < textParts.Length; i++)
+        {
+            var textPart = textParts[i];
+
+            textBlock.Inlines.Add(new Run
+            {
+                Text = textPart,
+                FontSize = 12,
+                BaselineAlignment = BaselineAlignment.Center
+            });
+
+            if (topicItems.Length <= i) continue;
+
+            var item = Describe(topicItems[i]);
+
+            textBlock.Inlines.Add(new InlineUIContainer(new Button
+            {
+                Content = item?.ToString(),
+                FontSize = 12,
+                Background = Brushes.Transparent,
+                BorderThickness = new Thickness(0),
+                Foreground = StandardBrushes.TextBrush,
+                Margin = new Thickness(0),
+                Padding = new Thickness(0, 2, 0, 0),
+                VerticalAlignment = VerticalAlignment.Center,
+                Command = ReactiveCommand.Create<string?>(param =>
+                {
+                    if (Application.Current?.ApplicationLifetime is not IClassicDesktopStyleApplicationLifetime { MainWindow.Clipboard: {} clipboard }) return;
+
+                    clipboard.SetTextAsync(param);
+                }),
+                CommandParameter = item?.ToString(),
+                [ToolTip.TipProperty] = "Copy"
+            }));
+        }
+
+        return textBlock;
+    }
+}

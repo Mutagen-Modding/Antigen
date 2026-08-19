@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record.Armor;
 using Mutagen.Bethesda.Analyzers.Skyrim.Record.ArmorAddon;
@@ -9,9 +9,9 @@ using Mutagen.Bethesda.Analyzers.Skyrim.Record.Weapon;
 
 namespace Antigen.Services.Game;
 
-public sealed class SkyrimAnalyzerFilter : IAnalyzerFilter
+public sealed class SkyrimAnalyzerFilter : AnalyzerFilter
 {
-    public bool ShouldAnalyze(IAnalyzer analyzer)
+    public override bool ShouldAnalyze(IAnalyzer analyzer)
     {
         return analyzer is not LinkAnalyzer
             and not MissingAssetsAnalyzerArmor

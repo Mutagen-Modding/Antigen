@@ -1,16 +1,21 @@
-﻿using Antigen.Resources.Converter;
+using Antigen.Resources.Converter;
 using Antigen.Services.Game;
-using Mutagen.Bethesda;
-using Mutagen.Bethesda.Skyrim;
+using Autofac;
+using Mutagen.Bethesda.Analyzers.Skyrim;
 
 namespace Antigen.Modules;
 
-public sealed class SkyrimModule : GameSpecificModule<ISkyrimMod, ISkyrimModGetter>
+public sealed class SkyrimModule : GameCategoryModule
 {
-    protected override GameRelease GameRelease => GameRelease.SkyrimSE;
+    protected override void RegisterFormattedTopicConverters(ContainerBuilder builder) =>
+        builder.RegisterType<SkyrimFormattedTopicConverters>().As<IFormattedTopicConverters>();
 
-    protected override IReg<IModInfoProvider<ISkyrimModGetter>> ModInfoProvider => Register<SkyrimModInfoProvider>();
-    protected override IReg<IFormattedTopicConverters> FormattedTopicConverters => Register<SkyrimFormattedTopicConverters>();
-    protected override IReg<IAnalyzerResultInfoFactory> AnalyzerResultInfoFactory => Register<SkyrimAnalyzerResultInfoFactory>();
-    protected override IReg<IAnalyzerFilter> AnalyzerFilter => Register<SkyrimAnalyzerFilter>();
+    protected override void RegisterAnalyzerResultInfoFactory(ContainerBuilder builder) =>
+        builder.RegisterType<SkyrimAnalyzerResultInfoFactory>().As<IAnalyzerResultInfoFactory>();
+
+    protected override void RegisterAnalyzerFilter(ContainerBuilder builder) =>
+        builder.RegisterType<SkyrimAnalyzerFilter>().As<IAnalyzerFilter>();
+
+    protected override void RegisterAnalyzers(ContainerBuilder builder) =>
+        builder.RegisterModule<SkyrimAnalyzerModule>();
 }
