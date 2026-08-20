@@ -1,5 +1,4 @@
 using System.Runtime.InteropServices;
-using Antigen.Models.Settings;
 using Antigen.Modules;
 using Antigen.Services;
 using Antigen.ViewModels;
@@ -30,40 +29,13 @@ public sealed class App : Application
             Container = SetupServices(window);
 
             var startup = Container.Resolve<AppStartup>();
-
-            startup.Logger.LogInformation(
-                "Antigen starting - {Runtime} on {OS} with {ProcessorCount} processors",
-                RuntimeInformation.FrameworkDescription,
-                RuntimeInformation.OSDescription,
-                Environment.ProcessorCount);
-
-            window.DataContext = startup.Main;
-
-            RestorePosition(window, startup.GuiSettings.Current);
+            startup.Start();
 
             desktop.MainWindow = window;
-            desktop.Exit += (_, _) => startup.Shutdown.Save();
+            desktop.Exit += (_, _) => startup.Shutdown();
         }
 
         base.OnFrameworkInitializationCompleted();
-    }
-
-    private static void RestorePosition(MainWindow window, GuiSettings saved)
-    {
-        if (saved.WindowX is { } x && saved.WindowY is { } y
-            && window.Screens.All.Any(s => s.Bounds.Contains(new PixelPoint(x, y))))
-        {
-            window.Position = new PixelPoint(x, y);
-            return;
-        }
-
-        if (window.Screens.Primary is { } screen)
-        {
-            window.Position = new PixelPoint(
-                screen.WorkingArea.X + (screen.WorkingArea.Width - (int)window.Width) / 2,
-                screen.WorkingArea.Y + (screen.WorkingArea.Height - (int)window.Height) / 2
-            );
-        }
     }
 
     private static IContainer SetupServices(MainWindow window)
@@ -80,8 +52,48 @@ public sealed class App : Application
     }
 }
 
-public sealed record AppStartup(
-    ILogger<App> Logger,
-    MainVM Main,
-    GuiSettingsService GuiSettings,
-    ShutdownService Shutdown) : ISingleton;
+/// <summary>Brings the app up once the container exists, and puts it away again on exit.</summary>
+public sealed class AppStartup(
+    Window window,
+    MainVM main,
+    GuiSettingsService guiSettings,
+    ShutdownService shutdown,
+    ILogger<AppStartup> logger) : ISingleton
+{
+    public void Start()
+    {
+        logger.LogInformation(
+            "Antigen starting - {Runtime} on {OS} with {ProcessorCount} processors",
+            RuntimeInformation.FrameworkDescription,
+            RuntimeInformation.OSDescription,
+            Environment.ProcessorCount);
+
+        window.DataContext = main;
+
+        RestorePosition();
+    }
+
+    public void Shutdown()
+    {
+        shutdown.Save();
+    }
+
+    private void RestorePosition()
+    {
+        var saved = guiSettings.Current;
+        if (saved.WindowX is { } x && saved.WindowY is { } y
+            && window.Screens.All.Any(s => s.Bounds.Contains(new PixelPoint(x, y))))
+        {
+            window.Position = new PixelPoint(x, y);
+            return;
+        }
+
+        if (window.Screens.Primary is { } screen)
+        {
+            window.Position = new PixelPoint(
+                screen.WorkingArea.X + (screen.WorkingArea.Width - (int)window.Width) / 2,
+                screen.WorkingArea.Y + (screen.WorkingArea.Height - (int)window.Height) / 2
+            );
+        }
+    }
+}
