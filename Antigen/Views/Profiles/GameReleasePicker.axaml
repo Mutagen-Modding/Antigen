@@ -1,0 +1,77 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:profiles="clr-namespace:Antigen.ViewModels.Profiles"
+             xmlns:controls="clr-namespace:Antigen.Controls"
+             mc:Ignorable="d"
+             d:DesignWidth="280"
+             x:Class="Antigen.Views.Profiles.GameReleasePicker"
+             x:DataType="profiles:GameReleasePickerVM">
+    <UserControl.Resources>
+        <!-- The menu stands in for the field rather than hanging off it to read as the same control. -->
+        <ControlTheme x:Key="FieldMenuPresenter"
+                      TargetType="MenuFlyoutPresenter"
+                      BasedOn="{StaticResource {x:Type MenuFlyoutPresenter}}">
+            <Setter Property="MinWidth"
+                    Value="{ReflectionBinding Bounds.Width, RelativeSource={RelativeSource AncestorType=Button, Tree=Logical}}" />
+            <Setter Property="Padding" Value="0,1" />
+            <Setter Property="CornerRadius" Value="4" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="BorderBrush" Value="{DynamicResource AccentTertiaryBrush}" />
+        </ControlTheme>
+
+        <ControlTheme x:Key="ReleaseMenuItem"
+                      TargetType="MenuItem"
+                      BasedOn="{StaticResource {x:Type MenuItem}}"
+                      x:DataType="profiles:GameChoice">
+            <Setter Property="Header" Value="{Binding Name}" />
+            <Setter Property="Command" Value="{Binding Select}" />
+            <Setter Property="Padding" Value="4,0" />
+            <Setter Property="MinHeight" Value="30" />
+
+            <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}" />
+
+            <Style Selector="^:selected">
+                <Setter Property="Foreground" Value="{DynamicResource AccentTertiaryBrush}" />
+            </Style>
+        </ControlTheme>
+
+        <ControlTheme x:Key="CategoryMenuItem"
+                      TargetType="MenuItem"
+                      BasedOn="{StaticResource ReleaseMenuItem}"
+                      x:DataType="profiles:GameChoice">
+            <Setter Property="ItemsSource" Value="{Binding Releases}" />
+            <Setter Property="ItemContainerTheme" Value="{StaticResource ReleaseMenuItem}" />
+        </ControlTheme>
+    </UserControl.Resources>
+
+    <Button Theme="{StaticResource FieldButton}"
+            HorizontalAlignment="Stretch"
+            HorizontalContentAlignment="Stretch">
+        <Grid ColumnDefinitions="*,Auto">
+            <TextBlock Grid.Column="0"
+                       Text="{Binding Display}"
+                       TextTrimming="CharacterEllipsis"
+                       VerticalAlignment="Center" />
+
+            <Path Grid.Column="1"
+                  Data="M 0,0 L 4,4 L 8,0"
+                  Margin="8,0,0,0"
+                  VerticalAlignment="Center"
+                  Stroke="{Binding $parent[Button].Foreground}"
+                  StrokeThickness="1.2"
+                  StrokeLineCap="Round"
+                  StrokeJoin="Round" />
+        </Grid>
+
+        <Button.Flyout>
+            <controls:FieldMenuFlyout ItemsSource="{Binding Choices}"
+                                      ItemContainerTheme="{StaticResource CategoryMenuItem}"
+                                      FlyoutPresenterTheme="{StaticResource FieldMenuPresenter}"
+                                      Placement="AnchorAndGravity"
+                                      PlacementAnchor="TopLeft"
+                                      PlacementGravity="BottomRight" />
+        </Button.Flyout>
+    </Button>
+</UserControl>

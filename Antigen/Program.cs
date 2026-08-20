@@ -55,6 +55,8 @@ internal sealed class Program
     {
         return AppBuilder.Configure<App>()
             .UsePlatformDetect()
+            // Helps with the mouse registering its position when opening game selector popups
+            .With(new X11PlatformOptions { OverlayPopups = true })
             .WithDeveloperTools()
             .LogToTrace()
             .UseReactiveUI(rxBuilder =>

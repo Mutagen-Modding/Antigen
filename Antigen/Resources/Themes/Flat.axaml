@@ -9,6 +9,7 @@
     <Color x:Key="AccentSecondaryColor">#8C8A93</Color>
     <Color x:Key="AccentTertiaryColor">#C9C7D0</Color>
     <Color x:Key="RowWashColor">#2E2D33</Color>
+    <Color x:Key="PopupSurfaceColor">#2A2930</Color>
 
     <Color x:Key="SeverityCtdColor">#CD5C5C</Color>
     <Color x:Key="SeverityErrorColor">#FFA500</Color>
@@ -39,6 +40,19 @@
     <SolidColorBrush x:Key="AccentTertiaryBrush" Color="{StaticResource AccentTertiaryColor}" />
 
     <SolidColorBrush x:Key="GlyphHoverBrush" Color="#FFFFFF" />
+
+    <SolidColorBrush x:Key="PopupSurfaceBrush" Color="{StaticResource PopupSurfaceColor}" />
+
+    <SolidColorBrush x:Key="MenuFlyoutPresenterBackground" Color="{StaticResource PopupSurfaceColor}" />
+    <SolidColorBrush x:Key="MenuFlyoutPresenterBorderBrush" Color="Transparent" />
+    <SolidColorBrush x:Key="MenuBarItemBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="MenuFlyoutItemBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPointerOver" Color="Transparent" />
+    <SolidColorBrush x:Key="MenuFlyoutItemBackgroundPressed" Color="Transparent" />
+    <SolidColorBrush x:Key="MenuFlyoutItemForegroundPointerOver" Color="{StaticResource AccentTertiaryColor}" />
+    <SolidColorBrush x:Key="MenuFlyoutItemForegroundPressed" Color="{StaticResource AccentTertiaryColor}" />
+    <SolidColorBrush x:Key="MenuFlyoutSubItemChevronPointerOver" Color="{StaticResource AccentTertiaryColor}" />
+    <SolidColorBrush x:Key="MenuFlyoutSubItemChevronSubMenuOpened" Color="{StaticResource AccentTertiaryColor}" />
 
     <SolidColorBrush x:Key="RowWashBrush" Color="{StaticResource RowWashColor}" />
     <SolidColorBrush x:Key="RowAccentWashBrush" Color="{StaticResource RowWashColor}" />
