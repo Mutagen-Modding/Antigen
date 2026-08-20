@@ -56,6 +56,7 @@
     <SolidColorBrush x:Key="AccentSoftBrush" Color="{StaticResource AccentColor}" Opacity="0.1" />
     <SolidColorBrush x:Key="OnAccentBrush" Color="{StaticResource BaseColor}" />
     <SolidColorBrush x:Key="AccentSecondaryBrush" Color="{StaticResource AccentSecondaryColor}" />
+    <SolidColorBrush x:Key="ErrorTextBrush" Color="{StaticResource SeverityErrorColor}" />
     <SolidColorBrush x:Key="AccentTertiaryBrush" Color="{StaticResource AccentTertiaryColor}" />
 
     <SolidColorBrush x:Key="GlyphHoverBrush" Color="{StaticResource AccentTertiaryColor}" />

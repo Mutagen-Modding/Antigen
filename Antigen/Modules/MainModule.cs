@@ -1,10 +1,13 @@
 using System.IO.Abstractions;
 using System.Reflection;
 using Autofac;
+using Avalonia.Controls;
 using Mutagen.Bethesda;
 using Mutagen.Bethesda.Autofac;
 using Mutagen.Bethesda.Environments.DI;
 using Mutagen.Bethesda.Plugins.Meta;
+using Noggog.Reactive;
+using Noggog.UI;
 using Module = Autofac.Module;
 
 namespace Antigen.Modules;
@@ -18,6 +21,18 @@ public class MainModule : Module
         // Register base services
         builder.RegisterType<FileSystem>()
             .As<IFileSystem>()
+            .SingleInstance();
+
+        builder.RegisterType<SchedulerProvider>()
+            .As<ISchedulerProvider>()
+            .SingleInstance();
+
+        builder.Register(context =>
+            {
+                var window = context.Resolve<Window>();
+                return new AvaloniaPathPickerDialogProvider(() => window);
+            })
+            .As<IPathPickerDialogProvider>()
             .SingleInstance();
 
         builder.RegisterModule<MutagenModule>();

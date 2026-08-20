@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <!--        <ApplicationIcon>Assets\.ico</ApplicationIcon>-->
@@ -34,6 +34,8 @@
         <PackageReference Include="Mutagen.Bethesda.Analyzers"/>
         <PackageReference Include="Mutagen.Bethesda.Analyzers.Skyrim"/>
         <PackageReference Include="Mutagen.Bethesda.Autofac"/>
+        <PackageReference Include="Noggog.UI"/>
+        <PackageReference Include="Noggog.UI.Avalonia"/>
         <PackageReference Include="ReactiveMarbles.ObservableEvents.SourceGenerator"/>
         <PackageReference Include="ReactiveUI.Avalonia"/>
         <PackageReference Include="ReactiveUI.SourceGenerators">

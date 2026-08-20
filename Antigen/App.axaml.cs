@@ -6,6 +6,7 @@ using Antigen.ViewModels;
 using Antigen.Views;
 using Autofac;
 using Avalonia;
+using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Microsoft.Extensions.Logging;
@@ -70,7 +71,8 @@ public sealed class App : Application
         var builder = new ContainerBuilder();
 
         builder.RegisterInstance(window)
-            .As<IMainWindow>();
+            .As<IMainWindow>()
+            .As<Window>();
 
         builder.RegisterModule<MainModule>();
 

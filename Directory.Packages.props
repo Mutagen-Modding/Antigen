@@ -19,6 +19,8 @@
     <PackageVersion Include="Mutagen.Bethesda.Analyzers" Version="0.1.0-alpha.758" />
     <PackageVersion Include="Mutagen.Bethesda.Analyzers.Skyrim" Version="0.1.0-alpha.758" />
     <PackageVersion Include="Mutagen.Bethesda.Autofac" Version="0.55.0-alpha.7" />
+    <PackageVersion Include="Noggog.UI" Version="4.4.0-avalonia.1" />
+    <PackageVersion Include="Noggog.UI.Avalonia" Version="4.4.0-avalonia.1" />
     <PackageVersion Include="ReactiveMarbles.ObservableEvents.SourceGenerator" Version="1.3.1" />
     <PackageVersion Include="ReactiveUI.Avalonia" Version="12.0.3" />
     <PackageVersion Include="ReactiveUI.SourceGenerators" Version="3.1.0">

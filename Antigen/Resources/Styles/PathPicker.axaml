@@ -1,0 +1,13 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:noggogUi="clr-namespace:Noggog.UI;assembly=Noggog.UI.Avalonia">
+    <!-- Same brushes the plain inputs use, so the picker reads as one of them. -->
+    <Style Selector="noggogUi|PathPicker">
+        <Setter Property="FieldBackground" Value="{DynamicResource TextControlBackground}" />
+        <Setter Property="FieldBackgroundPointerOver" Value="{DynamicResource TextControlBackgroundPointerOver}" />
+        <Setter Property="FieldBackgroundFocused" Value="{DynamicResource TextControlBackgroundFocused}" />
+        <Setter Property="WarningBrush" Value="{DynamicResource ErrorTextBrush}" />
+        <Setter Property="GlyphBrush" Value="{DynamicResource GlyphBrush}" />
+        <Setter Property="GlyphBrushPointerOver" Value="{DynamicResource GlyphHoverBrush}" />
+    </Style>
+</Styles>
