@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
 
@@ -18,7 +18,7 @@ public class MissingFieldsAnalyzer : IIsolatedRecordAnalyzer<IDialogBranchGetter
             Severity.Warning)
         .WithoutFormatting("Branch has no starting topic, nothing will not be available in game");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [NoQuest];
+    public IEnumerable<TopicDefinition> Topics { get; } = [NoQuest, NoStartingTopic];
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IDialogBranchGetter> param)
     {

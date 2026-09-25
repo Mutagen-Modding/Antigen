@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
 
@@ -18,7 +18,7 @@ public class OcclusionMarkerAnalyzer : IIsolatedRecordAnalyzer<IPlacedObjectGett
             Severity.Warning)
         .WithoutFormatting("Occlusion Box placement has half-extent smaller than 32, so it should be a Occlusion Plane instead");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [NoPrimitive];
+    public IEnumerable<TopicDefinition> Topics { get; } = [NoPrimitive, OcclusionBoxShouldBePlaneMarker];
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IPlacedObjectGetter> param)
     {

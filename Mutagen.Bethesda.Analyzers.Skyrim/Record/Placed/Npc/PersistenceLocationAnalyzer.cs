@@ -1,4 +1,4 @@
-﻿using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
+using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
 using Mutagen.Bethesda.Analyzers.SDK.Topics;
 using Mutagen.Bethesda.Analyzers.Skyrim.Caches;
 using Mutagen.Bethesda.Skyrim;
@@ -35,17 +35,15 @@ public class PersistenceLocationAnalyzer : IContextualRecordAnalyzer<IPlacedNpcG
         var cell = placedNpc.GetCell(param.LinkCache, param.ResolveCache<IExteriorCellCache>());
         if (cell is null) return;
 
-        var location = cell.Location.TryResolve(param.LinkCache);
-        if (location is null)
+        var location = cell.GetLocation(param.LinkCache);
+        if (location == null)
         {
             param.AddTopic(
                 PersistenceLocationWithCellWithoutLocation.Format(persistenceLocation, cell));
             return;
         }
 
-        if (location
-            .GetParentLocations(param.LinkCache, true)
-            .All(parentLocation => parentLocation.FormKey != persistenceLocation.FormKey))
+        if (!cell.GetAllLocations(param.LinkCache).Any(l => l.Equals(persistenceLocation)))
         {
             param.AddTopic(
                 NotInsidePersistenceLocation.Format(persistenceLocation, cell, location));

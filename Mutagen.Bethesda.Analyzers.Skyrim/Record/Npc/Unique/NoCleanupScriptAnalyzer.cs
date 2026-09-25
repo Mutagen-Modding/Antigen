@@ -40,7 +40,13 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Warning)
         .WithoutFormatting("WI quest property is not filled in cleanup script");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [NoCleanupScript, DeathContainerPropertyNotFilled, WIPropertyNotFilled];
+    public IEnumerable<TopicDefinition> Topics { get; } = [
+        NoCleanupScript,
+        DeathContainerPropertyNotFilled,
+        DeathContainerPropertyNotFilledWithContainer,
+        DeathContainerPropertyCanRespawn,
+        WIPropertyNotFilled
+    ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {

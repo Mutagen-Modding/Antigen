@@ -41,7 +41,7 @@ public class AmbushAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Warning)
         .WithFormatting<IPlacedNpcGetter>("Placed npc {0} with ambush script doesn't have a parent activator to trigger the ambush");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive, AmbushParentActivator];
+    public IEnumerable<TopicDefinition> Topics { get; } = [AmbushMissingScript, AmbushNotInEditorId, AmbushAggressive, AmbushPackages, AmbushParentActivator];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
