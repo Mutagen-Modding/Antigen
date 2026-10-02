@@ -1,8 +1,8 @@
 site_name: Mutagen Analyzers Documentation
-site_url: https://mutagen-modding.github.io/Mutagen.Bethesda.Analyzers/
+site_url: https://mutagen-modding.github.io/Antigen/
 
 repo_name: Mutagen Analyzers
-repo_url: https://github.com/Mutagen-Modding/Mutagen.Bethesda.Analyzers
+repo_url: https://github.com/Mutagen-Modding/Antigen
 
 extra:
   social:

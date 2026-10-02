@@ -1,0 +1,30 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Antigen.Tests</RootNamespace>
+        <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" />
+        <PackageReference Include="Mutagen.Bethesda.Skyrim" />
+        <PackageReference Include="Mutagen.Bethesda.Testing" />
+        <PackageReference Include="xunit" />
+        <PackageReference Include="xunit.runner.visualstudio">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Antigen\Antigen.csproj" />
+      <ProjectReference Include="..\Antigen.Engine\Antigen.Engine.csproj" />
+      <ProjectReference Include="..\Antigen.Skyrim\Antigen.Skyrim.csproj" />
+      <ProjectReference Include="..\Antigen.Testing\Antigen.Testing.csproj" />
+    </ItemGroup>
+
+</Project>
