@@ -16,19 +16,27 @@ public class SpeakerAnalyzer : IContextualRecordAnalyzer<IDialogResponsesGetter>
     public static readonly TopicDefinition<IDialogResponsesGetter> DifferentSpeakerInSharedInfo = MutagenTopicBuilder.FromDiscussion(
             467,
             "Different Speaker in Shared Info",
+            Severity.Suggestion)
+        .WithFormatting<IDialogResponsesGetter>(
+            "Dialog has speakers not in common with its shared info {0}");
+
+    public static readonly TopicDefinition<IDialogResponsesGetter> DifferentVoiceInSharedInfo = MutagenTopicBuilder.FromDiscussion(
+            656,
+            "Different Voices in Shared Info",
             Severity.Error)
         .WithFormatting<IDialogResponsesGetter>(
-            "Dialog uses a shared info {0} that has no speakers in common with itself");
+            "Dialog has voices not in common with its shared info {0}");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [MissingSpeaker, DifferentSpeakerInSharedInfo];
+    public IEnumerable<TopicDefinition> Topics { get; } = [MissingSpeaker, DifferentSpeakerInSharedInfo, DifferentVoiceInSharedInfo];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IDialogResponsesGetter> param)
     {
         var dialogResponses = param.Record;
 
         var voiceTypeAssetLookup = param.ResolveCache<VoiceTypeAssetLookup>();
+        // TODO: Would it be faster to only produce a HashSet if needed for IsSubsetOf? Wait until after lookup is optimised to test.
         var speakers = voiceTypeAssetLookup.GetSpeakers(dialogResponses).ToHashSet();
-        if (speakers.Capacity == 0)
+        if (speakers.Count == 0)
         {
             param.AddTopic(
                 MissingSpeaker.Format());
@@ -39,11 +47,20 @@ public class SpeakerAnalyzer : IContextualRecordAnalyzer<IDialogResponsesGetter>
             var sharedInfo = dialogResponses.ResponseData.TryResolve(param.LinkCache);
             if (sharedInfo is null) return;
 
-            var sharedInfoSpeakers = voiceTypeAssetLookup.GetSpeakers(sharedInfo).ToHashSet();
-            if (!speakers.Intersect(sharedInfoSpeakers).Any())
+            var sharedInfoSpeakers = voiceTypeAssetLookup.GetSpeakers(sharedInfo);
+            if (!speakers.IsSubsetOf(sharedInfoSpeakers))
             {
                 param.AddTopic(
-                    DifferentSpeakerInSharedInfo.Format(sharedInfo));
+                    DifferentSpeakerInSharedInfo.Format(sharedInfo), ("Missing", speakers.Except(sharedInfoSpeakers)));
+            }
+
+            // TODO: Would be nice to have GetSpeakerData that can give both speakers and voices at once
+            var voices = voiceTypeAssetLookup.GetVoiceTypes(dialogResponses).ToHashSet();
+            var sharedInfoVoices = voiceTypeAssetLookup.GetVoiceTypes(sharedInfo);
+            if (!voices.IsSubsetOf(sharedInfoVoices))
+            {
+                param.AddTopic(
+                    DifferentVoiceInSharedInfo.Format(sharedInfo), ("Missing", voices.Except(sharedInfoVoices)));
             }
         }
     }
@@ -51,5 +68,6 @@ public class SpeakerAnalyzer : IContextualRecordAnalyzer<IDialogResponsesGetter>
     public IEnumerable<Func<IDialogResponsesGetter, object?>> FieldsOfInterest()
     {
         yield return x => x.Conditions;
+        yield return x => x.ResponseData;
     }
 }
