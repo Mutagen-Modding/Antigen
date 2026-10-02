@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Mutagen.Bethesda.Analyzers.Skyrim.Record.Dialog.Responses;
-using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
+using Antigen.Skyrim.Record.Dialog.Responses;
+using Antigen.Testing.Frameworks;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Testing.AutoData;
 using Xunit;
 
-namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests.ContextualRecords.Dialog.Responses;
+namespace Antigen.Skyrim.Tests.ContextualRecords.Dialog.Responses;
 
 using Fixture = ContextualRecordTestFixture<SpeakerAnalyzer, DialogResponses, IDialogResponsesGetter>;
 
