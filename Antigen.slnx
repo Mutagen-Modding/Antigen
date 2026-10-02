@@ -1,0 +1,27 @@
+<Solution>
+  <Folder Name="/.solutionItems/">
+    <File Path=".editorconfig" />
+    <File Path=".gitignore" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/Analyzers/">
+    <Project Path="Antigen.Common/Antigen.Common.csproj" />
+    <Project Path="Antigen.Skyrim/Antigen.Skyrim.csproj" />
+  </Folder>
+  <Folder Name="/Core/">
+    <Project Path="Antigen.Engine/Antigen.Engine.csproj" />
+    <Project Path="Antigen.SDK/Antigen.SDK.csproj" />
+    <Project Path="Antigen/Antigen.csproj" />
+  </Folder>
+  <Folder Name="/Executables/">
+    <Project Path="Antigen.Cli/Antigen.Cli.csproj" />
+    <Project Path="Antigen.GitHub/Antigen.GitHub.csproj" />
+  </Folder>
+  <Folder Name="/Tests/">
+    <Project Path="Antigen.Skyrim.Tests/Antigen.Skyrim.Tests.csproj" />
+    <Project Path="Antigen.Testing/Antigen.Testing.csproj" />
+    <Project Path="Antigen.Tests/Antigen.Tests.csproj" />
+  </Folder>
+</Solution>

@@ -1,0 +1,55 @@
+using System.IO.Abstractions;
+using Autofac;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Antigen.Cli.Modules;
+using Antigen.Config.Topic;
+using Antigen.SDK.Topics;
+using Mutagen.Bethesda.Environments.DI;
+using Mutagen.Bethesda.Plugins.Cache;
+using Mutagen.Bethesda.Plugins.Order;
+using Mutagen.Bethesda.Plugins.Records;
+using Mutagen.Bethesda.Skyrim;
+using Noggog;
+using Noggog.WorkEngine;
+using NSubstitute;
+
+namespace Antigen.Testing;
+
+public class TestModule : Module
+{
+    private readonly IFileSystem? _fileSystem;
+
+    public TestModule(IFileSystem? fileSystem)
+    {
+        _fileSystem = fileSystem;
+    }
+
+    public TestModule()
+    {
+    }
+
+    protected override void Load(ContainerBuilder builder)
+    {
+        builder.RegisterModule<RunAnalyzerModule>();
+        builder.RegisterInstance(_fileSystem.GetOrDefault())
+            .As<IFileSystem>();
+        builder.RegisterGeneric(typeof(NullLogger<>))
+            .As(typeof(ILogger<>))
+            .SingleInstance();
+        builder.RegisterInstance(new TestDropoff())
+            .AsSelf()
+            .AsImplementedInterfaces();
+        builder.RegisterInstance(new GameReleaseInjection(GameRelease.SkyrimSE))
+            .AsImplementedInterfaces();
+        var minSev = Substitute.For<IMinimumSeverityConfiguration>();
+        minSev.MinimumSeverity.Returns(Severity.Suggestion);
+        builder.RegisterInstance(minSev).As<IMinimumSeverityConfiguration>();
+        builder.RegisterType<InlineWorkDropoff>().As<IWorkDropoff>();
+        var lo = new LoadOrder<ModListing<SkyrimMod>>();
+        builder.RegisterInstance(lo)
+            .As<ILoadOrderGetter<IModListingGetter<IModGetter>>>();
+        builder.RegisterInstance(lo.ToImmutableLinkCache())
+            .As<ILinkCache>();
+    }
+}
