@@ -1,7 +1,7 @@
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
 
-namespace Mutagen.Bethesda.Analyzers.Skyrim.Extensions;
+namespace Antigen.Skyrim.Extensions;
 
 public static class PlacedExtensions
 {
