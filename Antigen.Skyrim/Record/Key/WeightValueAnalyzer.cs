@@ -1,0 +1,45 @@
+﻿using Antigen.SDK.Analyzers;
+using Antigen.SDK.Topics;
+using Mutagen.Bethesda.Skyrim;
+
+namespace Antigen.Skyrim.Record.Key;
+
+public class WeightValueAnalyzer : IIsolatedRecordAnalyzer<IKeyGetter>
+{
+    public static readonly TopicDefinition<float> WeightNotZero = MutagenTopicBuilder.FromDiscussion(
+            229,
+            "Weight Not Zero",
+            Severity.Suggestion)
+        .WithFormatting<float>("Key weight {0} is not zero");
+
+    public static readonly TopicDefinition<uint> ValueNotZero = MutagenTopicBuilder.FromDiscussion(
+            310,
+            "Value Not Zero",
+            Severity.Suggestion)
+        .WithFormatting<uint>("Key value {0} is not zero");
+
+    public IEnumerable<TopicDefinition> Topics { get; } = [WeightNotZero, ValueNotZero];
+
+    public void AnalyzeRecord(IsolatedRecordAnalyzerParams<IKeyGetter> param)
+    {
+        var key = param.Record;
+
+        if (key is not { Weight: 0 })
+        {
+            param.AddTopic(
+                WeightNotZero.Format(key.Weight));
+        }
+
+        if (key.Value != 0)
+        {
+            param.AddTopic(
+                ValueNotZero.Format(key.Value));
+        }
+    }
+
+    public IEnumerable<Func<IKeyGetter, object?>> FieldsOfInterest()
+    {
+        yield return x => x.Weight;
+        yield return x => x.Value;
+    }
+}

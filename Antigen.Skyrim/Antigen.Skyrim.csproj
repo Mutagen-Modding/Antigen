@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+      <IsPackable>true</IsPackable>
+      <PackageId>Antigen.Skyrim</PackageId>
+      <Description>Skyrim-specific analyzers and contextual analysis for Bethesda mod analysis.</Description>
+      <RootNamespace>Antigen.Skyrim</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Antigen.Common\Antigen.Common.csproj" />
+      <ProjectReference Include="..\Antigen.SDK\Antigen.SDK.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Mutagen.Bethesda.FormKeys.SkyrimSE" />
+      <PackageReference Include="Mutagen.Bethesda.Skyrim" />
+      <PackageReference Include="Autofac" />
+      <PackageReference Include="Mutagen.Bethesda.Autofac" />
+      <PackageReference Include="GitVersion.MsBuild">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Record\MagicEffect\" />
+    </ItemGroup>
+
+</Project>

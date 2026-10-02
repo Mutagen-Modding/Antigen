@@ -1,0 +1,32 @@
+using Antigen.Skyrim.Record.Cell.Interior;
+using Antigen.Testing.Frameworks;
+using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Skyrim;
+using Mutagen.Bethesda.Testing.AutoData;
+using Xunit;
+
+namespace Antigen.Skyrim.Tests.IsolatedRecords.Cells;
+
+public class ShowSkyAnalyzerTests
+{
+    // [Theory, MutagenModAutoData]
+    // public void ShowSkyWithoutRegion(
+    //     IsolatedRecordTestFixture<ShowSkyAnalyzer, Cell, ICellGetter> fixture)
+    // {
+    //     fixture.Run(
+    //         prepForError: cell =>
+    //         {
+    //             cell.EditorID = "TestCell";
+    //             cell.Flags = Cell.Flag.IsInteriorCell | Cell.Flag.ShowSky;
+    //
+    //         },
+    //         prepForFix: static cell =>
+    //         {
+    //             cell.EditorID = "TestCell";
+    //             cell.Flags = Cell.Flag.IsInteriorCell | Cell.Flag.ShowSky;
+    //             cell.SkyAndWeatherFromRegion = new FormLinkNullable<IRegionGetter>(FormKeys.SkyrimSE.Skyrim.Region.WeatherMountains.FormKey);
+    //         },
+    //         ShowSkyAnalyzer.ShowSkyWithoutRegion);
+    // }
+}
+
