@@ -1,15 +1,10 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Mutagen.Bethesda.Analyzers.Skyrim.Record.Placed.Npc;
-using Mutagen.Bethesda.Analyzers.Testing.Frameworks;
+using Antigen.Skyrim.Record.Placed.Npc;
+using Antigen.Testing.Frameworks;
 using Mutagen.Bethesda.Skyrim;
 using Mutagen.Bethesda.Testing.AutoData;
 using Xunit;
 
-namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests.ContextualRecords.Placed.Npcs;
+namespace Antigen.Skyrim.Tests.ContextualRecords.Placed.Npcs;
 
 using Fixture = ContextualRecordTestFixture<UniquePlacedNpcAnalyzer, PlacedNpc, IPlacedNpcGetter>;
 

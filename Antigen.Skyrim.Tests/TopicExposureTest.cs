@@ -1,16 +1,15 @@
 using System.Reflection;
 using Autofac;
-using Mutagen.Bethesda;
-using Mutagen.Bethesda.Analyzers.SDK.Analyzers;
-using Mutagen.Bethesda.Analyzers.SDK.Topics;
-using Mutagen.Bethesda.Analyzers.Skyrim.Record.Conditions;
-using Mutagen.Bethesda.Analyzers.Testing;
+using Antigen.SDK.Analyzers;
+using Antigen.SDK.Topics;
+using Antigen.Skyrim.Record.Conditions;
+using Antigen.Testing;
 using Mutagen.Bethesda.Plugins.Meta;
 using Noggog;
 using Shouldly;
 using Xunit;
 
-namespace Mutagen.Bethesda.Analyzers.Skyrim.Tests;
+namespace Antigen.Skyrim.Tests;
 
 public class TopicExposureTest
 {
