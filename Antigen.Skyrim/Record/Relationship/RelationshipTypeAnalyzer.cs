@@ -18,7 +18,10 @@ public class RelationshipTypeAnalyzer : IContextualRecordAnalyzer<IRelationshipG
             Severity.Suggestion)
         .WithFormatting<Mutagen.Bethesda.Skyrim.Relationship.RankType>("Relationship type is Courting, but their rank {0} is lower than Acquaintance");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [CourtingRelationshipType];
+    public IEnumerable<TopicDefinition> Topics { get; } = [
+        SpouseRelationshipType,
+        CourtingRelationshipType,
+    ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IRelationshipGetter> param)
     {
