@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <IsPackable>true</IsPackable>
+        <PackageId>Antigen.SDK</PackageId>
+        <Description>Base classes and interfaces for creating custom Bethesda mod analyzers using the Antigen framework.</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Autofac" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" />
+        <PackageReference Include="Mutagen.Bethesda.Core" />
+        <PackageReference Include="GitVersion.MsBuild">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    </ItemGroup>
+
+</Project>

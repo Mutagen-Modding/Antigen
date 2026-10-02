@@ -12,8 +12,8 @@
         <!-- NuGet Package Configuration -->
         <IsPackable>false</IsPackable>
         <PackageLicenseExpression>GPL-3.0-only</PackageLicenseExpression>
-        <PackageProjectUrl>https://github.com/Mutagen-Modding/Mutagen.Bethesda.Analyzers</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/Mutagen-Modding/Mutagen.Bethesda.Analyzers</RepositoryUrl>
+        <PackageProjectUrl>https://github.com/Mutagen-Modding/Antigen</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/Mutagen-Modding/Antigen</RepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageOutputPath>..\nupkg</PackageOutputPath>

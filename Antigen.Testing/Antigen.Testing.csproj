@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <RootNamespace>Antigen.Testing</RootNamespace>
+    </PropertyGroup>
+
+    <PropertyGroup>
+        <TargetPlatformIdentifier>Windows</TargetPlatformIdentifier>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Mutagen.Bethesda.Testing" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Antigen.Cli\Antigen.Cli.csproj" />
+      <ProjectReference Include="..\Antigen.Common\Antigen.Common.csproj" />
+      <ProjectReference Include="..\Antigen.Engine\Antigen.Engine.csproj" />
+      <ProjectReference Include="..\Antigen.SDK\Antigen.SDK.csproj" />
+    </ItemGroup>
+
+</Project>

@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+      <IsPackable>true</IsPackable>
+      <PackageId>Antigen.Engine</PackageId>
+      <Description>Core analysis engine with drivers and reporting for Bethesda mod analyzers.</Description>
+      <RootNamespace>Antigen</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Antigen.SDK\Antigen.SDK.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Autofac" />
+      <PackageReference Include="Mutagen.Bethesda.Autofac" />
+      <PackageReference Include="GitVersion.MsBuild">
+        <PrivateAssets>all</PrivateAssets>
+        <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      </PackageReference>
+      <PackageReference Include="Microsoft.SourceLink.GitHub" />
+    </ItemGroup>
+
+</Project>

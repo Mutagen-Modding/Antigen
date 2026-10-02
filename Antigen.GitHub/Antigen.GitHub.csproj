@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Antigen.Common\Antigen.Common.csproj" />
+        <ProjectReference Include="..\Antigen.Engine\Antigen.Engine.csproj" />
+        <ProjectReference Include="..\Antigen.Skyrim\Antigen.Skyrim.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CommandLineParser" />
+        <PackageReference Include="Octokit.GraphQL" />
+    </ItemGroup>
+</Project>

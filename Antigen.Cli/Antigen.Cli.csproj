@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <CETCompat>false</CETCompat>
+    </PropertyGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Antigen.Engine\Antigen.Engine.csproj" />
+        <ProjectReference Include="..\Antigen.Skyrim\Antigen.Skyrim.csproj" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="Autofac.Extensions.DependencyInjection" />
+        <PackageReference Include="Microsoft.Extensions.Logging.Console" />
+        <PackageReference Include="Mutagen.Bethesda" />
+        <PackageReference Include="CommandLineParser" />
+    </ItemGroup>
+</Project>
