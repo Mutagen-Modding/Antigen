@@ -37,6 +37,20 @@ public static class CellExtensions
         return cellLocations;
     }
 
+    public static ILocationGetter? GetLocation(this ICellGetter cell, ILinkCache linkCache)
+    {
+        if (!cell.Location.IsNull)
+            return cell.Location.TryResolve(linkCache);
+
+        if (cell.Flags.HasFlag(Cell.Flag.IsInteriorCell))
+            return null;
+        if (!linkCache.TryResolveSimpleContext(cell, out var context))
+            return null;
+        if (!context.TryGetParent<IWorldspaceGetter>(out var world))
+            return null;
+        return world.Location.TryResolve(linkCache);
+    }
+
     /// <summary>
     /// Estimates if a cell is just a testing cell that can be ignored.
     /// A testing cell is always an interior cell, and has no special setup.

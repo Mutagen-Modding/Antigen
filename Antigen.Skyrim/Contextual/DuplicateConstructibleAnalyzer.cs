@@ -8,7 +8,7 @@ namespace Antigen.Skyrim.Contextual;
 
 public class DuplicateConstructibleAnalyzer : IContextualAnalyzer
 {
-    private static readonly TopicDefinition<int, IFormLinkNullableGetter<IConstructibleGetter>> DuplicateConstructibleReference = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<int, IFormLinkNullableGetter<IConstructibleGetter>> DuplicateConstructibleReference = MutagenTopicBuilder.FromDiscussion(
             206,
             "Duplicate Constructible Object",
             Severity.Warning)

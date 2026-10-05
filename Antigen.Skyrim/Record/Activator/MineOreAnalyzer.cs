@@ -24,7 +24,7 @@ public class MineOreAnalyzer : IContextualRecordAnalyzer<IActivatorGetter>
             Severity.Warning)
         .WithFormatting<IMiscItemGetter>("Mine ore uses incorrect ore: {0}");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [NoMineOreScript, IncorrectVeinOre];
+    public IEnumerable<TopicDefinition> Topics { get; } = [NoMineOreScript, NoOreProperty, IncorrectVeinOre];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IActivatorGetter> param)
     {
