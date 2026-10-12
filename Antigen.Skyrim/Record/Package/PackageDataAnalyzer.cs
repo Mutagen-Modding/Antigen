@@ -31,7 +31,12 @@ public class PackageDataAnalyzer : IContextualRecordAnalyzer<IPackageGetter>
             Severity.Error)
         .WithFormatting<string, string?>("Package data '{0}' referenced by {1} does not exist");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [PackageWithoutOwningQuestReferencingQuestAlias, PackageReferencingMissingQuestAlias];
+    public IEnumerable<TopicDefinition> Topics { get; } = [
+        PackageWithoutOwningQuestReferencingQuestAlias,
+        PackageReferencingMissingQuestAlias,
+        PackageTargetsNoObject,
+        PackageDataDoesNotExist,
+    ];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IPackageGetter> param)
     {

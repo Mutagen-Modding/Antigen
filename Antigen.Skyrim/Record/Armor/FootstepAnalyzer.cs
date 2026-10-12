@@ -32,7 +32,7 @@ public class FootstepAnalyzer : IContextualRecordAnalyzer<IArmorGetter>
             Severity.Suggestion)
         .WithFormatting<IFormLinkGetter<IRaceGetter>>("Armor has multiple armor addons that have footstep sounds which are enabled for the same race {0}");
 
-    public IEnumerable<TopicDefinition> Topics => [ArmorMatchingFootstepArmorType, ArmorMissingFootstep, ArmorDuplicateFootstep];
+    public IEnumerable<TopicDefinition> Topics => [UnknownArmorType, ArmorMatchingFootstepArmorType, ArmorMissingFootstep, ArmorDuplicateFootstep];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<IArmorGetter> param)
     {

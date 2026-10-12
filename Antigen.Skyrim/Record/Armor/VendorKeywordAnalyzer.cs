@@ -19,7 +19,7 @@ public class VendorKeywordAnalyzer : IIsolatedRecordAnalyzer<IArmorGetter>
             Severity.Suggestion)
         .WithoutFormatting("Armor has unsuitable vendor keywords");
 
-    public IEnumerable<TopicDefinition> Topics => [ArmorMissingVendorKeyword];
+    public IEnumerable<TopicDefinition> Topics => [ArmorMissingVendorKeyword, UnsuitableVendorKeyword];
 
     private static readonly HashSet<FormLink<IKeywordGetter>> AllArmorVendorKeywords =
     [

@@ -27,7 +27,7 @@ public class Level0Analyzer : IIsolatedRecordAnalyzer<INpcGetter>
         .WithFormatting<float>("Npc has too small level mult {0}");
 
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [Level0];
+    public IEnumerable<TopicDefinition> Topics { get; } = [Level0, MinLevel0, LevelMultTooSmall];
 
     public void AnalyzeRecord(IsolatedRecordAnalyzerParams<INpcGetter> param)
     {

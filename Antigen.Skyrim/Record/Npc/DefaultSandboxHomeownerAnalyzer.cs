@@ -12,7 +12,7 @@ public class DefaultSandboxHomeownerAnalyzer : IContextualRecordAnalyzer<INpcGet
             Severity.Suggestion)
         .WithoutFormatting("Npc uses DefaultSandboxHomeowner as last package, consider using DefaultHomeOwnerPackageList in Default Package List instead");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [];
+    public IEnumerable<TopicDefinition> Topics { get; } = [DefaultSandboxHomeownerListLast];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
