@@ -51,4 +51,14 @@ public partial record TopicDefinition
             severity: Severity,
             informationUri: InformationUri);
     }
+
+    public TopicDefinition<T1, T2, T3, T4, T5> WithFormatting<T1, T2, T3, T4, T5>(string messageFormat)
+    {
+        return new TopicDefinition<T1, T2, T3, T4, T5>(
+            id: Id,
+            title: Title,
+            messageFormat: messageFormat,
+            severity: Severity,
+            informationUri: InformationUri);
+    }
 }

@@ -6,19 +6,27 @@ using Noggog;
 
 namespace Antigen.Skyrim.Record.Npc;
 
-public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
+public sealed class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
 {
-    public static readonly TopicDefinition TrainerFactionMissingScript = MutagenTopicBuilder.FromDiscussion(
+    public const string JobTrainerEditorIDPart = "JobTrainer";
+
+    public static readonly TopicDefinition TrainerMissingScript = MutagenTopicBuilder.FromDiscussion(
             196,
             "Trainer requires TrainerGoldScript",
             Severity.Warning)
         .WithoutFormatting("Trainer npc does not have a TrainerGoldScript");
 
-    public static readonly TopicDefinition TrainerScriptMissingFaction = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition TrainerMissingFaction = MutagenTopicBuilder.FromDiscussion(
             197,
             "Trainer requires trainer faction",
             Severity.Warning)
         .WithoutFormatting("Trainer npc is not in a trainer faction");
+
+    public static readonly TopicDefinition<IFormLinkGetter<IClassGetter>> TrainerMissingClass = MutagenTopicBuilder.FromDiscussion(
+            665,
+            "Trainer requires trainer class",
+            Severity.Error)
+        .WithFormatting<IFormLinkGetter<IClassGetter>>("Trainer npc has {0} which is not a valid trainer class");
 
     public static readonly TopicDefinition TrainerWithoutSpecialization = MutagenTopicBuilder.FromDiscussion(
             198,
@@ -38,7 +46,7 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             Severity.Warning)
         .WithFormatting<string, int, IFormLinkGetter<IClassGetter>, int>("Npc is {0} trainer but only reaches skill level {1} with class {2}, at their minimum npc level {3}");
 
-    public IEnumerable<TopicDefinition> Topics { get; } = [TrainerFactionMissingScript, TrainerScriptMissingFaction, TrainerWithoutSpecialization, LowSkillLevel, LowSkillLevelAutoCalc];
+    public IEnumerable<TopicDefinition> Topics { get; } = [TrainerMissingScript, TrainerMissingFaction, TrainerWithoutSpecialization, LowSkillLevel, LowSkillLevelAutoCalc, TrainerMissingClass];
 
     public void AnalyzeRecord(ContextualRecordAnalyzerParams<INpcGetter> param)
     {
@@ -51,51 +59,83 @@ public class TrainerAnalyzer : IContextualRecordAnalyzer<INpcGetter>
             .ToList();
 
         var hasTrainerGoldScript = npc.VirtualMachineAdapter is not null && npc.HasScript("TrainerGoldScript");
-        var trainerFaction = factions.Find(x => x.EditorID?.Contains("JobTrainer", StringComparison.OrdinalIgnoreCase) ?? false);
+        var trainerFaction = factions.Find(x => x.EditorID?.Contains(JobTrainerEditorIDPart, StringComparison.OrdinalIgnoreCase) ?? false);
+        var hasTrainerFaction = trainerFaction is not null;
+        var trainerClass = npc.Class.TryResolve(param.LinkCache);
 
-        if (hasTrainerGoldScript && trainerFaction is null)
+        // Some classes are randomly set as trainer class without actually being a trainer class
+        // We check for the EditorID containing "Trainer" to filter out those cases
+        var hasTrainerClass = trainerClass is { MaxTrainingLevel: > 0, EditorID: {} classEditorID } && classEditorID.Contains("Trainer");
+
+        if ((hasTrainerGoldScript || hasTrainerClass) && trainerFaction is null)
         {
             param.AddTopic(
-                TrainerScriptMissingFaction.Format());
+                TrainerMissingFaction.Format());
         }
 
-        if (trainerFaction is not null && !hasTrainerGoldScript)
+        if ((hasTrainerFaction || hasTrainerClass) && !hasTrainerGoldScript)
         {
             param.AddTopic(
-                TrainerFactionMissingScript.Format());
+                TrainerMissingScript.Format());
         }
 
-        if (hasTrainerGoldScript || trainerFaction is not null)
+        if (hasTrainerGoldScript || hasTrainerFaction || hasTrainerClass)
         {
-            var trainerType = npc.GetTrainerType(param.LinkCache);
+            var factionSpecialization = factions
+                .Select<IFactionGetter, Skill?>(f =>
+                {
+                    if (f.EditorID is null) return null;
 
-            if (trainerType is null)
+                    var index = f.EditorID.IndexOf(JobTrainerEditorIDPart, StringComparison.OrdinalIgnoreCase);
+                    if (index < 0) return null;
+
+                    // If the EditorID ends with "JobTrainer", it is not a specialization
+                    if (index + JobTrainerEditorIDPart.Length >= f.EditorID.Length) return null;
+
+                    // Extract the specialization part
+                    var specialization = f.EditorID[(index + JobTrainerEditorIDPart.Length)..];
+                    specialization = specialization.TrimStringFromEnd("Faction");
+                    if (string.Equals(specialization, "Marksman", StringComparison.OrdinalIgnoreCase)) return Skill.Archery; // Handle marksman synonym for archery
+                    if (Enum.TryParse<Skill>(specialization, out var actorValue)) return actorValue;
+
+                    return null;
+                })
+                .WhereNotNull()
+                .FirstOrDefault();
+
+            if (factionSpecialization == 0)
             {
                 param.AddTopic(
                     TrainerWithoutSpecialization.Format());
+            }
+
+            var trainerType = npc.GetTrainerType(param.LinkCache);
+            if (trainerType is null)
+            {
+                param.AddTopic(
+                    TrainerMissingClass.Format(npc.Class));
             }
             else
             {
                 var minimumLevel = npc.GetMinimumLevel();
                 var minimumSkillLevel = npc.GetSkillLevel(trainerType.Value, minimumLevel, param.LinkCache);
-                if (minimumSkillLevel < 25)
+                if (minimumSkillLevel >= 25) return;
+
+                if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.AutoCalcStats))
                 {
-                    if (npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.AutoCalcStats))
-                    {
-                        param.AddTopic(
-                            LowSkillLevelAutoCalc.Format(
-                                trainerType.Value.ToString(),
-                                minimumSkillLevel,
-                                npc.Class,
-                                minimumLevel));
-                    }
-                    else
-                    {
-                        param.AddTopic(
-                            LowSkillLevel.Format(
-                                trainerType.Value,
-                                minimumSkillLevel));
-                    }
+                    param.AddTopic(
+                        LowSkillLevelAutoCalc.Format(
+                            trainerType.Value.ToString(),
+                            minimumSkillLevel,
+                            npc.Class,
+                            minimumLevel));
+                }
+                else
+                {
+                    param.AddTopic(
+                        LowSkillLevel.Format(
+                            trainerType.Value,
+                            minimumSkillLevel));
                 }
             }
         }

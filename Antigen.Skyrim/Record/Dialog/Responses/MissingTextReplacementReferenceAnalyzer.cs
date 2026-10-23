@@ -14,11 +14,11 @@ public class MissingTextReplacementReferenceAnalyzer : IContextualRecordAnalyzer
             Severity.Error)
         .WithFormatting<Language, string>("Prompt in {0} references a global variable with EditorID '{1}' that does not exist");
 
-    public static readonly TopicDefinition<Language, string> DialogPromptMissingGlobalVariableInQuest = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<Language, string, IQuestGetter> DialogPromptMissingGlobalVariableInQuest = MutagenTopicBuilder.FromDiscussion(
         444,
             "Dialog responses prompt references Global Variable not defined in quest",
             Severity.Error)
-        .WithFormatting<Language, string>("Prompt in {0} references a global variable with EditorID '{1}' that is not defined in the quest");
+        .WithFormatting<Language, string, IQuestGetter>("Prompt in {0} references a global variable with EditorID '{1}' that is not defined in the quest {2}");
 
     public static readonly TopicDefinition<Language, string> DialogPromptMissingAlias = MutagenTopicBuilder.FromDiscussion(
         445,
@@ -56,7 +56,7 @@ public class MissingTextReplacementReferenceAnalyzer : IContextualRecordAnalyzer
             param.LinkCache,
             dialogResponses.Prompt, // Expecting dialog to always have a quest
             (language, text) => param.AddTopic(
-                DialogPromptMissingGlobalVariableInQuest.Format(language, text)),
+                DialogPromptMissingGlobalVariableInQuest.Format(language, text, quest)),
             (language, text) => param.AddTopic(
                 DialogPromptMissingGlobalVariable.Format(language, text)),
             (language, text) => param.AddTopic(

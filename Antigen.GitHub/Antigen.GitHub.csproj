@@ -9,6 +9,7 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="CommandLineParser" />
+        <PackageReference Include="Microsoft.SourceLink.GitHub" />
         <PackageReference Include="Octokit.GraphQL" />
     </ItemGroup>
 </Project>

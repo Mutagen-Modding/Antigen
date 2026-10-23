@@ -17,25 +17,25 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         East,
         South,
         West
-    };
+    }
 
-    public static readonly TopicDefinition<Direction> HeightMapSeam = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<P2Int, IWorldspaceGetter, Direction> HeightMapSeam = MutagenTopicBuilder.FromDiscussion(
             606,
             "Landscape height map seam",
             Severity.Error)
-        .WithFormatting<Direction>("Landscape heightmap has seam in direction {0}");
+        .WithFormatting<P2Int, IWorldspaceGetter, Direction>("Landscape heightmap {0} in {1} has seam in direction {2}");
 
-    public static readonly TopicDefinition<Direction> VertexColorSeam = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<P2Int, IWorldspaceGetter, Direction> VertexColorSeam = MutagenTopicBuilder.FromDiscussion(
             609,
             "Landscape vertex color seam",
             Severity.Warning)
-        .WithFormatting<Direction>("Landscape vertex colors have seam in direction {0}");
+        .WithFormatting<P2Int, IWorldspaceGetter, Direction>("Landscape vertex colors {0} in {1} have seam in direction {2}");
 
-    public static readonly TopicDefinition<Quadrant, Direction, IFormLinkGetter<ILandscapeTextureGetter>> TextureSeam = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<Quadrant, P2Int, IWorldspaceGetter, Direction, IFormLinkGetter<ILandscapeTextureGetter>> TextureSeam = MutagenTopicBuilder.FromDiscussion(
             633,
             "Landscape texture seam",
             Severity.Warning)
-        .WithFormatting<Quadrant, Direction, IFormLinkGetter<ILandscapeTextureGetter>>("Landscape quadrant {0} has texture seam in direction {1} with texture {2}");
+        .WithFormatting<Quadrant, P2Int, IWorldspaceGetter, Direction, IFormLinkGetter<ILandscapeTextureGetter>>("Landscape quadrant {0} in {1} in {2} has texture seam in direction {3} with texture {4}");
 
     static readonly IReadOnlyArray2d<P3UInt8> DefaultVertexColors = new Array2d<P3UInt8>(new P2Int(LandscapeExtensions.GridSize, LandscapeExtensions.GridSize), new P3UInt8(255, 255, 255));
     // Minimum opacity difference to raise DefaultVertexColors. Somewhat arbritrary based on floating point errors + min difference for perception
@@ -80,9 +80,9 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
 
     public readonly struct Difference<T>
     {
-        public readonly int Index { get; init; }
-        public readonly T Self { get; init;  }
-        public readonly T Other { get; init; }
+        public int Index { get; init; }
+        public T Self { get; init;  }
+        public T Other { get; init; }
 
         public override string ToString()
         {
@@ -92,7 +92,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         public static IEnumerable<Difference<T>> GetDifferences(IEnumerable<T> self, IEnumerable<T> other, Func<T, T, bool> diffPredicate)
         {
             return self.Zip(other)
-                .Select((pair, index) => new Difference<T>() { Index = index, Self = pair.First, Other = pair.Second })
+                .Select((pair, index) => new Difference<T> { Index = index, Self = pair.First, Other = pair.Second })
                 .Where(d => diffPredicate(d.Self, d.Other));
         }
     }
@@ -103,7 +103,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
 
         var cell = landscape.GetCell(param.LinkCache);
         var worldspace = cell?.GetWorldspace(param.LinkCache);
-        if (cell?.Grid == null || worldspace == null) return;
+        if (cell?.Grid is not {} grid || worldspace is null) return;
 
         var usageCache = param.ResolveCache<ILinkUsageCache>();
         var exteriorCache = param.ResolveCache<IExteriorCellCache>();
@@ -116,8 +116,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         if (!cell.IsNearBorderRegion(param.LinkCache, usageCache, exteriorCache))
             return;
 
-
-        void CheckSeams<T>(TopicDefinition<Direction> topic, Func<ILandscapeGetter, IReadOnlyArray2d<T>?> getData)
+        void CheckSeams<T>(TopicDefinition<P2Int, IWorldspaceGetter, Direction> topic, Func<ILandscapeGetter, IReadOnlyArray2d<T>?> getData)
             where T : IEquatable<T>
         {
             var data = getData(landscape);
@@ -126,7 +125,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
 
             void CheckNeigbour(Direction dir)
             {
-                var neighbour = GetLandscape(cell.Grid.Point + ToOffset(dir));
+                var neighbour = GetLandscape(grid.Point + ToOffset(dir));
                 if (neighbour == null) return;
                 var neighbourData = getData(neighbour);
                 if (neighbourData == null) return;
@@ -136,7 +135,7 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
 
                 var diff = Difference<T>.GetDifferences(edgeSelf, edgeOther, (a, b) => !a.Equals(b));
                 if (diff.Any())
-                    param.AddTopic(topic.Format(dir), ("Differences", diff));
+                    param.AddTopic(topic.Format(grid.Point, worldspace, dir), ("Differences", diff));
             }
             CheckNeigbour(Direction.North);
             CheckNeigbour(Direction.East);
@@ -157,9 +156,8 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
                 // We need an epsilon here since opacities are stored as floats
                 var diff = Difference<float>.GetDifferences(edgeSelf, edgeOther, (a, b) => !a.EqualsWithin(b, AlphaOpacityEpsilon));
 
-                var zipped = edgeSelf.Zip(edgeOther);
                 if (diff.Any())
-                    param.AddTopic(TextureSeam.Format(selfQuadrant.Quadrant, selfToOther, texture), ("Differences", diff));
+                    param.AddTopic(TextureSeam.Format(selfQuadrant.Quadrant, grid.Point, worldspace, selfToOther, texture), ("Differences", diff));
             }
         }
 
@@ -183,28 +181,28 @@ public class LandscapeSeamAnalyzer : IContextualRecordAnalyzer<ILandscapeGetter>
         CheckTextures(bl, br, Direction.East);
         CheckTextures(tr, br, Direction.South);
 
-        var north = GetLandscape(cell.Grid.Point + ToOffset(Direction.North));
+        var north = GetLandscape(grid.Point + ToOffset(Direction.North));
         if (north != null)
         {
             CheckTextures(tl, north.Layers.DecodeQuadrant(Quadrant.BottomLeft), Direction.North);
             CheckTextures(tr, north.Layers.DecodeQuadrant(Quadrant.BottomRight), Direction.North);
         }
 
-        var east = GetLandscape(cell.Grid.Point + ToOffset(Direction.East));
+        var east = GetLandscape(grid.Point + ToOffset(Direction.East));
         if (east != null)
         {
             CheckTextures(tr, east.Layers.DecodeQuadrant(Quadrant.TopLeft), Direction.East);
             CheckTextures(br, east.Layers.DecodeQuadrant(Quadrant.BottomLeft), Direction.East);
         }
 
-        var south = GetLandscape(cell.Grid.Point + ToOffset(Direction.South));
+        var south = GetLandscape(grid.Point + ToOffset(Direction.South));
         if (south != null)
         {
             CheckTextures(bl, south.Layers.DecodeQuadrant(Quadrant.TopLeft), Direction.South);
             CheckTextures(br, south.Layers.DecodeQuadrant(Quadrant.TopRight), Direction.South);
         }
 
-        var west = GetLandscape(cell.Grid.Point + ToOffset(Direction.West));
+        var west = GetLandscape(grid.Point + ToOffset(Direction.West));
         if (west != null)
         {
             CheckTextures(tl, west.Layers.DecodeQuadrant(Quadrant.TopRight), Direction.West);

@@ -2,7 +2,7 @@
 using Antigen.SDK.Topics;
 using Mutagen.Bethesda.Skyrim;
 
-namespace Antigen.Skyrim.Record.Cell.Interior;
+namespace Antigen.Skyrim.Record.Cell.Interior.Dungeon;
 
 public class EnemyLevelMultiplierAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
@@ -44,7 +44,8 @@ public class EnemyLevelMultiplierAnalyzer : IContextualRecordAnalyzer<ICellGette
     public IEnumerable<Func<ICellGetter, object?>> FieldsOfInterest()
     {
         yield return x => x.Flags;
-        yield return x => x.LockList;
-        yield return x => x.Music;
+        yield return x => x.Location;
+        yield return x => x.Temporary;
+        yield return x => x.Persistent;
     }
 }

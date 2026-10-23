@@ -3,17 +3,17 @@ using Antigen.SDK.Topics;
 using Antigen.Skyrim.Caches;
 using Mutagen.Bethesda.Plugins;
 using Mutagen.Bethesda.Skyrim;
-
+using Noggog;
 
 namespace Antigen.Skyrim.Record.Cell.Interior;
 
 public class ShowSkyAnalyzer : IContextualRecordAnalyzer<ICellGetter>
 {
-    public static readonly TopicDefinition<IFormLinkNullableGetter<IRegionGetter>, ICellGetter, IPlacedObjectGetter> WrongRegion = MutagenTopicBuilder.FromDiscussion(
+    public static readonly TopicDefinition<IFormLinkNullableGetter<IRegionGetter>> WrongRegion = MutagenTopicBuilder.FromDiscussion(
             391,
             "Weather/Sky Region Mismatch",
             Severity.Warning)
-        .WithFormatting<IFormLinkNullableGetter<IRegionGetter>, ICellGetter, IPlacedObjectGetter>("The cell has sky enabled but its sky/weather from region {0} does not match the region of the cell {1} that the door {2} leads to");
+        .WithFormatting<IFormLinkNullableGetter<IRegionGetter>>("The cell has sky enabled but its sky/weather from region {0} does not match the regions of the exterior cells that lead to it");
 
     public static readonly TopicDefinition ShowSkyWithoutRegion = MutagenTopicBuilder.FromDiscussion(
             394,
@@ -37,16 +37,21 @@ public class ShowSkyAnalyzer : IContextualRecordAnalyzer<ICellGetter>
             param.AddTopic(ShowSkyWithoutRegion.Format());
         }
 
-        foreach (var exteriorDoor in cell.GetExteriorDoorsGoingIntoInteriorRecursively(param.LinkCache)) {
-            var exteriorCell = exteriorDoor.GetCell(param.LinkCache, param.ResolveCache<IExteriorCellCache>());
-            if (exteriorCell?.Regions is null) continue;
+        var exteriorCellCache = param.ResolveCache<IExteriorCellCache>();
+        var exteriorCells = cell.GetExteriorDoorsGoingIntoInteriorRecursively(param.LinkCache)
+            .Select(door => door.GetCell(param.LinkCache, exteriorCellCache))
+            .WhereNotNull()
+            .ToArray();
 
-            if (!exteriorCell.Regions.Contains(cellSkyAndWeatherFromRegion))
-            {
-                param.AddTopic(
-                    WrongRegion.Format(cellSkyAndWeatherFromRegion, exteriorCell, exteriorDoor),
-                    ("Exterior Cell Regions", exteriorCell.Regions));
-            }
+        var regionsInExteriorExits = exteriorCells
+            .SelectMany(c => c.Regions ?? [])
+            .ToHashSet();
+
+        if (!regionsInExteriorExits.Contains(cellSkyAndWeatherFromRegion)) {
+            param.AddTopic(
+                WrongRegion.Format(cellSkyAndWeatherFromRegion),
+                ("Exterior Cells", exteriorCells),
+                ("Exterior Cell Regions", regionsInExteriorExits));
         }
     }
 
@@ -58,4 +63,3 @@ public class ShowSkyAnalyzer : IContextualRecordAnalyzer<ICellGetter>
         yield return x => x.Persistent;
     }
 }
-

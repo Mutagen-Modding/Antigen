@@ -26,15 +26,15 @@ public class RefTypeDungeonAnalyzer : IContextualRecordAnalyzer<ILocationGetter>
 
         if (location.Keywords is null || location.Keywords.All(k => k.FormKey != FormKeys.SkyrimSE.Skyrim.Keyword.LocTypeDungeon.FormKey)) return;
 
-        var referenceTypes = location.LocationRefTypesReferences().ToList();
+        var referenceTypes = location.AllLocationRefTypesReferences(param.LinkCache, param.LoadOrder[^1].ModKey).ToArray();
 
-        if (!referenceTypes.Exists(staticRef => staticRef.LocationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.Boss.FormKey))
+        if (referenceTypes.All(staticRef => staticRef.LocationRefType.FormKey != FormKeys.SkyrimSE.Skyrim.LocationReferenceType.Boss.FormKey))
         {
             param.AddTopic(
                 NoBossRefType.Format());
         }
 
-        if (!referenceTypes.Exists(staticRef => staticRef.LocationRefType.FormKey == FormKeys.SkyrimSE.Skyrim.LocationReferenceType.BossContainer.FormKey))
+        if (referenceTypes.All(staticRef => staticRef.LocationRefType.FormKey != FormKeys.SkyrimSE.Skyrim.LocationReferenceType.BossContainer.FormKey))
         {
             param.AddTopic(
                 NoBossContainerRefType.Format());

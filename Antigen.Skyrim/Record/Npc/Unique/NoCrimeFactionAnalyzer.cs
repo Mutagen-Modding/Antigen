@@ -18,12 +18,10 @@ public class NoCrimeFactionAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     {
         var npc = param.Record;
         if (!npc.IsUniqueActorType(param.LinkCache)) return;
+        if (npc.IsGhost()) return;
 
         // Skip NPCs using templates for factions
         if (npc.Configuration.TemplateFlags.HasFlag(NpcConfiguration.TemplateFlag.Factions)) return;
-
-        // Skip NPCs who don't care about crime
-        if (npc.AIData.Responsibility == Responsibility.NoCrime) return;
 
         if (npc.CrimeFaction.IsNull)
         {

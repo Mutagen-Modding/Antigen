@@ -148,3 +148,31 @@ public record TopicDefinition<T1, T2, T3, T4> : TopicDefinition
 
     public override string ToString() => this.ToShortString();
 }
+
+public record TopicDefinition<T1, T2, T3, T4, T5> : TopicDefinition
+{
+    public TopicDefinition(
+        TopicId id,
+        string title,
+        string messageFormat,
+        Severity severity,
+        Uri? informationUri = null)
+        : base(id, title, severity, messageFormat, informationUri)
+    {
+    }
+
+    public IFormattedTopicDefinition Format(T1 item1, T2 item2, T3 item3, T4 item4, T5 item5)
+    {
+        return new FormattedTopicDefinition<T1, T2, T3, T4, T5>
+        {
+            TopicDefinition = this,
+            Item1 = item1,
+            Item2 = item2,
+            Item3 = item3,
+            Item4 = item4,
+            Item5 = item5,
+        };
+    }
+
+    public override string ToString() => this.ToShortString();
+}

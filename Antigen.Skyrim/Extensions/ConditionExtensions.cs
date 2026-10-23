@@ -1,3 +1,4 @@
+using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 
 namespace Antigen.Skyrim.Extensions;
@@ -23,5 +24,21 @@ public static class ConditionExtensions
         }
         if (block.Count > 0)
             yield return block;
+    }
+
+    public static float? GetInitialValue(this IConditionGlobalGetter condition, ILinkCache linkCache)
+    {
+        if (condition.ComparisonValue.TryResolve(linkCache, out var global))
+        {
+            return global switch
+            {
+                IGlobalFloatGetter globalFloatGetter => globalFloatGetter.Data,
+                IGlobalIntGetter globalIntGetter => globalIntGetter.Data,
+                IGlobalShortGetter globalShortGetter => globalShortGetter.Data,
+                _ => throw new InvalidOperationException($"Unexpected global type {global.GetType().Name}")
+            };
+        }
+
+        return null;
     }
 }

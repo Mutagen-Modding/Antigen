@@ -19,13 +19,13 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition DeathContainerPropertyNotFilled = MutagenTopicBuilder.FromDiscussion(
             343,
             "Death Container Not Found",
-            Severity.Warning)
+            Severity.Suggestion)
         .WithoutFormatting("Death container property is not filled in cleanup script");
 
     public static readonly TopicDefinition DeathContainerPropertyNotFilledWithContainer = MutagenTopicBuilder.FromDiscussion(
             523,
             "Death Container Not Filled With Container",
-            Severity.Warning)
+            Severity.Error)
         .WithoutFormatting("Death container property is not assigned to a container");
 
     public static readonly TopicDefinition DeathContainerPropertyCanRespawn = MutagenTopicBuilder.FromDiscussion(
@@ -37,7 +37,7 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     public static readonly TopicDefinition WIPropertyNotFilled = MutagenTopicBuilder.FromDiscussion(
             344,
             "WI quest Property Not Found",
-            Severity.Warning)
+            Severity.Error)
         .WithoutFormatting("WI quest property is not filled in cleanup script");
 
     public IEnumerable<TopicDefinition> Topics { get; } = [NoCleanupScript, DeathContainerPropertyNotFilled, WIPropertyNotFilled];
@@ -46,6 +46,7 @@ public class NoCleanupScriptAnalyzer : IContextualRecordAnalyzer<INpcGetter>
     {
         var npc = param.Record;
         if (!npc.IsUniqueActorType(param.LinkCache)) return;
+        if (npc.IsGhost()) return;
 
         // Skip NPCs using templates for scripts
         if (npc.Configuration.TemplateFlags.HasFlag(NpcConfiguration.TemplateFlag.Script)) return;

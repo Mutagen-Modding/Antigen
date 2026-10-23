@@ -35,7 +35,7 @@ public class RefTypeSettlementHouseAnalyzer : IContextualRecordAnalyzer<ILocatio
         if (!location.IsSettlementHouseLocationNotPlayerHome()) return;
         if (!location.IsLocationAppliedToInterior(param.LinkCache, param.ResolveCache<ILinkUsageCache>())) return;
 
-        if (location.LocationRefTypesReferences().Any(staticRef => HouseContainerRefTypes.Contains(staticRef.LocationRefType)))
+        if (location.AllLocationRefTypesReferences(param.LinkCache, param.LoadOrder[^1].ModKey).Any(staticRef => HouseContainerRefTypes.Contains(staticRef.LocationRefType)))
         {
             return;
         }

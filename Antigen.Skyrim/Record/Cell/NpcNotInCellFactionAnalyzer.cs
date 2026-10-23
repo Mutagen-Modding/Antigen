@@ -28,7 +28,7 @@ public class NpcNotInCellFactionAnalyzer : IContextualRecordAnalyzer<ICellGetter
             if (placedNpc.IsDeleted) continue;
 
             var npc = placedNpc.Base.TryResolve(param.LinkCache);
-            if (npc is null || !npc.IsUnique()) continue;
+            if (npc is null || !npc.IsUnique() || npc.IsGhost()) continue;
 
             // Skip npcs with cell owner faction
             if (npc.Factions.Any(r => r.Faction.FormKey == cellOwnerFaction.FormKey)) continue;

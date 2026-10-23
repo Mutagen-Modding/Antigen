@@ -1,4 +1,5 @@
 ﻿using Mutagen.Bethesda.Plugins;
+using Mutagen.Bethesda.Plugins.Aspects;
 using Mutagen.Bethesda.Plugins.Cache;
 using Mutagen.Bethesda.Skyrim;
 using Noggog;
@@ -46,33 +47,20 @@ public static class NpcExtensions
         return npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.Unique);
     }
 
+    public static bool IsGhost(this INpcGetter npc)
+    {
+        return npc.Configuration.Flags.HasFlag(NpcConfiguration.Flag.IsGhost)
+         || (npc.Keywords is not null && npc.Keywords.Contains(FormKeys.SkyrimSE.Skyrim.Keyword.ActorTypeGhost));
+    }
+
     public static Skill? GetTrainerType(this INpcGetter npc, ILinkCache linkCache)
     {
-        const string JobTrainerPart = "JobTrainer";
+        if (!npc.Class.TryResolve(linkCache, out var npcClass)) return null;
 
-        return npc.Factions
-            .Select(x => x.Faction.TryResolve(linkCache))
-            .WhereNotNull()
-            .Select<IFactionGetter, Skill?>(f =>
-            {
-                if (f.EditorID is null) return null;
+        // A trainer type of 0 means the NPC does not train any skills, so return null in that case
+        if (npcClass.MaxTrainingLevel == 0) return null;
 
-                var index = f.EditorID.IndexOf(JobTrainerPart, StringComparison.OrdinalIgnoreCase);
-                if (index < 0) return null;
-
-                // If the EditorID ends with "JobTrainer", it is not a specialization
-                if (index + JobTrainerPart.Length >= f.EditorID.Length) return null;
-
-                // Extract the specialization part
-                var specialization = f.EditorID[(index + JobTrainerPart.Length)..];
-                specialization = specialization.TrimStringFromEnd("Faction");
-                if (Enum.TryParse<Skill>(specialization, out var actorValue)) return actorValue;
-
-                return null;
-
-            })
-            .WhereNotNull()
-            .FirstOrDefault();
+        return npcClass.Teaches;
     }
 
     public static int GetBaseSkillLevel(this INpcGetter npc, Skill skill, ILinkCache linkCache, int iAVDSkillStart = 15)
@@ -121,5 +109,65 @@ public static class NpcExtensions
             IPcLevelMult => npc.Configuration.CalcMinLevel,
             _ => throw new ArgumentOutOfRangeException()
         };
+    }
+
+    public static IEnumerable<IItemGetter> SampleItems(this INpcGetter npc, ILinkCache linkCache, int level, bool useChanceNone, Random random)
+    {
+        // Handle template npcs
+        if (npc.Configuration.TemplateFlags.HasFlag(NpcConfiguration.TemplateFlag.Inventory) && npc.Template.TryResolve(linkCache, out var template))
+        {
+            return template switch
+            {
+                INpcGetter templateNpc => templateNpc.SampleItems(linkCache, level, useChanceNone, random),
+                ILeveledNpcGetter leveledNpc => leveledNpc.SampleNpc(linkCache, level, random)?
+                        .SampleItems(linkCache, level, useChanceNone, random)
+                 ?? [],
+                _ => []
+            };
+        }
+
+        // Handle regular npcs
+        if (npc.Items is null) return [];
+
+        return npc.Items
+            .SelectMany(entry =>
+            {
+                return entry.Item.Item.TryResolve(linkCache) switch
+                {
+                    ILeveledItemGetter leveledItem => leveledItem.SampleItems(linkCache, level, useChanceNone, random),
+                    {} item => Enumerable.Repeat(item, entry.Item.Count),
+                    _ => []
+                };
+            })
+            .WhereNotNull();
+    }
+
+    public static long GetAverageGoldValue(this INpcGetter npc, ILinkCache linkCache, int level)
+    {
+        // Handle template npcs
+        if (npc.Configuration.TemplateFlags.HasFlag(NpcConfiguration.TemplateFlag.Inventory) && npc.Template.TryResolve(linkCache, out var template))
+        {
+            return template switch
+            {
+                INpcGetter templateNpc => templateNpc.GetAverageGoldValue(linkCache, level),
+                ILeveledNpcGetter leveledNpc => leveledNpc.GetAverageGoldValue(linkCache, level),
+                _ => 0
+            };
+        }
+
+        // Handle regular npcs
+        if (npc.Items is null) return 0;
+
+        return npc.Items
+            .Select(entry =>
+            {
+                return entry.Item.Item.TryResolve(linkCache) switch
+                {
+                    ILeveledItemGetter leveledItem => leveledItem.GetAverageGoldValue(linkCache, level),
+                    IWeightValueGetter item => item.Value * entry.Item.Count,
+                    _ => 0
+                };
+            })
+            .Sum();
     }
 }

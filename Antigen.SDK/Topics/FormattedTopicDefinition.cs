@@ -119,3 +119,32 @@ public record FormattedTopicDefinition<T1, T2, T3, T4> : IFormattedTopicDefiniti
         };
     }
 }
+
+public record FormattedTopicDefinition<T1, T2, T3, T4, T5> : IFormattedTopicDefinition
+{
+    public required TopicDefinition TopicDefinition { get; init; }
+    public required T1 Item1 { get; init; }
+    public required T2 Item2 { get; init; }
+    public required T3 Item3 { get; init; }
+    public required T4 Item4 { get; init; }
+    public required T5 Item5 { get; init; }
+
+    public override string ToString() => FormattedMessage;
+
+    public string FormattedMessage => string.Format(TopicDefinition.MessageFormat, Item1, Item2, Item3, Item4, Item5);
+
+    public IFormattedTopicDefinition Transform<TParams>(
+        TParams param,
+        Func<TParams, object?, object?> transformer)
+    {
+        return new FormattedTopicDefinition<object?, object?, object?, object?, object?>()
+        {
+            TopicDefinition = TopicDefinition,
+            Item1 = transformer(param, Item1),
+            Item2 = transformer(param, Item2),
+            Item3 = transformer(param, Item3),
+            Item4 = transformer(param, Item4),
+            Item5 = transformer(param, Item5)
+        };
+    }
+}

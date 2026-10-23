@@ -24,6 +24,7 @@ public class HasHouseKeyAnalyzer : IContextualRecordAnalyzer<IPlacedNpcGetter>
         var npc = placedNpc.Base.TryResolve(param.LinkCache);
         if (npc is null) return;
         if (!npc.IsUnique()) return;
+        if (npc.IsGhost()) return;
         if (!npc.IsActorTypeNpc(param.LinkCache)) return;
 
         var cell = placedNpc.GetCell(param.LinkCache, param.ResolveCache<IExteriorCellCache>());
