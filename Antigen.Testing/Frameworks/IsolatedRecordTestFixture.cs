@@ -58,7 +58,7 @@ public class IsolatedRecordTestFixture<TAnalyzer, TMajor, TMajorGetter>
         prep(rec);
         var dropOff = new TestDropoff();
         var param = new IsolatedRecordAnalyzerParams<TMajorGetter>(
-            mod: null!,
+            mod: ModKey.Null,
             record: rec,
             parameters: default,
             reportDropbox: dropOff);
